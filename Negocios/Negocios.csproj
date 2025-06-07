@@ -84,9 +84,28 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompetenciasNegocios.cs" />
+    <Compile Include="ConglomeradosNegocios.cs" />
+    <Compile Include="CorreoService.cs" />
+    <Compile Include="DepartamentosNegocios.cs" />
     <Compile Include="DependenciasNegocios.cs" />
+    <Compile Include="EstadoEvaluacionNegocios.cs" />
+    <Compile Include="EvaluacionesNegocios.cs" />
+    <Compile Include="EvaluacionXcompetenciaNegocios.cs" />
+    <Compile Include="EvaluacionXObjetivosNegocios.cs" />
     <Compile Include="FuncionarioNegocios.cs" />
+    <Compile Include="FuncionarioXConglomeradoNegocios.cs" />
+    <Compile Include="MetasNegocios.cs" />
+    <Compile Include="MetaXObjetivoNegocios.cs" />
+    <Compile Include="ObjetivoNegocios.cs" />
+    <Compile Include="PeriodosEvaluacionNegocios.cs" />
+    <Compile Include="PesosConglomeradoNegocios.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PuestosNegocios.cs" />
+    <Compile Include="ReportesNegocios.cs" />
+    <Compile Include="RolesNegocios.cs" />
+    <Compile Include="TiposCompetenciasNegocios.cs" />
+    <Compile Include="TiposObjetivosNegocios.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Datos\Datos.csproj">

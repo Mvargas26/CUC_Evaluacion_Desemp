@@ -84,8 +84,28 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompetenciasModel.cs" />
+    <Compile Include="ConglomeradoModel.cs" />
+    <Compile Include="DepartamentoModel.cs" />
+    <Compile Include="EstadoEvaluacionModel.cs" />
+    <Compile Include="EstadoFuncionarioModel.cs" />
+    <Compile Include="EvaluacionModel.cs" />
+    <Compile Include="EvaluacionXcompetenciaModel.cs" />
+    <Compile Include="EvaluacionXObjetivoModel.cs" />
     <Compile Include="FuncionarioModel.cs" />
+    <Compile Include="FuncionarioViewModel.cs" />
+    <Compile Include="FuncionarioXConglomeradoModel.cs" />
+    <Compile Include="MetaModel.cs" />
+    <Compile Include="MetaXObjetivoModel.cs" />
+    <Compile Include="ObjetivoModel.cs" />
+    <Compile Include="PeriodoEvaluacionModel.cs" />
+    <Compile Include="PesosConglomeradoModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PuestoModel.cs" />
+    <Compile Include="ReporteMolde.cs" />
+    <Compile Include="RolesModel.cs" />
+    <Compile Include="TiposCompetenciasModel.cs" />
+    <Compile Include="TiposObjetivosModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
