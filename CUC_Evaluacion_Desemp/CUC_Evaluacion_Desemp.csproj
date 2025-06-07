@@ -190,6 +190,8 @@
     <Content Include="sources\css\alerta.css" />
     <Content Include="sources\css\login.css" />
     <Content Include="sources\css\styles.css" />
+    <Content Include="sources\img\logo.jpg" />
+    <Content Include="sources\img\LogoCUC.png" />
     <Content Include="sources\js\scripts.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
