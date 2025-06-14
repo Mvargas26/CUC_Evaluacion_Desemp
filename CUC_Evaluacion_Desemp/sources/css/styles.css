@@ -1,8 +1,8 @@
 
 /* Paleta de colores */
 :root {
-    --azul-oscuro: #1a1f3c;
-    --dorado: #d2ad67;
+    --azul-corporativo: #1E376C;
+    --rojo-corporativo: #EF4135;
     --gris-claro: #f5f5f5;
     --blanco: #ffffff;
 }
@@ -22,7 +22,7 @@ body {
 /*-----------------------------------------------------------------------Sidebar */
 .sidebar {
     width: 170px;
-    background-color: var(--azul-oscuro);
+    background-color: var( --azul-corporativo);
     color: var(--blanco);
     padding: 1rem;
     flex-shrink: 0;
@@ -54,7 +54,7 @@ body {
 
 /* --------------------------------------------------------------------Encabezado */
 .topbar {
-    background-color: var(--dorado);
+    background-color: var(--rojo-corporativo);
     color: #000;
     padding: 1rem;
     display: flex;
@@ -119,11 +119,11 @@ main {
 
 /* ----------------------------------------------------------------------Footer */
 footer {
-    background-color: var(--azul-oscuro);
+    background-color: var( --azul-corporativo);
     color: var(--blanco);
     text-align: center;
     padding: 0.5rem 1rem;
-    border-top: 2px solid var(--azul-oscuro);
+    border-top: 2px solid var( --azul-corporativo);
     display: flex;
     justify-content: center;
     align-items: center;

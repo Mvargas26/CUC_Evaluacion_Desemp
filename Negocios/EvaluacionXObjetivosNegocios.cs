@@ -14,7 +14,7 @@ namespace Negocios
     {
         private readonly IAccesoBD _accesoBD;
 
-        public EvaluacionXObjetivosNegocio(IAccesoBD accesoBD)
+        public EvaluacionXObjetivosNegocios(IAccesoBD accesoBD)
         {
             _accesoBD = accesoBD;
         }

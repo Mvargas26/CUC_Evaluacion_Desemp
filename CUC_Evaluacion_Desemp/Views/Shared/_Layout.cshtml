@@ -4,8 +4,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Sistema de Evaluación del Desempeño CUC</title>
+    <title>Evaluación del Desempeño CUC</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://kit.fontawesome.com/611d65fda4.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="~/sources/css/styles.css" />
     <link rel="stylesheet" href="~/sources/css/alerta.css" />
     <script defer src="~/sources/js/scripts.js"></script>
@@ -33,8 +34,8 @@
                 {
                     <li><a href="@Url.Action("Index", "Mantenimientos")">Mantenimientos</a></li>
                 }
-                <li><a href="@Url.Action("Index", "Evaluacion")">Evaluación</a></li>
-                <li><a href="@Url.Action("Index", "Reportes")">Reportes</a></li>
+                <li><a href="@Url.Action("Index", "Evaluacion")">Evaluación <i class="fa-solid fa-arrow-down"></i></a></li>
+                <li><a href="@Url.Action("Index", "Reportes")">Reportes <i class="fa-solid fa-arrow-down"></i></a></li>
             </ul>
         </nav>
 
@@ -55,7 +56,7 @@
             </main>
 
             <footer>
-                <img src="~/sources/img/logo.jpg" alt="CUC Logo" />
+                <img src="~/sources/img/LogoCUC.png" alt="CUC Logo" />
                 <p>&copy; 2025 Evaluación CUC - Todos los derechos reservados</p>
             </footer>
         </div>

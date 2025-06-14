@@ -1,0 +1,29 @@
+﻿.index-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 150px);
+    text-align: center;
+}
+
+    .index-welcome img {
+        height: 200px;
+        margin-bottom: 1rem;
+    }
+
+    .index-welcome h2 {
+        font-weight: bold;
+        color: var(--azul-corporativo);
+        margin-bottom: 0.5rem;
+    }
+
+    .index-welcome a {
+        font-size: 0.9rem;
+        text-decoration: underline;
+        color: var(--azul-corporativo);
+    }
+
+        .index-welcome a:hover {
+            color: var(--rojo-corporativo);
+        }

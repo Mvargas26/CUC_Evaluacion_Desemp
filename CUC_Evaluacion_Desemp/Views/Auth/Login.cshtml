@@ -1,0 +1,39 @@
+﻿@using Entidades.AuthModels
+@model LoginViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+
+<form action="@Url.Action("Login", "Auth")" method="post">
+
+    <div class="mb-3 text-start">
+        <label class="form-label">Cédula:</label>
+        @*<input asp-for="Cedula" type="text" class="form-control" id="cedulaInput"
+        placeholder="Ingrese su cédula" required maxlength="20"
+        pattern="^[a-zA-Z0-9]{1,20}$"
+        title="Solo se permiten letras y números (sin espacios ni símbolos)"
+        oninvalid="validarCedula(this)"
+        oninput="this.setCustomValidity('')">*@
+        @Html.TextBoxFor(m => m.Cedula, new { @class = "form-control", maxlength = 20, id = "Cedula" })
+    </div>
+
+    <span asp-validation-for="Cedula" class="text-danger"></span>
+
+    <div class="mb-3 text-start">
+        <label class="form-label">Contraseña:</label>
+        @*<input asp-for="Password" type="password" class="form-control"
+        placeholder="Ingrese su contraseña" required
+        oninvalid="this.setCustomValidity('Por favor, ingrese su contraseña')"
+        oninput="this.setCustomValidity('')">*@
+        @Html.PasswordFor(m => m.Password, new { @class = "form-control", id = "Password" })
+    </div>
+
+
+    <div class="text-center">
+        <a href="/Auth/RecuperarPassword" class="text-decoration-none link">¿Olvidó su Contraseña?</a>
+    </div>
+
+    <button type="submit" class="btn-login btn btn-primary w-100 mt-3">Entrar</button>
+</form>
+
