@@ -47,6 +47,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
         [HttpPost]
         public ActionResult VerificarCodigo(string cedula, string codigoSeguridad) 
         {
+            return RedirectToAction("Index", "Home");
+
+
             //if (string.IsNullOrEmpty(cedula))
             //{
             //    cedula = TempData["Cedula"]?.ToString();
@@ -66,20 +69,20 @@ namespace CUC_Evaluacion_Desemp.Controllers
             //if (funcionario != null && funcionario.CodigoSeguridad == codigoSeguridad)
             //{
             //    var origen = TempData["Origen"]?.ToString();
-               var origen = "pasa";
+            // var origen = "pasa";
 
 
             //    TempData["Cedula"] = cedula; // mantener cédula en TempData
 
-            if (origen == "Recuperar")
-                {
-                    return RedirectToAction("ReestablecerPassword", "Auth");
-                }
-                else
-                {
-                    TempData["MensajeExito"] = "Login exitoso";
-                    return RedirectToAction("Index", "Home");
-                }
+            //if (origen == "Recuperar")
+            //    {
+            //        return RedirectToAction("ReestablecerPassword", "Auth");
+            //    }
+            //    else
+            //    {
+            //        TempData["MensajeExito"] = "Login exitoso";
+            //        return RedirectToAction("Index", "Home");
+            //    }
             //}
             //else
             //{
@@ -89,6 +92,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
             //}
         }
 
-        
+
     }//fin controller
 }//fin space
