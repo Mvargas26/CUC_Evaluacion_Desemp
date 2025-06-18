@@ -104,6 +104,8 @@
     <Compile Include="PuestosNegocios.cs" />
     <Compile Include="ReportesNegocios.cs" />
     <Compile Include="RolesNegocios.cs" />
+    <Compile Include="Services\IMantenimientosService.cs" />
+    <Compile Include="Services\MantenimientosService.cs" />
     <Compile Include="TiposCompetenciasNegocios.cs" />
     <Compile Include="TiposObjetivosNegocios.cs" />
   </ItemGroup>

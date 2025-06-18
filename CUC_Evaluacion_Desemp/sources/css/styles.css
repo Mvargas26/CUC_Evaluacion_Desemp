@@ -116,9 +116,10 @@ body {
 
 /* --------------------------------------------------------------------Cuerpo principal */
 main {
-    padding: 2rem;
-    padding: 0;
     flex-grow: 1;
+    overflow-y: auto; 
+    padding: 2rem;
+    max-height: calc(100vh - 140px); 
 }
 
 /* ----------------------------------------------------------------------Footer */
@@ -144,8 +145,12 @@ footer {
 /*controla label barra vertical */
 html, body {
     overflow-x: hidden;
+    overflow-y: auto;
     height: 100%;
+    height: 100%;
+    margin: 0;
 }
 *, *::before, *::after {
     box-sizing: border-box;
 }
+

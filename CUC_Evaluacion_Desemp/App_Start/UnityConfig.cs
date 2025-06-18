@@ -1,4 +1,5 @@
-using Negocios;
+﻿using Negocios;
+using Negocios.Services;
 using System;
 using System.Web.Mvc;
 using Unity;
@@ -47,12 +48,15 @@ namespace CUC_Evaluacion_Desemp
 
         public static void RegisterComponents()
         {
-            var container = new UnityContainer();
+            var container = Container;
 
-            // Llamamos a registro desde negocios
+            //Registramos la implementación de la interfaz
+            container.RegisterType<IMantenimientosService, MantenimientosService>();
+
+            //Este metodo regista todas las classes publicas del proyecto negocios
             DependenciasNegocios.RegistrarTipos(container);
 
-            RegisterTypes(container); 
+            RegisterTypes(container);
 
             DependencyResolver.SetResolver(new Unity.Mvc5.UnityDependencyResolver(container));
         }
