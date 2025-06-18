@@ -1,5 +1,4 @@
-
-/* Paleta de colores */
+/* ------------------------------- Paleta de colores ------------------------------- */
 :root {
     --azul-corporativo: #1E376C;
     --rojo-corporativo: #EF4135;
@@ -7,24 +6,31 @@
     --blanco: #ffffff;
 }
 
-body {
+/* ------------------------------- Estilos base ------------------------------- */
+html, body {
     margin: 0;
     padding: 0;
+    height: 100%;
+    overflow-x: hidden;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--gris-claro);
     color: #333;
 }
 
-.wrapper {
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 
-/*-----------------------------------------------------------------------Sidebar */
+/* ------------------------------- Wrapper general ------------------------------- */
+.wrapper {
+    display: flex;
+    height: 100%;
+}
+
+/* ------------------------------- Sidebar ------------------------------- */
 .sidebar {
-    width: 170px;
-    background-color: var( --azul-corporativo);
+    width: 180px;
+    background-color: var(--azul-corporativo);
     color: var(--blanco);
     padding: 1rem;
     flex-shrink: 0;
@@ -46,15 +52,43 @@ body {
         text-decoration: underline;
     }
 
-/* ---------------------------------------------------------------- Contenido principal */
+.submenu {
+    display: none;
+    list-style: none;
+    padding-left: 1rem;
+}
+
+    .submenu li {
+        margin: 0.5rem 0;
+    }
+
+.toggle-submenu {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-menu li.active > .submenu {
+    display: block;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* ------------------------------- Contenido principal ------------------------------- */
 .main-content {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    width: 100%;
+    height: 100vh;
+    overflow: hidden;
 }
 
-/* --------------------------------------------------------------------Encabezado */
+/* ------------------------------- Encabezado ------------------------------- */
 .topbar {
     background-color: var(--rojo-corporativo);
     color: #000;
@@ -62,17 +96,17 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    text-align:center;
+    text-align: center;
 }
 
     .topbar h1 {
         font-size: 1.5rem;
         margin: 0;
         padding: 0;
-        color: var(--blanco)
+        color: var(--blanco);
     }
 
-/* -----------------------------------------------------------------Menú de usuario */
+/* ------------------------------- Menú de usuario ------------------------------- */
 .user-menu {
     position: relative;
 }
@@ -114,43 +148,29 @@ body {
         background-color: #eee;
     }
 
-/* --------------------------------------------------------------------Cuerpo principal */
+/* ------------------------------- Cuerpo principal ------------------------------- */
 main {
-    flex-grow: 1;
-    overflow-y: auto; 
+    flex: 1;
+    overflow-y: auto;
     padding: 2rem;
-    max-height: calc(100vh - 140px); 
+    background-color: var(--gris-claro);
 }
 
-/* ----------------------------------------------------------------------Footer */
+/* ------------------------------- Footer ------------------------------- */
 footer {
-    background-color: var( --azul-corporativo);
+    background-color: var(--azul-corporativo);
     color: var(--blanco);
     text-align: center;
     padding: 0.5rem 1rem;
-    border-top: 2px solid var( --azul-corporativo);
+    border-top: 2px solid var(--azul-corporativo);
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 1rem;
+    flex-shrink: 0;
 }
 
     footer img {
         max-height: 40px;
         margin: 0;
     }
-
-
-/* ----------------------------------------------------------------------Dejar al final */
-/*controla label barra vertical */
-html, body {
-    overflow-x: hidden;
-    overflow-y: auto;
-    height: 100%;
-    height: 100%;
-    margin: 0;
-}
-*, *::before, *::after {
-    box-sizing: border-box;
-}
-

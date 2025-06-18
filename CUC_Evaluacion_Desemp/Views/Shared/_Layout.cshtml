@@ -30,12 +30,30 @@
                 </h2>
             </div>
             <ul class="sidebar-menu">
-                @if (nombreRol == "Administración" || nombreRol == "Jefatura")
-                {
-                    <li><a href="@Url.Action("Index", "Mantenimientos")">Mantenimientos</a></li>
-                }
-                <li><a href="@Url.Action("Index", "Evaluacion")">Evaluación <i class="fa-solid fa-arrow-down"></i></a></li>
-                <li><a href="@Url.Action("Index", "Reportes")">Reportes <i class="fa-solid fa-arrow-down"></i></a></li>
+                <li>
+                    <a href="#" class="toggle-submenu">
+                        Mantenimientos <i class="fa-solid fa-chevron-down"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="/Mantenimientos/ManteniConglomerados">Conglomerados</a></li>
+                        <li><a href="/Mantenimientos/ManteniDepartamentos">Departamentos</a></li>
+                        <li><a href="/Mantenimientos/ManteniFuncionarios">Funcionarios</a></li>
+                        <li><a href="/Mantenimientos/ManteniPuestos">Puestos</a></li>
+                        <li><a href="/Mantenimientos/ManteniPeriodo">Períodos</a></li>
+                        <li><a href="/Mantenimientos/GestionObjetivos">Objetivos</a></li>
+                        <li><a href="/Mantenimientos/ManteniCompetencias">Competencias</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="toggle-submenu">
+                        Evaluación <i class="fa-solid fa-chevron-down"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="toggle-submenu">
+                        Evaluación <i class="fa-solid fa-chevron-down"></i>
+                    </a>
+                </li>
             </ul>
         </nav>
 
@@ -63,5 +81,7 @@
     </div>
 
     @RenderSection("Scripts", required: false)
-<script defer src="~/sources/js/scripts.js"></script></body>
+<script defer src="~/sources/js/scripts.js"></script>
+<script defer src="~/sources/js/EventoSubMenu.js"></script>
+</body>
 </html>

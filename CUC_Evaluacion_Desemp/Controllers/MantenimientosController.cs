@@ -44,6 +44,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var departamentos = _servicioMantenimientos.Departamentos.ListarDepartamentos();
                 var roles = _servicioMantenimientos.Roles.ListarRoles(); 
                 var funcionario = new FuncionarioModel();
+                var estadosFunc = _servicioMantenimientos.EstadoFuncionariosNegocios.ListarEstadosFuncionario();
 
                 FuncionarioViewModel newFuncionarioViewModel = new FuncionarioViewModel
                 {
@@ -51,7 +52,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     Puestos = puestos,
                     Conglomerados = conglomerados,
                     Departamentos = departamentos,
-                    Roles = roles
+                    Roles = roles,
+                    EstadosFuncionario = estadosFunc
                 };
 
 

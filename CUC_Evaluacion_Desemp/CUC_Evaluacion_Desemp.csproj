@@ -197,6 +197,7 @@
     <Content Include="sources\img\LogoCUCFondoBlanco.jpg" />
     <Content Include="sources\img\LogoCUCFondoNegro.png" />
     <Content Include="sources\img\LogoCUCsinFondo.png" />
+    <Content Include="sources\js\EventoSubMenu.js" />
     <Content Include="sources\js\scripts.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -218,6 +219,8 @@
     <Content Include="Views\Auth\RecuperarPassword.cshtml" />
     <Content Include="Views\Auth\VerificarCodigo.cshtml" />
     <Content Include="Views\Mantenimientos\CrearFuncionario.cshtml" />
+    <Content Include="Views\Mantenimientos\Index.cshtml" />
+    <Content Include="Views\Mantenimientos\ManteniFuncionarios.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
