@@ -15,5 +15,8 @@ namespace Entidades
         public List<DepartamentoModel> Departamentos { get; set; }
         public List<RolesModel> Roles { get; set; }
         public List<EstadoFuncionarioModel> EstadosFuncionario { get; set; }
+        public List <AreasModel>  Areas { get; set; }
+
+        public List <FuncionarioModel> Jefes { get; set; }
     }
 }

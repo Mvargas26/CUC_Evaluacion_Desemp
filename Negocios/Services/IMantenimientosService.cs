@@ -23,6 +23,9 @@ namespace Negocios.Services
         PesosConglomeradoNegocios PesosConglomerado { get; }
         TiposCompetenciasNegocios TiposCompetencias { get; }
         TiposObjetivosNegocios TiposObjetivos { get; }
-        EstadoFuncionariosNegocios EstadoFuncionariosNegocios { get; }
+        EstadoFuncionariosNegocios EstadoFuncionarios { get; }
+        AreasNegocios Areas { get; }
+
+        FuncionarioPorAreaNegocios FuncionarioPorArea { get; }
     }
 }

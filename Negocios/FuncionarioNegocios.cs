@@ -194,6 +194,37 @@ namespace Negocios
                 IdDepartamento = Convert.ToInt32(row["idDepartamento"])
             };
         }
+
+        public List<FuncionarioModel> ListarJefes()
+        {
+            var parametros = new SqlParameter[]
+            {
+            new SqlParameter("@Accion", "SELECT_JEFATURAS"),
+            new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+            };
+
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_CrudFuncionarios", parametros);
+
+            var lista = new List<FuncionarioModel>();
+            foreach (DataRow row in dt.Rows)
+            {
+                lista.Add(new FuncionarioModel
+                {
+                    Cedula = row["cedula"].ToString(),
+                    Nombre = row["nombre"].ToString(),
+                    Apellido1 = row["apellido1"].ToString(),
+                    Apellido2 = row["apellido2"].ToString(),
+                    Correo = row["correo"].ToString(),
+                    Password = row["password"].ToString(),
+                    Departamento = row["Departamento"].ToString(),
+                    Rol = row["Rol"].ToString(),
+                    Puesto = row["Puesto"].ToString(),
+                    Estado = row["Estado"].ToString()
+                });
+            }
+
+            return lista;
+        }
     }
 
 }//fin space

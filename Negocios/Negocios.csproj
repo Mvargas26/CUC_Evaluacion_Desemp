@@ -84,6 +84,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AreasNegocios.cs" />
     <Compile Include="CompetenciasNegocios.cs" />
     <Compile Include="ConglomeradosNegocios.cs" />
     <Compile Include="CorreoService.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="EvaluacionXcompetenciaNegocios.cs" />
     <Compile Include="EvaluacionXObjetivosNegocios.cs" />
     <Compile Include="FuncionarioNegocios.cs" />
+    <Compile Include="FuncionarioPorAreaNegocios.cs" />
     <Compile Include="FuncionarioXConglomeradoNegocios.cs" />
     <Compile Include="MetasNegocios.cs" />
     <Compile Include="MetaXObjetivoNegocios.cs" />

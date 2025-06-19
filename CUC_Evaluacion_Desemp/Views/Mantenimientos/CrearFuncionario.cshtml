@@ -6,17 +6,17 @@
 <div class="container mt-4">
     <h2 class="mb-4">Creación de Funcionario</h2>
 
-    @using (Html.BeginForm("CrearNuevoFuncionario", "Mantenimientos", FormMethod.Post))
+    @using (Html.BeginForm("CrearFuncionario", "Mantenimientos", FormMethod.Post))
     {
         <div class="container">
             @*********************************** Fila 1*@
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.Cedula, new { @class = "form-label" })
+                    @Html.LabelFor(m => m.Funcionario.Cedula, "Cedula:", new { @class = "form-label" })
                     @Html.TextBoxFor(m => m.Funcionario.Cedula, new { @class = "form-control", required = "required", maxlength = "15", minlength = "8", pattern = ".*\\S.*" })
                 </div>
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.Nombre, new { @class = "form-label" })
+                    @Html.LabelFor(m => m.Funcionario.Nombre, "Nombre:", new { @class = "form-label" })
                     @Html.TextBoxFor(m => m.Funcionario.Nombre, new { @class = "form-control", required = "required", maxlength = "100", pattern = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$" })
                 </div>
                 <div class="col-md-4 mb-3">
@@ -31,58 +31,51 @@
                     @Html.TextBoxFor(m => m.Funcionario.Apellido2, new { @class = "form-control", required = "required", maxlength = "100", pattern = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$" })
                 </div>
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.Correo, new { @class = "form-label" })
+                    @Html.LabelFor(m => m.Funcionario.Correo, "Correo:", new { @class = "form-label" })
                     @Html.TextBoxFor(m => m.Funcionario.Correo, new { @class = "form-control", type = "email", required = "required", maxlength = "255" })
                 </div>
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.Password, new { @class = "form-label" })
-                    @Html.PasswordFor(m => m.Funcionario.Password, new { @class = "form-control", required = "required", maxlength = "100" })
+                    @Html.LabelFor(m => m.Funcionario.Password, "Contraseña:", new { @class = "form-label" })
+                    @Html.PasswordFor(m => m.Funcionario.Password, new { @class = "form-control", required = "required",type="password", maxlength = "100" })
                 </div>
             </div>
             @*********************************** Fila 3*@
             <div class="row">
                 <div class="col-md-4 mb-3">
                     @Html.LabelFor(m => m.Funcionario.IdDepartamento, "Departamento:", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.Funcionario.IdDepartamento, new SelectList(Model.Departamentos, "IdDepartamento", "Departamento"), "Seleccione un departamento ↓", new { @class = "form-select", required = "required" })
+                    @Html.DropDownListFor(m => m.Funcionario.IdDepartamento, new SelectList(Model.Departamentos, "IdDepartamento", "Departamento"), "Seleccione", new { @class = "form-select", required = "required" })
                 </div>
                 <div class="col-md-4 mb-3">
                     @Html.LabelFor(m => m.Funcionario.IdRol, "Rol:", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.Funcionario.IdRol, new SelectList(Model.Roles, "IdRol", "Rol"), "Seleccione un rol", new { @class = "form-select", required = "required" })
+                    @Html.DropDownListFor(m => m.Funcionario.IdRol, new SelectList(Model.Roles, "IdRol", "Rol"), "Seleccione", new { @class = "form-select", required = "required" })
                 </div>
                 <div class="col-md-4 mb-3">
                     @Html.LabelFor(m => m.Funcionario.IdPuesto, "Puesto:", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.Funcionario.IdPuesto, new SelectList(Model.Puestos, "IdPuesto", "Puesto"), "Seleccione un puesto ↓", new { @class = "form-select", required = "required" })
+                    @Html.DropDownListFor(m => m.Funcionario.IdPuesto, new SelectList(Model.Puestos, "IdPuesto", "Puesto"), "Seleccione", new { @class = "form-select", required = "required" })
                 </div>
             </div>
             @*********************************** Fila 4*@
             <div class="row">
                 <div class="col-md-4 mb-3">
                     @Html.LabelFor(m => m.Funcionario.IdDepartamento, "Telefono:", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.Funcionario.IdDepartamento, new SelectList(Model.Departamentos, "IdDepartamento", "Departamento"), "Seleccione un departamento", new { @class = "form-select", required = "required" })
-                </div>
-                <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.IdRol, "Area:", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.Funcionario.IdRol, new SelectList(Model.Roles, "IdRol", "Rol"), "Seleccione un rol ↓", new { @class = "form-select", required = "required" })
+                    @Html.TextBoxFor(m => m.Funcionario.Telefono, new { @class = "form-control", type = "text", required = "required", maxlength = "20" })
                 </div>
                 <div class="col-md-4 mb-3">
                     @Html.LabelFor(m => m.Funcionario.IdPuesto, "Carrera:", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.Funcionario.IdPuesto, new SelectList(Model.Puestos, "IdPuesto", "Puesto"), "Seleccione un puesto ↓", new { @class = "form-select", required = "required" })
+                    @Html.DropDownListFor(m => m.Funcionario.IdPuesto, new SelectList(Model.Puestos, "IdPuesto", "Puesto"), "Seleccione", new { @class = "form-select", required = "required" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    @Html.LabelFor(m => m.Jefes, "Jefe Inmediato:", new { @class = "form-label" })
+                    @Html.DropDownListFor(m => m.Jefes, new SelectList(Model.Jefes, "Cedula", "NombreCompleto"), "Seleccione", new { @class = "form-select", required = "required" })
                 </div>
             </div>
             @*********************************** Fila 4*@
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.IdDepartamento, "Jefe Inmediato:", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.Funcionario.IdDepartamento, new SelectList(Model.Departamentos, "IdDepartamento", "Departamento"), "Seleccione un departamento ↓", new { @class = "form-select", required = "required" })
-                </div>
-                <div class="col-md-4 mb-3">
                     @Html.LabelFor(m => m.Funcionario.IdRol, "Estado:", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.Funcionario.IdRol, new SelectList(Model.EstadosFuncionario, "IdEstadoFuncionario", "Estado"), "Seleccione un estado ↓", new { @class = "form-select", required = "required" })
+                    @Html.DropDownListFor(m => m.Funcionario.IdRol, new SelectList(Model.EstadosFuncionario, "IdEstadoFuncionario", "Estado"), "Seleccione", new { @class = "form-select", required = "required" })
                 </div>
-                @*<div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.IdPuesto, "Carrera:", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.Funcionario.IdPuesto, new SelectList(Model.Puestos, "IdPuesto", "Puesto"), "Seleccione un puesto", new { @class = "form-control", required = "required" })
-                </div>*@
+
             </div>
             @*********************************** cheks conglomerados*@
             <hr />
@@ -99,7 +92,24 @@
                         </div>
                     }
                 </div>
-                <span id="checkboxError" class="text-danger" style="display:none;">Debe seleccionar al menos un conglomerado.</span>
+                <span id="checkboxErrorConglomerado" class="text-danger" style="display:none;">Debe seleccionar al menos un conglomerado.</span>
+            </div>
+            @*********************************** cheks Areas*@
+            <hr />
+            <div class="mb-3">
+                <label class="form-label">Seleccione las Areas de este funcionario:</label>
+                <div class="row row-cols-1 row-cols-md-2 g-2">
+                    @foreach (var item in Model.Areas)
+                    {
+                        <div class="col">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="IdAreasSeleccionadas" value="@item.idArea" />
+                                <label class="form-check-label">@item.nombreArea</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <span id="checkboxErrorArea" class="text-danger" style="display:none;">Debe seleccionar al menos una Area.</span>
             </div>
             @*********************************** Botones*@
             <div class="d-flex justify-content-between">
@@ -112,18 +122,8 @@
             </div>
         </div>
 
-        <script>
-            document.querySelector("form").addEventListener("submit", function (e) {
-                const checkboxes = document.querySelectorAll('input[name="IdConglomeradosSeleccionados"]:checked');
-                const error = document.getElementById('checkboxError');
-                if (checkboxes.length === 0) {
-                    e.preventDefault();
-                    error.style.display = 'block';
-                } else {
-                    error.style.display = 'none';
-                }
-            });
-        </script>
+
+        <script defer src="~/sources/js/Vistas/CrearFuncionario/CrearFuncionarioJS.js"></script>
     }
 
 </div>

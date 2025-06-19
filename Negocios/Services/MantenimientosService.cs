@@ -30,7 +30,11 @@ namespace Negocios.Services
         public TiposCompetenciasNegocios TiposCompetencias { get; }
         public TiposObjetivosNegocios TiposObjetivos { get; }
 
-        public EstadoFuncionariosNegocios EstadoFuncionariosNegocios { get; }
+        public EstadoFuncionariosNegocios EstadoFuncionarios { get; }
+        public AreasNegocios Areas { get; }
+
+        public FuncionarioPorAreaNegocios FuncionarioPorArea { get; }
+
 
         public MantenimientosService(
             FuncionarioNegocios funcionario,
@@ -47,7 +51,10 @@ namespace Negocios.Services
             PesosConglomeradoNegocios pesosConglomerado,
             TiposCompetenciasNegocios tiposCompetencias,
             TiposObjetivosNegocios tiposObjetivos,
-            EstadoFuncionariosNegocios estadoFuncionariosNegocios)
+            EstadoFuncionariosNegocios estadoFuncionarios,
+            AreasNegocios areas,
+            FuncionarioPorAreaNegocios funcionarioPorArea
+            )
         {
             Funcionario = funcionario;
             Puestos = puestos;
@@ -63,7 +70,9 @@ namespace Negocios.Services
             PesosConglomerado = pesosConglomerado;
             TiposCompetencias = tiposCompetencias;
             TiposObjetivos = tiposObjetivos;
-            EstadoFuncionariosNegocios = estadoFuncionariosNegocios;
+            EstadoFuncionarios = estadoFuncionarios;
+            Areas = areas;
+            FuncionarioPorArea = funcionarioPorArea;
         }
     }
 }

@@ -199,6 +199,7 @@
     <Content Include="sources\img\LogoCUCsinFondo.png" />
     <Content Include="sources\js\EventoSubMenu.js" />
     <Content Include="sources\js\scripts.js" />
+    <Content Include="sources\js\Vistas\CrearFuncionario\CrearFuncionarioJS.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

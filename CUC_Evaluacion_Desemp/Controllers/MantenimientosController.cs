@@ -44,7 +44,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var departamentos = _servicioMantenimientos.Departamentos.ListarDepartamentos();
                 var roles = _servicioMantenimientos.Roles.ListarRoles(); 
                 var funcionario = new FuncionarioModel();
-                var estadosFunc = _servicioMantenimientos.EstadoFuncionariosNegocios.ListarEstadosFuncionario();
+                var estadosFunc = _servicioMantenimientos.EstadoFuncionarios.ListarEstadosFuncionario();
+                var Areas = _servicioMantenimientos.Areas.ListarAreas();
+                var Jefes = _servicioMantenimientos.Funcionario.ListarJefes();
 
                 FuncionarioViewModel newFuncionarioViewModel = new FuncionarioViewModel
                 {
@@ -53,7 +55,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     Conglomerados = conglomerados,
                     Departamentos = departamentos,
                     Roles = roles,
-                    EstadosFuncionario = estadosFunc
+                    EstadosFuncionario = estadosFunc,
+                    Areas = Areas,
+                    Jefes = Jefes
                 };
 
 
@@ -67,6 +71,72 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult CrearFuncionario(FuncionarioViewModel model, FormCollection collection )
+        {
+            try
+            {
+                FuncionarioModel newFuncionario = new FuncionarioModel();
+                newFuncionario = model.Funcionario;
+                string idFuncionario = newFuncionario.Cedula;
+                //Guardamos el nuevo func
+             //   _servicioMantenimientos.Funcionario.CrearFuncionario(newFuncionario);
+
+                var conglomeradosSeleccionados = collection["IdConglomeradosSeleccionados"];
+
+                foreach (var id in conglomeradosSeleccionados)
+                {
+                    FuncionarioXConglomeradoModel relacion = new FuncionarioXConglomeradoModel
+                    {
+                        IdFuncionario = idFuncionario,
+                        IdConglomerado = Convert.ToInt32(id)
+                    };
+
+                    //_servicioMantenimientos.FuncionarioXConglomerado.CrearFuncionarioXConglomerado(relacion);
+                }
+
+
+                var areasSeleccionadas = collection["IdAreasSeleccionadas"];
+
+                foreach (var id in areasSeleccionadas)
+                {
+                    FuncionarioPorAreaModel relacion = new FuncionarioPorAreaModel
+                    {
+                        cedulaFuncionario = idFuncionario,
+                        idArea = Convert.ToInt32(id)
+                    };
+
+                    //_servicioMantenimientos.FuncionarioPorArea.CrearFuncionarioPorArea(relacion);
+                }
+
+
+                if (ModelState.IsValid)
+                {
+                    TempData["MensajeExito"] = "Funcionario creado exitosamente";
+                    return RedirectToAction("ManteniFuncionarios");
+                }
+
+                CargarListas(model);
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = $"Error al crear funcionario: {ex.Message}";
+                CargarListas(model);
+                return View(model);
+            }
+        }
+
+        private void CargarListas(FuncionarioViewModel model)
+        {
+            model.Puestos = _servicioMantenimientos.Puestos.ObtenerPuestos();
+            model.Conglomerados = _servicioMantenimientos.Conglomerados.ListarConglomerados();
+            model.Departamentos = _servicioMantenimientos.Departamentos.ListarDepartamentos();
+            model.Roles = _servicioMantenimientos.Roles.ListarRoles();
+            model.EstadosFuncionario = _servicioMantenimientos.EstadoFuncionarios.ListarEstadosFuncionario();
+            model.Areas = _servicioMantenimientos.Areas.ListarAreas();
+            model.Jefes = _servicioMantenimientos.Funcionario.ListarJefes();
+        }
         #endregion
 
 

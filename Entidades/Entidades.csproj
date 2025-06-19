@@ -84,6 +84,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AreasModel.cs" />
     <Compile Include="AuthModels\LoginViewModel.cs" />
     <Compile Include="AuthModels\RecuperarPasswordViewModel.cs" />
     <Compile Include="AuthModels\ReestablecerPasswordViewModel.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="EvaluacionXcompetenciaModel.cs" />
     <Compile Include="EvaluacionXObjetivoModel.cs" />
     <Compile Include="FuncionarioModel.cs" />
+    <Compile Include="FuncionarioPorAreaModel.cs" />
     <Compile Include="FuncionarioViewModel.cs" />
     <Compile Include="FuncionarioXConglomeradoModel.cs" />
     <Compile Include="MetaModel.cs" />
