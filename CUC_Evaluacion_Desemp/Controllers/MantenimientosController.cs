@@ -11,16 +11,16 @@ namespace CUC_Evaluacion_Desemp.Controllers
 {
     public class MantenimientosController : Controller
     {
-        // -------------------------------------------------VARIABLES
+     
         private readonly IMantenimientosService _servicioMantenimientos;
 
-        //Constructor
+      
         public MantenimientosController(IMantenimientosService servicio)
         {
             _servicioMantenimientos = servicio;
+            
         }
 
-        // GET: Mantenimientos
         public ActionResult Index()
         {
             return View();
@@ -39,7 +39,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
         {
             try
             {
-                var puestos = _servicioMantenimientos.Puestos.ObtenerPuestos();
+                var puestos = _servicioMantenimientos.Puestos.ListarPuesto();
                 var conglomerados = _servicioMantenimientos.Conglomerados.ListarConglomerados();
                 var departamentos = _servicioMantenimientos.Departamentos.ListarDepartamentos();
                 var roles = _servicioMantenimientos.Roles.ListarRoles(); 
@@ -70,5 +70,112 @@ namespace CUC_Evaluacion_Desemp.Controllers
         #endregion
 
 
-    }//fin class
-}// fin space
+        #region Puestos
+
+        public ActionResult ManteniPuesto()
+        {
+            try
+            {
+                var puesto = _servicioMantenimientos.Puestos.ListarPuesto();
+                return View(puesto);
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = $"Error al obtener los puestos: {ex.Message}";
+                return View(new List<PuestoModel>());
+            }
+        }
+
+        public ActionResult CreaPuesto()
+        {
+            return View("CreaPuesto", new PuestoModel());
+        }
+
+  
+        [HttpPost]
+        public ActionResult CreaPuesto(PuestoModel nuevoPuesto)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // Aquí llamas al método para agregar el puesto a la base de datos
+                   _servicioMantenimientos.Puestos.CrearPuesto(nuevoPuesto);
+
+                    // Si la inserción fue exitosa, muestras el mensaje de éxito
+                    TempData["MensajeExito"] = $"Puesto {nuevoPuesto.Puesto} creado correctamente.";
+                    return RedirectToAction(nameof(ManteniPuesto));
+                }
+                else
+                {
+                    // Si el modelo no es válido, vuelve a la vista original con los datos
+                    return View("CreaPuesto", nuevoPuesto); // Usa el mismo nombre de vista aquí
+                }
+            }
+            catch (Exception ex)
+            {
+                // Aquí atrapas el error y lo muestras en la vista usando TempData
+                TempData["MensajeError"] = $"Error al crear el puesto: {ex.Message}";
+                return View("CreaPuesto", nuevoPuesto); // Usa el mismo nombre de vista aquí
+            }
+        }
+
+    
+        public ActionResult EditaPuesto(int id)
+        {
+            return View(_servicioMantenimientos.Puestos.ConsultarPuestoID(id));
+        }
+
+    
+        [HttpPost]
+        public ActionResult EditaPuesto(PuestoModel puestoModificado)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _servicioMantenimientos.Puestos.ModificarPuesto(puestoModificado);
+                    TempData["MensajeExito"] = $"Puesto {puestoModificado.Puesto} modificado correctamente.";
+                    return RedirectToAction(nameof(ManteniPuesto));
+                }
+                else
+                {
+                    return View(puestoModificado);
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = $"Error al actualizar el puesto: {ex.Message}";
+                return View(puestoModificado);
+            }
+        }
+
+        public ActionResult EliminarPuesto(int id)
+        {
+            try
+            {
+                var puesto = _servicioMantenimientos.Puestos.ConsultarPuestoID(id);
+                if (puesto == null)
+                {
+                    TempData["MensajeError"] = $"El puesto con ID {id} no fue encontrado.";
+                }
+                else
+                {
+                    _servicioMantenimientos.Puestos.EliminarPuesto(id);
+                    TempData["MensajeExito"] = $"Puesto {puesto.Puesto} eliminado correctamente.";
+                }
+                return RedirectToAction(nameof(ManteniPuesto));
+            }
+            catch
+            {
+                TempData["MensajeError"] = "No puede borrar este puesto, verifique las relaciones.";
+                return RedirectToAction(nameof(ManteniPuesto));
+            }
+        }
+
+
+        #endregion
+    }
+
+}
+

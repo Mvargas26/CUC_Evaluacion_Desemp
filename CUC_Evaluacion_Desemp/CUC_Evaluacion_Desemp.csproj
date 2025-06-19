@@ -221,6 +221,9 @@
     <Content Include="Views\Mantenimientos\CrearFuncionario.cshtml" />
     <Content Include="Views\Mantenimientos\Index.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniFuncionarios.cshtml" />
+    <Content Include="Views\Mantenimientos\CreaPuesto.cshtml" />
+    <Content Include="Views\Mantenimientos\EditaPuesto.cshtml" />
+    <Content Include="Views\Mantenimientos\ManteniPuesto.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

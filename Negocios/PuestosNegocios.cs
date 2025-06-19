@@ -19,17 +19,40 @@ namespace Negocios
             _accesoBD = accesoBD;
         }
 
-        public List<PuestoModel> ObtenerPuestos()
+       
+        public PuestoModel ConsultarPuestoID(int idPuesto)
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Accion", "SELECT"),
+            new SqlParameter("@Operacion", "R"),
+            new SqlParameter("@idPuesto", idPuesto)
+            };
+
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_Puesto_CRUD", parametros);
+
+            if (dt.Rows.Count == 0)
+                return null;
+
+            DataRow row = dt.Rows[0];
+
+            return new PuestoModel
+            {
+                idPuesto = Convert.ToInt32(row["idPuesto"]),
+                Puesto = row["Puesto"].ToString(),
+            };
+        }
+
+        public List<PuestoModel> ListarPuesto()
+        {
+            var parametros = new SqlParameter[]
+            {
+            new SqlParameter("@Operacion", "R"),
             new SqlParameter("@idPuesto", DBNull.Value)
             };
 
-            DataTable dt = _accesoBD.EjecutarSPconDT("sp_CrudPuesto", parametros);
-            var lista = new List<PuestoModel>();
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_Puesto_CRUD", parametros);
 
+            var lista = new List<PuestoModel>();
             foreach (DataRow row in dt.Rows)
             {
                 lista.Add(new PuestoModel
@@ -40,62 +63,44 @@ namespace Negocios
             }
 
             return lista;
+
         }
 
-        public PuestoModel ObtenerPuestoId(int id)
+        public void CrearPuesto(PuestoModel puesto)
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Accion", "SELECT"),
-            new SqlParameter("@idPuesto", id)
+            new SqlParameter("@Operacion", "C"),
+            new SqlParameter("@Puesto", puesto.Puesto),
+
             };
 
-            DataTable dt = _accesoBD.EjecutarSPconDT("sp_CrudPuesto", parametros);
-
-            if (dt.Rows.Count == 0)
-                return null;
-
-            DataRow row = dt.Rows[0];
-
-            return new PuestoModel
-            {
-                idPuesto = Convert.ToInt32(row["idPuesto"]),
-                Puesto = row["Puesto"].ToString()
-            };
+            _accesoBD.EjecutarSPconDT("sp_Puesto_CRUD", parametros);
         }
 
-        public void AgregarPuesto(PuestoModel puesto)
+        public void ModificarPuesto(PuestoModel puesto)
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Accion", "INSERT"),
-            new SqlParameter("@Puesto", puesto.Puesto)
-            };
-
-            _accesoBD.EjecutarSPconDT("sp_CrudPuesto", parametros);
-        }
-
-        public void ActualizarPuesto(PuestoModel puesto)
-        {
-            var parametros = new SqlParameter[]
-            {
-            new SqlParameter("@Accion", "UPDATE"),
+            new SqlParameter("@Operacion", "U"),
             new SqlParameter("@idPuesto", puesto.idPuesto),
             new SqlParameter("@Puesto", puesto.Puesto)
+
             };
 
-            _accesoBD.EjecutarSPconDT("sp_CrudPuesto", parametros);
+            _accesoBD.EjecutarSPconDT("sp_Puesto_CRUD", parametros);
         }
 
         public void EliminarPuesto(int id)
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Accion", "DELETE"),
+            new SqlParameter("@Operacion", "D"),
             new SqlParameter("@idPuesto", id)
             };
 
-            _accesoBD.EjecutarSPconDT("sp_CrudPuesto", parametros);
+            _accesoBD.EjecutarSPconDT("sp_Puesto_CRUD", parametros);
         }
+
     }
-}//fin space
+}
