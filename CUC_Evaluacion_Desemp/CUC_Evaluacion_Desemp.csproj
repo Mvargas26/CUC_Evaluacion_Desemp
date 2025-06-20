@@ -230,6 +230,7 @@
     <Content Include="Views\Mantenimientos\EditaArea.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniArea.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniDependencias.cshtml" />
+    <Content Include="Views\Mantenimientos\ManteniRoles.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

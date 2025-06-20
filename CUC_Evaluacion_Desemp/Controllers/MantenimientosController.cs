@@ -360,7 +360,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             try
             {
                 _servicioMantenimientos.Dependencias.CrearDependencia(newDependencia);
-                TempData["MensajeExito"] = $"Dependencia {newDependencia.Dependencia} creado correctamente.";
+                TempData["MensajeExito"] = $"{newDependencia.Dependencia} creado correctamente.";
                 return RedirectToAction(nameof(ManteniDependencias));
             }
             catch (Exception ex)
@@ -382,7 +382,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
             catch (Exception ex)
             {
-                TempData["MensajeError"] = "No se puede eliminar porque esta siendo utilizada.";
+                TempData["MensajeError"] = "No se puede eliminar porque esta siendo utilizada. "+ex.Message;
                 return RedirectToAction(nameof(ManteniDependencias));
             }
         }
@@ -399,12 +399,77 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
             catch (Exception ex)
             {
-                TempData["MensajeError"] = "Error al editar.";
+                TempData["MensajeError"] = "Error al editar."+ex.Message;
                 return RedirectToAction(nameof(ManteniDependencias));
             }
         }
         #endregion
 
+        #region mantenimiento Roles
+        public ActionResult ManteniRoles()
+        {
+            try
+            {
+                var Roles = _servicioMantenimientos.Roles.ListarRoles();
+                return View(Roles);
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = $"Error al obtener la lista: {ex.Message}";
+                return View(new List<PuestosModel>());
+            }
+        }
+
+        [HttpPost]
+        public ActionResult CrearRol(RolesModel newRol)
+        {
+            try
+            {
+                _servicioMantenimientos.Roles.CrearRol(newRol);
+                TempData["MensajeExito"] = $"{newRol.Rol} creado correctamente.";
+                return RedirectToAction(nameof(ManteniRoles));
+            }
+            catch (Exception ex)
+            {
+
+                TempData["MensajeError"] = $"Error al crear: {ex.Message}";
+                return View("ManteniRoles", newRol);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult EliminarRol(int id)
+        {
+            try
+            {
+                _servicioMantenimientos.Roles.EliminarRol(id);
+                TempData["MensajeExito"] = $"Eliminado correctamente.";
+                return RedirectToAction(nameof(ManteniRoles));
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = "No se puede eliminar porque esta siendo utilizada."+ ex.Message;
+                return RedirectToAction(nameof(ManteniRoles));
+            }
+        }
+
+        [HttpPost]
+        public ActionResult EditarRol(RolesModel editRol)
+        {
+            try
+            {
+                _servicioMantenimientos.Roles.ActualizarRol(editRol);
+                TempData["MensajeExito"] = $"Editado correctamente.";
+                return RedirectToAction(nameof(ManteniRoles));
+
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = "Error al editar. "+ ex.Message;
+                return RedirectToAction(nameof(ManteniRoles));
+            }
+        }
+        #endregion
 
     }//fin class
 
