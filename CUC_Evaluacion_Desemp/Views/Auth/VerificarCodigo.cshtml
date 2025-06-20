@@ -3,7 +3,7 @@
     Layout = "~/Views/Shared/_LayoutLogin.cshtml";
 }
 
-<form method="post" action="/Auth/VerificarCodigo">
+<form action="@Url.Action("VerificarCodigo", "Auth")" method="post">
     <!-- obtiene la cedula del tempdata -->
     <input type="hidden" name="cedula" value="@TempData["Cedula"]" />
     <label class="form-label" for="codigoSeguridad">Ingrese el código de seguridad:</label>

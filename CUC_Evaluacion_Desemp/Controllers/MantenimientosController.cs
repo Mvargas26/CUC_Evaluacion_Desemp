@@ -129,7 +129,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
         private void CargarListas(FuncionarioViewModel model)
         {
-            model.Puestos = _servicioMantenimientos.Puestos.ObtenerPuestos();
+            model.Puestos = _servicioMantenimientos.Puestos.ListarPuesto();
             model.Conglomerados = _servicioMantenimientos.Conglomerados.ListarConglomerados();
             model.Departamentos = _servicioMantenimientos.Departamentos.ListarDepartamentos();
             model.Roles = _servicioMantenimientos.Roles.ListarRoles();
