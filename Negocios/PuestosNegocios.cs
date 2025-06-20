@@ -20,7 +20,7 @@ namespace Negocios
         }
 
        
-        public PuestoModel ConsultarPuestoID(int idPuesto)
+        public PuestosModel ConsultarPuestoID(int idPuesto)
         {
             var parametros = new SqlParameter[]
             {
@@ -35,27 +35,26 @@ namespace Negocios
 
             DataRow row = dt.Rows[0];
 
-            return new PuestoModel
+            return new PuestosModel
             {
                 idPuesto = Convert.ToInt32(row["idPuesto"]),
                 Puesto = row["Puesto"].ToString(),
             };
         }
 
-        public List<PuestoModel> ListarPuesto()
+        public List<PuestosModel> ListarPuesto()
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Operacion", "R"),
-            new SqlParameter("@idPuesto", DBNull.Value)
+            new SqlParameter("@Operacion", "R")
             };
 
-            DataTable dt = _accesoBD.EjecutarSPconDT("sp_Puesto_CRUD", parametros);
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_PuestosCRUD", parametros);
 
-            var lista = new List<PuestoModel>();
+            var lista = new List<PuestosModel>();
             foreach (DataRow row in dt.Rows)
             {
-                lista.Add(new PuestoModel
+                lista.Add(new PuestosModel
                 {
                     idPuesto = Convert.ToInt32(row["idPuesto"]),
                     Puesto = row["Puesto"].ToString()
@@ -66,7 +65,7 @@ namespace Negocios
 
         }
 
-        public void CrearPuesto(PuestoModel puesto)
+        public void CrearPuesto(PuestosModel puesto)
         {
             var parametros = new SqlParameter[]
             {
@@ -78,7 +77,7 @@ namespace Negocios
             _accesoBD.EjecutarSPconDT("sp_Puesto_CRUD", parametros);
         }
 
-        public void ModificarPuesto(PuestoModel puesto)
+        public void ModificarPuesto(PuestosModel puesto)
         {
             var parametros = new SqlParameter[]
             {

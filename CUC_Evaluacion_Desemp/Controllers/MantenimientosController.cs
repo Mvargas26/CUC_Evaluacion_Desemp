@@ -41,7 +41,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             {
                 var puestos = _servicioMantenimientos.Puestos.ListarPuesto();
                 var conglomerados = _servicioMantenimientos.Conglomerados.ListarConglomerados();
-                var departamentos = _servicioMantenimientos.Departamentos.ListarDepartamentos();
+                var dependencias = _servicioMantenimientos.Dependencias.ListarDependencias();
                 var roles = _servicioMantenimientos.Roles.ListarRoles(); 
                 var funcionario = new FuncionarioModel();
                 var estadosFunc = _servicioMantenimientos.EstadoFuncionarios.ListarEstadosFuncionario();
@@ -53,7 +53,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     Funcionario = funcionario,
                     Puestos = puestos,
                     Conglomerados = conglomerados,
-                    Departamentos = departamentos,
+                    Dependencias = dependencias,
                     Roles = roles,
                     EstadosFuncionario = estadosFunc,
                     Areas = Areas,
@@ -116,27 +116,16 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     return RedirectToAction("ManteniFuncionarios");
                 }
 
-                CargarListas(model);
                 return View(model);
             }
             catch (Exception ex)
             {
                 TempData["MensajeError"] = $"Error al crear funcionario: {ex.Message}";
-                CargarListas(model);
                 return View(model);
             }
         }
 
-        private void CargarListas(FuncionarioViewModel model)
-        {
-            model.Puestos = _servicioMantenimientos.Puestos.ListarPuesto();
-            model.Conglomerados = _servicioMantenimientos.Conglomerados.ListarConglomerados();
-            model.Departamentos = _servicioMantenimientos.Departamentos.ListarDepartamentos();
-            model.Roles = _servicioMantenimientos.Roles.ListarRoles();
-            model.EstadosFuncionario = _servicioMantenimientos.EstadoFuncionarios.ListarEstadosFuncionario();
-            model.Areas = _servicioMantenimientos.Areas.ListarAreas();
-            model.Jefes = _servicioMantenimientos.Funcionario.ListarJefes();
-        }
+        
         #endregion
 
 
@@ -152,18 +141,18 @@ namespace CUC_Evaluacion_Desemp.Controllers
             catch (Exception ex)
             {
                 TempData["MensajeError"] = $"Error al obtener los puestos: {ex.Message}";
-                return View(new List<PuestoModel>());
+                return View(new List<PuestosModel>());
             }
         }
 
         public ActionResult CreaPuesto()
         {
-            return View("CreaPuesto", new PuestoModel());
+            return View("CreaPuesto", new PuestosModel());
         }
 
   
         [HttpPost]
-        public ActionResult CreaPuesto(PuestoModel nuevoPuesto)
+        public ActionResult CreaPuesto(PuestosModel nuevoPuesto)
         {
             try
             {
@@ -198,7 +187,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
     
         [HttpPost]
-        public ActionResult EditaPuesto(PuestoModel puestoModificado)
+        public ActionResult EditaPuesto(PuestosModel puestoModificado)
         {
             try
             {
