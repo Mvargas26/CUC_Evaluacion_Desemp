@@ -18,7 +18,7 @@ namespace Negocios.Services
         public FuncionarioNegocios Funcionario { get; }
         public PuestosNegocios Puestos { get; }
         public ConglomeradosNegocios Conglomerados { get; }
-        public DepartamentosNegocios Departamentos { get; }
+        public DependenciasNegocios Dependencias { get; }
         public RolesNegocios Roles { get; }
         public CompetenciasNegocios Competencias { get; }
         public EstadoEvaluacionNegocios EstadoEvaluacion { get; }
@@ -40,7 +40,7 @@ namespace Negocios.Services
             FuncionarioNegocios funcionario,
             PuestosNegocios puestos,
             ConglomeradosNegocios conglomerados,
-            DepartamentosNegocios departamentos,
+            DependenciasNegocios dependencias,
             RolesNegocios roles,
             CompetenciasNegocios competencias,
             EstadoEvaluacionNegocios estadoEvaluacion,
@@ -59,7 +59,7 @@ namespace Negocios.Services
             Funcionario = funcionario;
             Puestos = puestos;
             Conglomerados = conglomerados;
-            Departamentos = departamentos;
+            Dependencias = dependencias;
             Roles = roles;
             Competencias = competencias;
             EstadoEvaluacion = estadoEvaluacion;

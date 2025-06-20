@@ -12,8 +12,9 @@ namespace Entidades
     {
         public int IdCompetencia { get; set; }
         public string Competencia { get; set; }
-        public decimal Calificacion { get; set; }
+        public string Descripcion { get; set; }
+        public decimal Porcentaje { get; set; }
+        public int IdTipoCompetencia { get; set; }
         public string Tipo { get; set; }
-        public int? IdTipoCompetencia { get; set; }
     }
 }

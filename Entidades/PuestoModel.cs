@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 
 namespace Entidades
 {
-    public class PuestoModel
+    public class PuestosModel
     {
-        public int? idPuesto { get; set; }
+        public int idPuesto { get; set; }
         public string Puesto { get; set; }
+        public int IdDependencia { get; set; }
+        public string Descripcion { get; set; }
     }
 }

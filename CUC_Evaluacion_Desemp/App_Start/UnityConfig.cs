@@ -54,7 +54,7 @@ namespace CUC_Evaluacion_Desemp
             container.RegisterType<IMantenimientosService, MantenimientosService>();
 
             //Este metodo regista todas las classes publicas del proyecto negocios
-            DependenciasNegocios.RegistrarTipos(container);
+            Unix_DependenciasNegocios.RegistrarTipos(container);
 
             RegisterTypes(container);
 

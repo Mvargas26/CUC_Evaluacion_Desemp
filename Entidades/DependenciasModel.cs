@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Entidades
 {
-    public class DepartamentoModel
+    public class DependenciasModel
     {
 
-        public int IdDepartamento { get; set; }  
-        public string Departamento { get; set; }
+        public int IdDependencia { get; set; }  
+        public string Dependencia { get; set; }
 
     } //Fin clase
 

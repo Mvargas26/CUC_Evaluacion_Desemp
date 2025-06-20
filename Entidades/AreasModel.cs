@@ -13,6 +13,8 @@ namespace Entidades
 
         public string Descripcion { get; set; }
 
+        public bool Estado { get; set; }
+
     }//fin class
 }//fin space
 

@@ -20,7 +20,7 @@
     }
 
     <div class="wrapper">
-
+    
         <nav class="sidebar">
             <div class="sidebar-header">
                 <h2>
@@ -35,14 +35,11 @@
                         Mantenimientos <i class="fa-solid fa-chevron-down"></i>
                     </a>
                     <ul class="submenu">
-                        <li><a href="/Mantenimientos/ManteniArea">Areas</a></li>
-                        <li><a href="/Mantenimientos/ManteniConglomerados">Conglomerados</a></li>
-                        <li><a href="/Mantenimientos/ManteniDepartamentos">Departamentos</a></li>
-                        <li><a href="/Mantenimientos/ManteniFuncionarios">Funcionarios</a></li>
-                        <li><a href="/Mantenimientos/ManteniPuesto">Puestos</a></li>
-                        <li><a href="/Mantenimientos/ManteniPeriodo">Períodos</a></li>
-                        <li><a href="/Mantenimientos/GestionObjetivos">Objetivos</a></li>
-                        <li><a href="/Mantenimientos/ManteniCompetencias">Competencias</a></li>
+                        <li><a href="@Url.Action("ManteniConglomerados", "Mantenimientos")">Dependencias</a></li>
+                        <li><a href="@Url.Action("ManteniDepartamentos", "Mantenimientos")">Roles</a></li>
+                        <li><a href="@Url.Action("ManteniPuesto", "Mantenimientos")">Puestos</a></li>
+                        <li><a href="@Url.Action("ManteniDepartamentos", "Mantenimientos")">Areas</a></li>
+                        <li><a href="@Url.Action("ManteniFuncionarios", "Mantenimientos")" >Funcionarios</a></li>
                     </ul>
                 </li>
                 <li>
@@ -58,7 +55,7 @@
             </ul>
         </nav>
 
-
+ 
         <div class="main-content">
             <header class="topbar">
                 <h1>Sistema de Evaluación del Desempeño CUC</h1>
@@ -85,9 +82,6 @@
     <script defer src="~/sources/js/scripts.js"></script>
     <script defer src="~/sources/js/EventoSubMenu.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/jqueryval")
-
 
 </body>
 </html>

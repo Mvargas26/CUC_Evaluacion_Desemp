@@ -7,11 +7,14 @@ using System.Threading.Tasks;
 
 namespace Entidades
 {
-    public class PeriodoEvaluacionModel
+    public class PeriodosModel
     {
+        public int idPeriodo {  get; set; }
         public int Anio { get; set; }
-
-        public DateTime FechaMaxima { get; set; }
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaFIn { get; set; }
+        public Boolean Estado { get; set; }
+        public string Nombre { get; set; }
 
 
     }//Fin clase

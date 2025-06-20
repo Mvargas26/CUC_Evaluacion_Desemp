@@ -41,11 +41,11 @@ namespace CUC_Evaluacion_Desemp.Controllers
             {
                 var puestos = _servicioMantenimientos.Puestos.ListarPuesto();
                 var conglomerados = _servicioMantenimientos.Conglomerados.ListarConglomerados();
-                var departamentos = _servicioMantenimientos.Departamentos.ListarDepartamentos();
+                var dependencias = _servicioMantenimientos.Dependencias.ListarDependencias();
                 var roles = _servicioMantenimientos.Roles.ListarRoles(); 
                 var funcionario = new FuncionarioModel();
                 var estadosFunc = _servicioMantenimientos.EstadoFuncionarios.ListarEstadosFuncionario();
-                var Areas = _servicioMantenimientos.Areas.ListarArea();
+                var Areas = _servicioMantenimientos.Areas.ListarAreas();
                 var Jefes = _servicioMantenimientos.Funcionario.ListarJefes();
 
                 FuncionarioViewModel newFuncionarioViewModel = new FuncionarioViewModel
@@ -53,7 +53,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     Funcionario = funcionario,
                     Puestos = puestos,
                     Conglomerados = conglomerados,
-                    Departamentos = departamentos,
+                    Dependencias = dependencias,
                     Roles = roles,
                     EstadosFuncionario = estadosFunc,
                     Areas = Areas,
@@ -116,27 +116,16 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     return RedirectToAction("ManteniFuncionarios");
                 }
 
-                CargarListas(model);
                 return View(model);
             }
             catch (Exception ex)
             {
                 TempData["MensajeError"] = $"Error al crear funcionario: {ex.Message}";
-                CargarListas(model);
                 return View(model);
             }
         }
 
-        private void CargarListas(FuncionarioViewModel model)
-        {
-            model.Puestos = _servicioMantenimientos.Puestos.ListarPuesto();
-            model.Conglomerados = _servicioMantenimientos.Conglomerados.ListarConglomerados();
-            model.Departamentos = _servicioMantenimientos.Departamentos.ListarDepartamentos();
-            model.Roles = _servicioMantenimientos.Roles.ListarRoles();
-            model.EstadosFuncionario = _servicioMantenimientos.EstadoFuncionarios.ListarEstadosFuncionario();
-            model.Areas = _servicioMantenimientos.Areas.ListarArea();
-            model.Jefes = _servicioMantenimientos.Funcionario.ListarJefes();
-        }
+        
         #endregion
 
 
@@ -152,41 +141,41 @@ namespace CUC_Evaluacion_Desemp.Controllers
             catch (Exception ex)
             {
                 TempData["MensajeError"] = $"Error al obtener los puestos: {ex.Message}";
-                return View(new List<PuestoModel>());
+                return View(new List<PuestosModel>());
             }
         }
 
         public ActionResult CreaPuesto()
         {
-            return View("CreaPuesto", new PuestoModel());
+            return View("CreaPuesto", new PuestosModel());
         }
 
   
         [HttpPost]
-        public ActionResult CreaPuesto(PuestoModel nuevoPuesto)
+        public ActionResult CreaPuesto(PuestosModel nuevoPuesto)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-              
+                    // Aquí llamas al método para agregar el puesto a la base de datos
                    _servicioMantenimientos.Puestos.CrearPuesto(nuevoPuesto);
 
-                
+                    // Si la inserción fue exitosa, muestras el mensaje de éxito
                     TempData["MensajeExito"] = $"Puesto {nuevoPuesto.Puesto} creado correctamente.";
                     return RedirectToAction(nameof(ManteniPuesto));
                 }
                 else
                 {
-                   
-                    return View("CreaPuesto", nuevoPuesto); 
+                    // Si el modelo no es válido, vuelve a la vista original con los datos
+                    return View("CreaPuesto", nuevoPuesto); // Usa el mismo nombre de vista aquí
                 }
             }
             catch (Exception ex)
             {
-                
+                // Aquí atrapas el error y lo muestras en la vista usando TempData
                 TempData["MensajeError"] = $"Error al crear el puesto: {ex.Message}";
-                return View("CreaPuesto", nuevoPuesto); 
+                return View("CreaPuesto", nuevoPuesto); // Usa el mismo nombre de vista aquí
             }
         }
 
@@ -198,7 +187,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
     
         [HttpPost]
-        public ActionResult EditaPuesto(PuestoModel puestoModificado)
+        public ActionResult EditaPuesto(PuestosModel puestoModificado)
         {
             try
             {
@@ -245,113 +234,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
 
         #endregion
-
-
-        #region Areas
-
-        public ActionResult ManteniArea()
-        {
-            try
-            {
-                var area = _servicioMantenimientos.Areas.ListarArea();
-                return View(area);
-            }
-            catch (Exception ex)
-            {
-                TempData["MensajeError"] = $"Error al obtener las areas: {ex.Message}";
-                return View(new List<AreasModel>());
-            }
-        }
-
-        public ActionResult CreaArea()
-        {
-            return View("CreaArea", new AreasModel());
-        }
-
-
-        [HttpPost]
-        public ActionResult CreaArea(AreasModel nuevoArea)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-               
-                    _servicioMantenimientos.Areas.CrearArea(nuevoArea);
-
-                  
-                    TempData["MensajeExito"] = $"Area {nuevoArea.NombreArea} creado correctamente.";
-                    return RedirectToAction(nameof(ManteniArea));
-                }
-                else
-                {
-                   
-                    return View("CreaArea", nuevoArea); 
-                }
-            }
-            catch (Exception ex)
-            {
-               
-                TempData["MensajeError"] = $"Error al crear la area: {ex.Message}";
-                return View("CreaArea", nuevoArea); 
-            }
-        }
-
-
-        public ActionResult EditaArea(int id)
-        {
-            return View(_servicioMantenimientos.Areas.ConsultarAreaID(id));
-        }
-
-
-        [HttpPost]
-        public ActionResult EditaArea(AreasModel areaModificado)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    _servicioMantenimientos.Areas.ModificarArea(areaModificado);
-                    TempData["MensajeExito"] = $" {areaModificado.NombreArea} fue modificado correctamente.";
-                    return RedirectToAction(nameof(ManteniArea));
-                }
-                else
-                {
-                    return View("EditaArea", areaModificado);
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["MensajeError"] = $"Error al actualizar la area: {ex.Message}";
-                return View("EditaArea", areaModificado);
-            }
-        }
-
-        public ActionResult EliminarArea(int id)
-        {
-            try
-            {
-                var area = _servicioMantenimientos.Areas.ConsultarAreaID(id);
-                if (area == null)
-                {
-                    TempData["MensajeError"] = $"El area con ID {id} no fue encontrado.";
-                }
-                else
-                {
-                    _servicioMantenimientos.Areas.EliminarArea(id);
-                    TempData["MensajeExito"] = $"Area {area.NombreArea} eliminado correctamente.";
-                }
-                return RedirectToAction(nameof(ManteniArea));
-            }
-            catch
-            {
-                TempData["MensajeError"] = "No puede borrar esta area, verifique las relaciones.";
-                return RedirectToAction(nameof(ManteniArea));
-            }
-        }
-
-        #endregion
-
     }
 
 }

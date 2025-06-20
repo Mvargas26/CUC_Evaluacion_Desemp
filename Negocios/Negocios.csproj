@@ -88,8 +88,8 @@
     <Compile Include="CompetenciasNegocios.cs" />
     <Compile Include="ConglomeradosNegocios.cs" />
     <Compile Include="CorreoService.cs" />
-    <Compile Include="DepartamentosNegocios.cs" />
     <Compile Include="DependenciasNegocios.cs" />
+    <Compile Include="Unix_DependenciasNegocios.cs" />
     <Compile Include="EstadoEvaluacionNegocios.cs" />
     <Compile Include="EstadoFuncionariosNegocios.cs" />
     <Compile Include="EvaluacionesNegocios.cs" />

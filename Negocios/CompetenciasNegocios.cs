@@ -40,8 +40,8 @@ namespace Negocios
                 {
                     IdCompetencia = Convert.ToInt32(row["idCompetencia"]),
                     Competencia = row["Competencia"].ToString(),
-                    Calificacion = Convert.ToDecimal(row["Calificacion"]),
-                    IdTipoCompetencia = row["idTipoCompetencia"] != DBNull.Value ? Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null
+                    Porcentaje = Convert.ToDecimal(row["Porcentaje"]),
+                    IdTipoCompetencia = (int)(row["idTipoCompetencia"] != DBNull.Value ? Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null)
                 };
             }
             catch (Exception ex)
@@ -70,9 +70,9 @@ namespace Negocios
                     {
                         IdCompetencia = Convert.ToInt32(row["idCompetencia"]),
                         Competencia = row["Competencia"].ToString(),
-                        Calificacion = Convert.ToDecimal(row["Calificacion"]),
+                        Porcentaje = Convert.ToDecimal(row["Porcentaje"]),
                         Tipo = row["Tipo"].ToString(),
-                        IdTipoCompetencia = row["idTipoCompetencia"] != DBNull.Value ? Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null
+                        IdTipoCompetencia = (int)(row["idTipoCompetencia"] != DBNull.Value ? Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null)
                     });
                 }
             }
@@ -92,7 +92,7 @@ namespace Negocios
                 {
                 new SqlParameter("@Operacion", "C"),
                 new SqlParameter("@Competencia", competencia.Competencia),
-                new SqlParameter("@Calificacion", competencia.Calificacion),
+                new SqlParameter("@Calificacion", competencia.Porcentaje),
                 new SqlParameter("@idTipoCompetencia", competencia.IdTipoCompetencia)
                 };
 
@@ -113,7 +113,7 @@ namespace Negocios
                 new SqlParameter("@Operacion", "U"),
                 new SqlParameter("@idCompetencia", competencia.IdCompetencia),
                 new SqlParameter("@Competencia", competencia.Competencia),
-                new SqlParameter("@Calificacion", competencia.Calificacion),
+                new SqlParameter("@Calificacion", competencia.Porcentaje),
                 new SqlParameter("@idTipoCompetencia", competencia.IdTipoCompetencia)
                 };
 

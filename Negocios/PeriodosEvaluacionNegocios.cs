@@ -19,7 +19,7 @@ namespace Negocios
             _accesoBD = accesoBD;
         }
 
-        public List<PeriodoEvaluacionModel> ListarPeriodos()
+        public List<PeriodosModel> ListarPeriodos()
         {
             var parametros = new SqlParameter[]
             {
@@ -28,38 +28,38 @@ namespace Negocios
 
             DataTable dt = _accesoBD.EjecutarSPconDT("sp_CrudPeriodo", parametros);
 
-            var lista = new List<PeriodoEvaluacionModel>();
+            var lista = new List<PeriodosModel>();
             foreach (DataRow row in dt.Rows)
             {
-                lista.Add(new PeriodoEvaluacionModel
+                lista.Add(new PeriodosModel
                 {
                     Anio = Convert.ToInt32(row["anio"]),
-                    FechaMaxima = Convert.ToDateTime(row["fechaMaxima"])
+                    FechaInicio = Convert.ToDateTime(row["fechaMaxima"])
                 });
             }
 
             return lista;
         }
 
-        public void CrearPeriodo(PeriodoEvaluacionModel nuevo)
+        public void CrearPeriodo(PeriodosModel nuevo)
         {
             var parametros = new SqlParameter[]
             {
             new SqlParameter("@Accion", "INSERT"),
             new SqlParameter("@ANNO", nuevo.Anio),
-            new SqlParameter("@FechaM", nuevo.FechaMaxima)
+            new SqlParameter("@FechaM", nuevo.FechaInicio)
             };
 
             _accesoBD.EjecutarSPconDT("sp_CrudPeriodo", parametros);
         }
 
-        public void ModificarPeriodo(PeriodoEvaluacionModel periodo)
+        public void ModificarPeriodo(PeriodosModel periodo)
         {
             var parametros = new SqlParameter[]
             {
             new SqlParameter("@Accion", "UPDATE"),
             new SqlParameter("@ANNO", periodo.Anio),
-            new SqlParameter("@FechaM", periodo.FechaMaxima)
+            new SqlParameter("@FechaM", periodo.FechaInicio)
             };
 
             _accesoBD.EjecutarSPconDT("sp_CrudPeriodo", parametros);
@@ -76,7 +76,7 @@ namespace Negocios
             _accesoBD.EjecutarSPconDT("sp_CrudPeriodo", parametros);
         }
 
-        public PeriodoEvaluacionModel ConsultarPeriodoPorAnio(int anio)
+        public PeriodosModel ConsultarPeriodoPorAnio(int anio)
         {
             var parametros = new SqlParameter[]
             {
@@ -91,10 +91,10 @@ namespace Negocios
 
             DataRow row = dt.Rows[0];
 
-            return new PeriodoEvaluacionModel
+            return new PeriodosModel
             {
                 Anio = Convert.ToInt32(row["anio"]),
-                FechaMaxima = Convert.ToDateTime(row["fechaMaxima"])
+                FechaInicio = Convert.ToDateTime(row["fechaMaxima"])
             };
         }
     }

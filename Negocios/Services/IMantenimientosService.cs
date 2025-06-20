@@ -12,7 +12,7 @@ namespace Negocios.Services
         FuncionarioNegocios Funcionario { get; }
         PuestosNegocios Puestos { get; }
         ConglomeradosNegocios Conglomerados { get; }
-        DepartamentosNegocios Departamentos { get; }
+        DependenciasNegocios Dependencias { get; }
         RolesNegocios Roles { get; }
         CompetenciasNegocios Competencias { get; }
         EstadoEvaluacionNegocios EstadoEvaluacion { get; }

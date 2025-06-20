@@ -208,9 +208,9 @@ namespace Negocios
                     {
                         IdCompetencia = Convert.ToInt32(row["idCompetencia"]),
                         Competencia = row["Competencia"].ToString(),
-                        Calificacion = Convert.ToDecimal(row["Calificacion"]),
-                        IdTipoCompetencia = row.Table.Columns.Contains("idTipoCompetencia") && row["idTipoCompetencia"] != DBNull.Value ?
-                                             Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null
+                        Porcentaje = Convert.ToDecimal(row["Porcentaje"]),
+                        IdTipoCompetencia = (int)(row.Table.Columns.Contains("idTipoCompetencia") && row["idTipoCompetencia"] != DBNull.Value ?
+                                             Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null)
                     });
                 }
             }
