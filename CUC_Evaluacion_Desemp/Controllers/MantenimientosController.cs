@@ -339,7 +339,74 @@ namespace CUC_Evaluacion_Desemp.Controllers
         }
 
         #endregion
-    }
+        #region Dependencias
+        public ActionResult ManteniDependencias()
+        {
+            try
+            {
+                var Dependencias = _servicioMantenimientos.Dependencias.ListarDependencias();
+                return View(Dependencias);
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = $"Error al obtener los puestos: {ex.Message}";
+                return View(new List<PuestosModel>());
+            }
+        }
+
+        [HttpPost]
+        public ActionResult CrearDependencia(DependenciasModel newDependencia)
+        {
+            try
+            {
+                _servicioMantenimientos.Dependencias.CrearDependencia(newDependencia);
+                TempData["MensajeExito"] = $"Dependencia {newDependencia.Dependencia} creado correctamente.";
+                return RedirectToAction(nameof(ManteniDependencias));
+            }
+            catch (Exception ex)
+            {
+
+                TempData["MensajeError"] = $"Error al crear: {ex.Message}";
+                return View("CrearDependencia", newDependencia);
+            }
+        }
+        
+        [HttpPost]
+        public ActionResult EliminarDependencia(int id)
+        {
+            try
+            {
+                _servicioMantenimientos.Dependencias.EliminarDependencia(id);
+                TempData["MensajeExito"] = $"Eliminado correctamente.";
+                return RedirectToAction(nameof(ManteniDependencias));
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = "No se puede eliminar porque esta siendo utilizada.";
+                return RedirectToAction(nameof(ManteniDependencias));
+            }
+        }
+
+        [HttpPost]
+        public ActionResult EditarDependencia(DependenciasModel editDependencia)
+        {
+            try
+            {
+                _servicioMantenimientos.Dependencias.ModificarDependencia(editDependencia);
+                TempData["MensajeExito"] = $"Editado correctamente.";
+                return RedirectToAction(nameof(ManteniDependencias));
+
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = "Error al editar.";
+                return RedirectToAction(nameof(ManteniDependencias));
+            }
+        }
+        #endregion
+
+
+    }//fin class
 
 }
 

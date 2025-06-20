@@ -1,0 +1,140 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Mantenimiento Dependencias";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Mantenimiento Dependencias</h2>
+    @********************************************************* mENSAJES eXITO Y eRROR*@
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["MensajeExito"]
+        </div>
+    }
+
+    @if (TempData["MensajeError"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["MensajeError"]
+        </div>
+    }
+    @*********************************************************bOTON GRANDE cREAR*@
+
+    <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrearDependencia">
+            <i class="fas fa-plus"></i> Crear
+        </button>
+    </div>
+    @*********************************************************TABLA*@
+    <div class="table-responsive mt-3">
+        <table class="table table-striped table-bordered text-center">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Dependencia </th>
+                    <th>Acciones </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var Dependencias in Model)
+                {
+                    <tr>
+                        <td>@Dependencias.IdDependencia</td>
+                        <td>@Dependencias.Dependencia</td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarDependencia-@Dependencias.IdDependencia">
+                                <i class="fas fa-edit"></i>
+                            </button>
+
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminarDependencia-@Dependencias.IdDependencia">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@********************************************************* Modal para CREAR*@
+<div class="modal fade" id="modalCrearDependencia" tabindex="-1" aria-labelledby="modalCrearDependenciaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCrearDependenciaLabel">Nueva Dependencia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form action="@Url.Action("CrearDependencia", "Mantenimientos")" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nuevaDependenciaNombre" class="form-label">Nombre de la Dependencia</label>
+                        <input type="text" class="form-control" id="nuevaDependenciaNombre"
+                               name="Dependencia" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Dependencia</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@********************************************************* Modal para EDITAR*@
+@foreach (var Dependencias in Model)
+{
+    <div class="modal fade" id="modalEditarDependencia-@Dependencias.IdDependencia" tabindex="-1" aria-labelledby="modalEditarDependenciaLabel-@Dependencias.IdDependencia" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarDependenciaLabel-@Dependencias.IdDependencia">Editar Dependencia</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <form action="@Url.Action("EditarDependencia", "Mantenimientos")" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="IdDependencia" value="@Dependencias.IdDependencia" />
+
+                        <div class="mb-3">
+                            <label for="dependenciaNombre-@Dependencias.IdDependencia" class="form-label">Nombre de la Dependencia</label>
+                            <input type="text" class="form-control" id="dependenciaNombre-@Dependencias.IdDependencia"
+                                   name="Dependencia" value="@Dependencias.Dependencia" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+@********************************************************* Modal para ELIMINAR*@
+@foreach (var Dependencias in Model)
+{
+    <div class="modal fade" id="modalEliminarDependencia-@Dependencias.IdDependencia" tabindex="-1" aria-labelledby="modalEliminarDependenciaLabel-@Dependencias.IdDependencia" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEliminarDependenciaLabel-@Dependencias.IdDependencia">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Realmente desea eliminar la dependencia <strong>@Dependencias.Dependencia</strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                    <form action="@Url.Action("EliminarDependencia", "Mantenimientos")" method="post">
+                        <input type="hidden" name="id" value="@Dependencias.IdDependencia" />
+                        <button type="submit" class="btn btn-danger">Sí</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script defer src="~/sources/js/accionOcultarCerrarMensajes.js"></script>
+
+

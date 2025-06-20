@@ -107,7 +107,7 @@ namespace Negocios
             }
         }
 
-        public void EliminarDepartamento(int id)
+        public void EliminarDependencia(int id)
         {
             try
             {
