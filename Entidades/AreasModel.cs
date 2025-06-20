@@ -9,7 +9,7 @@ namespace Entidades
     public class AreasModel
     {
         public int idArea { get; set; }
-        public string nombreArea { get; set; }
+        public string NombreArea { get; set; }
 
         public string Descripcion { get; set; }
 
