@@ -24,7 +24,7 @@ namespace Negocios
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Operacion", "R"),
+            new SqlParameter("@Operacion", "SELECT"),
             new SqlParameter("@idArea", DBNull.Value)
             };
 

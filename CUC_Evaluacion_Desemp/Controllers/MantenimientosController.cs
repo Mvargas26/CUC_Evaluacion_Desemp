@@ -45,7 +45,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var roles = _servicioMantenimientos.Roles.ListarRoles(); 
                 var funcionario = new FuncionarioModel();
                 var estadosFunc = _servicioMantenimientos.EstadoFuncionarios.ListarEstadosFuncionario();
-                var Areas = _servicioMantenimientos.Areas.ListarAreas();
+                var Areas = _servicioMantenimientos.Areas.ListarArea();
                 var Jefes = _servicioMantenimientos.Funcionario.ListarJefes();
 
                 FuncionarioViewModel newFuncionarioViewModel = new FuncionarioViewModel
@@ -232,6 +232,111 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
+
+        #endregion
+
+        #region Areas
+
+        public ActionResult ManteniArea()
+        {
+            try
+            {
+                var area = _servicioMantenimientos.Areas.ListarArea();
+                return View(area);
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = $"Error al obtener las areas: {ex.Message}";
+                return View(new List<AreasModel>());
+            }
+        }
+
+        public ActionResult CreaArea()
+        {
+            return View("CreaArea", new AreasModel());
+        }
+
+
+        [HttpPost]
+        public ActionResult CreaArea(AreasModel nuevoArea)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+
+                    _servicioMantenimientos.Areas.CrearArea(nuevoArea);
+
+
+                    TempData["MensajeExito"] = $"Area {nuevoArea.NombreArea} creado correctamente.";
+                    return RedirectToAction(nameof(ManteniArea));
+                }
+                else
+                {
+
+                    return View("CreaArea", nuevoArea);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                TempData["MensajeError"] = $"Error al crear la area: {ex.Message}";
+                return View("CreaArea", nuevoArea);
+            }
+        }
+
+
+        public ActionResult EditaArea(int id)
+        {
+            return View(_servicioMantenimientos.Areas.ConsultarAreaID(id));
+        }
+
+
+        [HttpPost]
+        public ActionResult EditaArea(AreasModel areaModificado)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _servicioMantenimientos.Areas.ModificarArea(areaModificado);
+                    TempData["MensajeExito"] = $" {areaModificado.NombreArea} fue modificado correctamente.";
+                    return RedirectToAction(nameof(ManteniArea));
+                }
+                else
+                {
+                    return View("EditaArea", areaModificado);
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = $"Error al actualizar la area: {ex.Message}";
+                return View("EditaArea", areaModificado);
+            }
+        }
+
+        public ActionResult EliminarArea(int id)
+        {
+            try
+            {
+                var area = _servicioMantenimientos.Areas.ConsultarAreaID(id);
+                if (area == null)
+                {
+                    TempData["MensajeError"] = $"El area con ID {id} no fue encontrado.";
+                }
+                else
+                {
+                    _servicioMantenimientos.Areas.EliminarArea(id);
+                    TempData["MensajeExito"] = $"Area {area.NombreArea} eliminado correctamente.";
+                }
+                return RedirectToAction(nameof(ManteniArea));
+            }
+            catch
+            {
+                TempData["MensajeError"] = "No puede borrar esta area, verifique las relaciones.";
+                return RedirectToAction(nameof(ManteniArea));
+            }
+        }
 
         #endregion
     }
