@@ -62,10 +62,14 @@
         <div class="main-content">
             <header class="topbar">
                 <h1>Sistema de Evaluación del Desempeño CUC</h1>
-                <div class="user-menu">
+                <div class="user-menu d-flex align-items-center gap-2 text-white">
+                    <span>
+                        <strong>Bienvenido(a): Michael Vargas</strong><br />
+                        <small>Rol: Admin</small>
+                    </span>
                     <button id="userIcon" class="user-icon" type="button">👤</button>
                     <ul class="dropdown-menu">
-                        <li><a href="@Url.Action("CerrarSesion", "Home")">Cerrar sesión</a></li>
+                        <li><a href="@Url.Action("Login", "Auth")">Cerrar sesión</a></li>
                     </ul>
                 </div>
             </header>
