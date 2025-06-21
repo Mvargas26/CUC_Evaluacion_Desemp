@@ -144,7 +144,6 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Controllers\AuthController.cs" />
-    <Compile Include="Controllers\FuncionarioController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MantenimientosController.cs" />
     <Compile Include="Global.asax.cs">
@@ -215,7 +214,6 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Funcionario\Index.cshtml" />
     <Content Include="Views\Auth\Login.cshtml" />
     <Content Include="Views\Shared\_LayoutLogin.cshtml" />
     <Content Include="Views\Auth\RecuperarPassword.cshtml" />
@@ -231,6 +229,7 @@
     <Content Include="Views\Mantenimientos\ManteniArea.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniDependencias.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniRoles.cshtml" />
+    <Content Include="Views\Mantenimientos\ManteniCarreras.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

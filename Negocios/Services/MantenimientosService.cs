@@ -34,6 +34,7 @@ namespace Negocios.Services
         public AreasNegocios Areas { get; }
 
         public FuncionarioPorAreaNegocios FuncionarioPorArea { get; }
+        public CarrerasNegocios Carreras { get; }
 
 
         public MantenimientosService(
@@ -53,7 +54,8 @@ namespace Negocios.Services
             TiposObjetivosNegocios tiposObjetivos,
             EstadoFuncionariosNegocios estadoFuncionarios,
             AreasNegocios areas,
-            FuncionarioPorAreaNegocios funcionarioPorArea
+            FuncionarioPorAreaNegocios funcionarioPorArea,
+            CarrerasNegocios carreras
             )
         {
             Funcionario = funcionario;
@@ -73,6 +75,7 @@ namespace Negocios.Services
             EstadoFuncionarios = estadoFuncionarios;
             Areas = areas;
             FuncionarioPorArea = funcionarioPorArea;
+            Carreras = carreras;
         }
     }
 }

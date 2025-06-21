@@ -60,13 +60,12 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     Jefes = Jefes
                 };
 
-
                 return View(newFuncionarioViewModel);
 
             }
             catch (Exception ex)
             {
-                TempData["MensajeError"] = $"Error al cargar la vista: {ex.Message}";
+                TempData["MensajeError"] = $"Error al crear: {ex.Message}";
                 return View();
             }
         }
@@ -80,7 +79,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 newFuncionario = model.Funcionario;
                 string idFuncionario = newFuncionario.Cedula;
                 //Guardamos el nuevo func
-             //   _servicioMantenimientos.Funcionario.CrearFuncionario(newFuncionario);
+                _servicioMantenimientos.Funcionario.CrearFuncionario(newFuncionario);
 
                 var conglomeradosSeleccionados = collection["IdConglomeradosSeleccionados"];
 
@@ -92,7 +91,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                         IdConglomerado = Convert.ToInt32(id)
                     };
 
-                    //_servicioMantenimientos.FuncionarioXConglomerado.CrearFuncionarioXConglomerado(relacion);
+                    _servicioMantenimientos.FuncionarioXConglomerado.CrearFuncionarioXConglomerado(relacion);
                 }
 
 
@@ -106,26 +105,18 @@ namespace CUC_Evaluacion_Desemp.Controllers
                         idArea = Convert.ToInt32(id)
                     };
 
-                    //_servicioMantenimientos.FuncionarioPorArea.CrearFuncionarioPorArea(relacion);
+                    _servicioMantenimientos.FuncionarioPorArea.CrearFuncionarioPorArea(relacion);
                 }
 
-
-                if (ModelState.IsValid)
-                {
-                    TempData["MensajeExito"] = "Funcionario creado exitosamente";
-                    return RedirectToAction("ManteniFuncionarios");
-                }
-
-                return View(model);
+                TempData["MensajeExito"] = $"Creado correctamente.";
+                return RedirectToAction("ManteniFuncionarios");
             }
             catch (Exception ex)
             {
-                TempData["MensajeError"] = $"Error al crear funcionario: {ex.Message}";
-                return View(model);
+                TempData["MensajeError"] = $"Error al crear: {ex.Message}";
+                return RedirectToAction("ManteniFuncionarios");
             }
         }
-
-        
         #endregion
 
 
@@ -471,6 +462,71 @@ namespace CUC_Evaluacion_Desemp.Controllers
         }
         #endregion
 
+        #region Carreras
+        public ActionResult ManteniCarreras()
+        {
+            try
+            {
+                var Carreras = _servicioMantenimientos.Carreras.ListarCarreras();
+                return View(Carreras);
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = $"Error al obtener la lista: {ex.Message}";
+                return View(new List<CarrerasModel>());
+            }
+        }
+
+        [HttpPost]
+        public ActionResult CrearCarrera(CarrerasModel newCarrera)
+        {
+            try
+            {
+                _servicioMantenimientos.Carreras.CrearCarrera(newCarrera);
+                TempData["MensajeExito"] = $"{newCarrera.NombreCarrera} creado correctamente.";
+                return RedirectToAction(nameof(ManteniCarreras));
+            }
+            catch (Exception ex)
+            {
+
+                TempData["MensajeError"] = $"Error al crear: {ex.Message}";
+                return View("ManteniCarreras", newCarrera);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult EliminarCarrera(int id)
+        {
+            try
+            {
+                _servicioMantenimientos.Carreras.EliminarCarrera(id);
+                TempData["MensajeExito"] = $"Eliminado correctamente.";
+                return RedirectToAction(nameof(ManteniCarreras));
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = "No se puede eliminar porque esta siendo utilizada." + ex.Message;
+                return RedirectToAction(nameof(ManteniCarreras));
+            }
+        }
+
+        [HttpPost]
+        public ActionResult EditarCarrera(CarrerasModel editCarrera)
+        {
+            try
+            {
+                _servicioMantenimientos.Carreras.ModificarCarrera(editCarrera);
+                TempData["MensajeExito"] = $"Editado correctamente.";
+                return RedirectToAction(nameof(ManteniCarreras));
+
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = "Error al editar. " + ex.Message;
+                return RedirectToAction(nameof(ManteniCarreras));
+            }
+        }
+        #endregion
     }//fin class
 
 }

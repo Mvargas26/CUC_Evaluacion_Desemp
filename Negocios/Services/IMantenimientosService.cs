@@ -25,7 +25,8 @@ namespace Negocios.Services
         TiposObjetivosNegocios TiposObjetivos { get; }
         EstadoFuncionariosNegocios EstadoFuncionarios { get; }
         AreasNegocios Areas { get; }
-
         FuncionarioPorAreaNegocios FuncionarioPorArea { get; }
+
+        CarrerasNegocios Carreras { get; }
     }
 }

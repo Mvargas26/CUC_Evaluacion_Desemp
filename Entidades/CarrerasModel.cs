@@ -10,5 +10,6 @@ namespace Entidades
     {
         public int idCarrera {  get; set; }
         public string NombreCarrera { get; set; }
+        public string Descripcion { get; set; }
     }//fin class
 }

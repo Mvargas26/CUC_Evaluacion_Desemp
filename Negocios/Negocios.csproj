@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AreasNegocios.cs" />
+    <Compile Include="CarrerasNegocios.cs" />
     <Compile Include="CompetenciasNegocios.cs" />
     <Compile Include="ConglomeradosNegocios.cs" />
     <Compile Include="CorreoService.cs" />
