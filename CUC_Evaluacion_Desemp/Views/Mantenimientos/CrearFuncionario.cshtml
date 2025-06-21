@@ -65,7 +65,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     @Html.LabelFor(m => m.Funcionario.IdRol, "Estado:", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.Funcionario.IdRol, new SelectList(Model.EstadosFuncionario, "IdEstadoFuncionario", "Estado"), "Seleccione", new { @class = "form-select", required = "required" })
+                    @Html.DropDownListFor(m => m.Funcionario.IdEstadoFuncionario, new SelectList(Model.EstadosFuncionario, "IdEstadoFuncionario", "Estado"), "Seleccione", new { @class = "form-select", required = "required" })
                 </div>
             </div>
             @*********************************** Fila 4*@
@@ -76,7 +76,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     @Html.LabelFor(m => m.Funcionario.IdPuesto, "Carrera:", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.Funcionario.IdPuesto, new SelectList(Model.Puestos, "IdPuesto", "Puesto"), "Seleccione", new { @class = "form-select", required = "required" })
+                    @Html.DropDownListFor(m => m.Carreras, new SelectList(Model.Carreras, "idCarrera", "NombreCarrera"), "Seleccione", new { @class = "form-select", required = "required" })
                 </div>
                 <div class="col-md-4 mb-3">
                     @Html.LabelFor(m => m.Jefes, "Jefe Inmediato:", new { @class = "form-label" })

@@ -47,6 +47,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var estadosFunc = _servicioMantenimientos.EstadoFuncionarios.ListarEstadosFuncionario();
                 var Areas = _servicioMantenimientos.Areas.ListarArea();
                 var Jefes = _servicioMantenimientos.Funcionario.ListarJefes();
+                var carreras = _servicioMantenimientos.Carreras.ListarCarreras();
 
                 FuncionarioViewModel newFuncionarioViewModel = new FuncionarioViewModel
                 {
@@ -57,7 +58,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     Roles = roles,
                     EstadosFuncionario = estadosFunc,
                     Areas = Areas,
-                    Jefes = Jefes
+                    Jefes = Jefes,
+                    Carreras = carreras
                 };
 
                 return View(newFuncionarioViewModel);
@@ -118,7 +120,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
         #endregion
-
 
         #region Puestos
 
@@ -330,6 +331,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
         }
 
         #endregion
+
         #region Dependencias
         public ActionResult ManteniDependencias()
         {

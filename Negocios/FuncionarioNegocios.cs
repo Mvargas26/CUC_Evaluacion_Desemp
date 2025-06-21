@@ -99,7 +99,7 @@ namespace Negocios
         }
 
         public bool CrearFuncionario(FuncionarioModel funcionario)
-        {
+         {
             var parametros = new SqlParameter[]
             {
             new SqlParameter("@Accion", "INSERT"),
@@ -109,16 +109,21 @@ namespace Negocios
             new SqlParameter("@Apellido2", funcionario.Apellido2),
             new SqlParameter("@Correo", funcionario.Correo),
             new SqlParameter("@Password", funcionario.Password),
-            new SqlParameter("@Departamento", funcionario.Dependencia),
-            new SqlParameter("@Rol", funcionario.Rol),
-            new SqlParameter("@Puesto", funcionario.Puesto),
-            new SqlParameter("@Estado", funcionario.Estado),
+            new SqlParameter("@IdRol", funcionario.IdRol),
+            new SqlParameter("@IdPuesto", funcionario.IdPuesto),
+            new SqlParameter("@IdEstadoFuncionario", funcionario.IdEstadoFuncionario),
             new SqlParameter("@CodigoSeguridad", funcionario.CodigoSeguridad),
-            new SqlParameter("@IdDepartamento", funcionario.IdDepartamento),
+            new SqlParameter("@Telefono", funcionario.Telefono),
             new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             _accesoBD.EjecutarSPconDT("sp_CrudFuncionarios", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
 
             return true;
         }
