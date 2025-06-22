@@ -10,9 +10,10 @@ namespace Entidades
 {
     public class PuestosModel
     {
-        public int idPuesto { get; set; }
+        public int IdPuesto { get; set; }
         public string Puesto { get; set; }
         public int IdDependencia { get; set; }
         public string Descripcion { get; set; }
+      
     }
 }

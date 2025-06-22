@@ -127,8 +127,12 @@ namespace CUC_Evaluacion_Desemp.Controllers
         {
             try
             {
-                var puesto = _servicioMantenimientos.Puestos.ListarPuesto();
-                return View(puesto);
+                ViewBag.ListarDependencias = _servicioMantenimientos.Dependencias.ListarDependencias();
+                var puestos = _servicioMantenimientos.Puestos.ListarPuesto();
+              
+
+
+                return View(puestos);
             }
             catch (Exception ex)
             {
@@ -137,12 +141,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
-        public ActionResult CreaPuesto()
-        {
-            return View("CreaPuesto", new PuestosModel());
-        }
 
-  
+
+
         [HttpPost]
         public ActionResult CreaPuesto(PuestosModel nuevoPuesto)
         {
@@ -150,34 +151,30 @@ namespace CUC_Evaluacion_Desemp.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    // Aquí llamas al método para agregar el puesto a la base de datos
+            
                    _servicioMantenimientos.Puestos.CrearPuesto(nuevoPuesto);
+                    ViewBag.ListaAreas = _servicioMantenimientos.Dependencias.ListarDependencias();
 
-                    // Si la inserción fue exitosa, muestras el mensaje de éxito
+
                     TempData["MensajeExito"] = $"Puesto {nuevoPuesto.Puesto} creado correctamente.";
                     return RedirectToAction(nameof(ManteniPuesto));
                 }
                 else
                 {
-                    // Si el modelo no es válido, vuelve a la vista original con los datos
-                    return View("CreaPuesto", nuevoPuesto); // Usa el mismo nombre de vista aquí
+              
+                    return View("CreaPuesto", nuevoPuesto); 
                 }
             }
             catch (Exception ex)
             {
-                // Aquí atrapas el error y lo muestras en la vista usando TempData
+                
                 TempData["MensajeError"] = $"Error al crear el puesto: {ex.Message}";
-                return View("CreaPuesto", nuevoPuesto); // Usa el mismo nombre de vista aquí
+                return View("CreaPuesto", nuevoPuesto); 
             }
         }
 
-    
-        public ActionResult EditaPuesto(int id)
-        {
-            return View(_servicioMantenimientos.Puestos.ConsultarPuestoID(id));
-        }
-
-    
+     
+            
         [HttpPost]
         public ActionResult EditaPuesto(PuestosModel puestoModificado)
         {

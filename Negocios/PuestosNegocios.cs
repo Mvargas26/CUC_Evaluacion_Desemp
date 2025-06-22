@@ -19,16 +19,25 @@ namespace Negocios
             _accesoBD = accesoBD;
         }
 
-       
+
         public PuestosModel ConsultarPuestoID(int idPuesto)
         {
-            var parametros = new SqlParameter[]
+            var mensajeError = new SqlParameter("@MensajeError", SqlDbType.VarChar, 500)
             {
-            new SqlParameter("@Operacion", "R"),
-            new SqlParameter("@idPuesto", idPuesto)
+                Direction = ParameterDirection.Output
             };
 
-            DataTable dt = _accesoBD.EjecutarSPconDT("sp_Puesto_CRUD", parametros);
+            var parametros = new SqlParameter[]
+            {
+        new SqlParameter("@Operacion", "R"),
+        new SqlParameter("@idPuesto", idPuesto),
+        new SqlParameter("@Puesto", DBNull.Value),
+        new SqlParameter("@idDependencia", DBNull.Value),
+        new SqlParameter("@Descripcion", DBNull.Value),
+        mensajeError
+            };
+
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_Puestos_CRUD", parametros);
 
             if (dt.Rows.Count == 0)
                 return null;
@@ -37,69 +46,139 @@ namespace Negocios
 
             return new PuestosModel
             {
-                idPuesto = Convert.ToInt32(row["idPuesto"]),
+                IdPuesto = Convert.ToInt32(row["idPuesto"]),
                 Puesto = row["Puesto"].ToString(),
+                Descripcion = row["Descripcion"]?.ToString(),
+                IdDependencia = row["idDependencia"] != DBNull.Value ? Convert.ToInt32(row["idDependencia"]) : 0
+              
             };
         }
 
+
         public List<PuestosModel> ListarPuesto()
         {
-            var parametros = new SqlParameter[]
+
+            var mensajeError = new SqlParameter("@MensajeError", SqlDbType.VarChar, 500)
             {
-            new SqlParameter("@Operacion", "R")
+                Direction = ParameterDirection.Output
             };
 
-            DataTable dt = _accesoBD.EjecutarSPconDT("sp_PuestosCRUD", parametros);
+            var parametros = new SqlParameter[]
+            {
+        new SqlParameter("@Operacion", "R"),
+        new SqlParameter("@idPuesto", DBNull.Value),
+        new SqlParameter("@Puesto", DBNull.Value),
+        new SqlParameter("@idDependencia", DBNull.Value),
+        new SqlParameter("@Descripcion", DBNull.Value),
+        mensajeError
+            };
+
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_Puestos_CRUD", parametros);
 
             var lista = new List<PuestosModel>();
             foreach (DataRow row in dt.Rows)
             {
                 lista.Add(new PuestosModel
                 {
-                    idPuesto = Convert.ToInt32(row["idPuesto"]),
-                    Puesto = row["Puesto"].ToString()
+                    IdPuesto = Convert.ToInt32(row["idPuesto"]),
+                    IdDependencia = Convert.ToInt32(row["idDependencia"]),
+                    Puesto = row["Puesto"].ToString(),
+                    Descripcion = row["Descripcion"].ToString(),
+
                 });
             }
 
-            return lista;
 
+            return lista;
         }
+
+
+       
 
         public void CrearPuesto(PuestosModel puesto)
         {
-            var parametros = new SqlParameter[]
+            var mensajeError = new SqlParameter("@MensajeError", SqlDbType.VarChar, 500)
             {
-            new SqlParameter("@Operacion", "C"),
-            new SqlParameter("@Puesto", puesto.Puesto),
-
+                Direction = ParameterDirection.Output
             };
 
-            _accesoBD.EjecutarSPconDT("sp_Puesto_CRUD", parametros);
+            var parametros = new SqlParameter[]
+            {
+        new SqlParameter("@Operacion", "C"),
+        new SqlParameter("@idPuesto", DBNull.Value),
+        new SqlParameter("@Puesto", puesto.Puesto ?? (object)DBNull.Value),
+        new SqlParameter("@idDependencia", puesto.IdDependencia),
+        new SqlParameter("@Descripcion", puesto.Descripcion ?? (object)DBNull.Value),
+        mensajeError
+            };
+
+            _accesoBD.EjecutarSPconDT("sp_Puestos_CRUD", parametros);
+
+
+            var resultado = mensajeError.Value?.ToString();
+            if (!string.IsNullOrEmpty(resultado))
+            {
+
+                Console.WriteLine("Mensaje del SP (Crear): " + resultado);
+            }
         }
 
         public void ModificarPuesto(PuestosModel puesto)
         {
-            var parametros = new SqlParameter[]
+            var mensajeError = new SqlParameter("@MensajeError", SqlDbType.VarChar, 500)
             {
-            new SqlParameter("@Operacion", "U"),
-            new SqlParameter("@idPuesto", puesto.idPuesto),
-            new SqlParameter("@Puesto", puesto.Puesto)
-
+                Direction = ParameterDirection.Output
             };
 
-            _accesoBD.EjecutarSPconDT("sp_Puesto_CRUD", parametros);
+            var parametros = new SqlParameter[]
+            {
+        new SqlParameter("@Operacion", "U"),
+        new SqlParameter("@idPuesto", puesto.IdPuesto),
+        new SqlParameter("@Puesto", puesto.Puesto ?? (object)DBNull.Value),
+        new SqlParameter("@idDependencia", puesto.IdDependencia),
+        new SqlParameter("@Descripcion", puesto.Descripcion ?? (object)DBNull.Value),
+        mensajeError
+            };
+
+            _accesoBD.EjecutarSPconDT("sp_Puestos_CRUD", parametros);
+
+
+            var resultado = mensajeError.Value?.ToString();
+            if (!string.IsNullOrEmpty(resultado))
+            {
+                Console.WriteLine("Mensaje del SP (Modificar): " + resultado);
+            }
         }
+
 
         public void EliminarPuesto(int id)
         {
-            var parametros = new SqlParameter[]
+            var mensajeError = new SqlParameter("@MensajeError", SqlDbType.VarChar, 500)
             {
-            new SqlParameter("@Operacion", "D"),
-            new SqlParameter("@idPuesto", id)
+                Direction = ParameterDirection.Output
             };
 
-            _accesoBD.EjecutarSPconDT("sp_Puesto_CRUD", parametros);
+            var parametros = new SqlParameter[]
+            {
+        new SqlParameter("@Operacion", "D"),
+        new SqlParameter("@idPuesto", id),
+        new SqlParameter("@Puesto", DBNull.Value),
+        new SqlParameter("@idDependencia", DBNull.Value),
+        new SqlParameter("@Descripcion", DBNull.Value),
+        mensajeError
+            };
+
+            _accesoBD.EjecutarSPconDT("sp_Puestos_CRUD", parametros);
+
+            // Opcional: revisar si el SP devolvió algún error
+            string mensaje = mensajeError.Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensaje))
+            {
+                throw new Exception(mensaje); // O manejarlo como prefieras
+            }
         }
+
+    
 
     }
 }

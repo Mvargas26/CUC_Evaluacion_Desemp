@@ -1,10 +1,11 @@
-﻿@{
+﻿
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Gestión de Puestos";
 }
 
 <div class="container mt-4">
-    <h2 class="mb-4">Gestión de Puestos</h2>
+    <h2 class="mb-4">Mantenimiento Puestos</h2>
 
 
     @if (TempData["MensajeExito"] != null)
@@ -14,12 +15,17 @@
         </div>
     }
 
-
+    @if (TempData["MensajeError"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["MensajeError"]
+        </div>
+    }
 
     <div class="d-flex justify-content-between">
-        <a href="/Mantenimientos/CreaPuesto" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Crear Nuevo Puesto
-        </a>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrearPuesto">
+            <i class="fas fa-plus"></i> Crear
+        </button>
     </div>
 
 
@@ -28,24 +34,27 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Nombre del Puesto</th>
+                    <th>Puesto</th>
+                    <th>Descripción</th>
+
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var puesto in Model)
+                @foreach (var Puestos in Model)
                 {
                     <tr>
-                        <td>@puesto.idPuesto</td>
-                        <td>@puesto.Puesto</td>
-                        <td>
-                            <a href="/Mantenimientos/EditaPuesto/@puesto.idPuesto" class="btn btn-primary btn-sm">
-                                <i class="fas fa-edit"></i> Modificar Puesto
-                            </a>
+                        <td>@Puestos.IdPuesto</td>
+                        <td>@Puestos.Puesto</td>
+                        <td>@Puestos.Descripcion</td>
 
-                    
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminarPuesto-@puesto.idPuesto">
-                                <i class="fas fa-trash-alt"></i> Eliminar Puesto
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarPuesto-@Puestos.IdPuesto">
+                                <i class="fas fa-edit"></i>
+                            </button>
+
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminarPuesto-@Puestos.IdPuesto">
+                                <i class="fas fa-trash-alt"></i>
                             </button>
                         </td>
                     </tr>
@@ -55,24 +64,102 @@
     </div>
 </div>
 
+@* Modal para CREAR *@
+<div class="modal fade" id="modalCrearPuesto" tabindex="-1" aria-labelledby="modalCrearPuestoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCrearPuestoLabel">Nuevo Puesto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form action="@Url.Action("CreaPuesto", "Mantenimientos")" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nuevoPuestoNombre" class="form-label">Nombre del Puesto</label>
+                        <input type="text" class="form-control" id="nuevoPuestoNombre" name="Puesto" required />
+                    </div>
 
-@foreach (var puesto in Model)
+                    <div class="mb-3">
+                        <label for="idDependencia" class="form-label">Departamento</label>
+                        <select class="form-select" id="idDependencia" name="idDependencia" required>
+                            <option value="">Seleccione un departamento</option>
+                            @foreach (var Dependencias in ViewBag.ListarDependencias)
+                            {
+                                <option value="@Dependencias.IdDependencia">@Dependencias.Dependencia</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" name="Descripcion" id="Descripcion" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Puesto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* Modal para EDITAR *@
+@foreach (var Puestos in Model)
 {
-    <div class="modal fade" id="modalEliminarPuesto-@puesto.idPuesto" tabindex="-1" aria-labelledby="modalEliminarPuestoLabel-@puesto.idPuesto" aria-hidden="true">
+    <div class="modal fade" id="modalEditarPuesto-@Puestos.IdPuesto" tabindex="-1" aria-labelledby="modalEditarPuestoLabel-@Puestos.IdPuesto" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalEliminarPuestoLabel-@puesto.idPuesto">Confirmar eliminación</h5>
+                    <h5 class="modal-title" id="modalEditarPuestoLabel-@Puestos.IdPuesto">Editar Puesto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <form action="@Url.Action("EditaPuesto", "Mantenimientos")" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="IdPuesto" value="@Puestos.IdPuesto" />
+                        <input type="hidden" name="IdDependencia" value="@Puestos.IdDependencia" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Nombre del Puesto</label>
+                            <input type="text" class="form-control" name="Puesto" value="@Puestos.Puesto" required />
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea class="form-control" name="Descripcion" rows="3">@Puestos.Descripcion</textarea>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+
+@* Modal para ELIMINAR *@
+@foreach (var Puestos in Model)
+{
+    <div class="modal fade" id="modalEliminarPuesto-@Puestos.IdPuesto" tabindex="-1" aria-labelledby="modalEliminarPuestoLabel-@Puestos.IdPuesto" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEliminarPuestoLabel-@Puestos.IdPuesto">Confirmar eliminación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    ¿Realmente desea eliminar el puesto <strong>@puesto.Puesto</strong>?
+                    ¿Realmente desea eliminar el puesto <strong>@Puestos.Puesto</strong>?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-
                     <form action="@Url.Action("EliminarPuesto", "Mantenimientos")" method="post">
-                        <input type="hidden" name="id" value="@puesto.idPuesto" />
+                        <input type="hidden" name="id" value="@Puestos.IdPuesto" />
                         <button type="submit" class="btn btn-danger">Sí</button>
                     </form>
                 </div>
@@ -81,4 +168,4 @@
     </div>
 }
 
-
+<script defer src="~/sources/js/accionOcultarCerrarMensajes.js"></script>

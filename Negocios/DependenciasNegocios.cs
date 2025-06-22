@@ -45,14 +45,26 @@ namespace Negocios
         {
             try
             {
+                var mensajeError = new SqlParameter("@MensajeError", SqlDbType.VarChar, 500)
+                {
+                    Direction = ParameterDirection.Output
+                };
+
                 var parametros = new SqlParameter[]
                 {
-                new SqlParameter("@Operacion", "R")
+            new SqlParameter("@Operacion", "R"),
+            mensajeError
                 };
 
                 DataTable dt = _accesoBD.EjecutarSPconDT("sp_DependenciasCRUD", parametros);
-                List<DependenciasModel> lista = new List<DependenciasModel>();
 
+                string error = mensajeError.Value?.ToString();
+                if (!string.IsNullOrEmpty(error))
+                {
+                    throw new Exception("Error desde SP: " + error);
+                }
+
+                List<DependenciasModel> lista = new List<DependenciasModel>();
                 foreach (DataRow row in dt.Rows)
                 {
                     lista.Add(new DependenciasModel
