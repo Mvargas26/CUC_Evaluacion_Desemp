@@ -7,7 +7,21 @@
 
 <div class="container mt-4">
     <h2 class="mb-4">Gestión de Funcionarios</h2>
+    @********************************************************* mENSAJES eXITO Y eRROR*@
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["MensajeExito"]
+        </div>
+    }
 
+    @if (TempData["MensajeError"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["MensajeError"]
+        </div>
+    }
+    @*********************************************************bOTON GRANDE cREAR*@
     <div class="d-flex justify-content-between">
         <a href="@Url.Action("CrearFuncionario", "Mantenimientos")" class="btn btn-primary">
             <i class="fas fa-plus"></i> Crear nuevo Funcionario
@@ -58,7 +72,7 @@
     </div>
 </div>
 
-<!-- Modales -->
+@*------------------------------------------------------------------MODAL ELIMINAR*@
 @foreach (var dt in Model)
 {
     <div class="modal fade" id="modalEliminarFuncionario-@dt.Cedula" tabindex="-1"
@@ -86,4 +100,5 @@
     </div>
 }
 
+<script defer src="~/sources/js/accionOcultarCerrarMensajes.js"></script>
 
