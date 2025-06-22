@@ -22,22 +22,23 @@ namespace Negocios
 
         public PuestosModel ConsultarPuestoID(int idPuesto)
         {
-            var mensajeError = new SqlParameter("@MensajeError", SqlDbType.VarChar, 500)
-            {
-                Direction = ParameterDirection.Output
-            };
-
             var parametros = new SqlParameter[]
             {
-        new SqlParameter("@Operacion", "R"),
-        new SqlParameter("@idPuesto", idPuesto),
-        new SqlParameter("@Puesto", DBNull.Value),
-        new SqlParameter("@idDependencia", DBNull.Value),
-        new SqlParameter("@Descripcion", DBNull.Value),
-        mensajeError
+                new SqlParameter("@Operacion", "R"),
+                new SqlParameter("@idPuesto", idPuesto),
+                new SqlParameter("@Puesto", DBNull.Value),
+                new SqlParameter("@idDependencia", DBNull.Value),
+                new SqlParameter("@Descripcion", DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             DataTable dt = _accesoBD.EjecutarSPconDT("sp_Puestos_CRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
 
             if (dt.Rows.Count == 0)
                 return null;
@@ -53,8 +54,6 @@ namespace Negocios
               
             };
         }
-
-
         public List<PuestosModel> ListarPuesto()
         {
             var parametros = new SqlParameter[]
@@ -91,94 +90,69 @@ namespace Negocios
 
             return lista;
         }
-
-
-       
-
         public void CrearPuesto(PuestosModel puesto)
         {
-            var mensajeError = new SqlParameter("@MensajeError", SqlDbType.VarChar, 500)
-            {
-                Direction = ParameterDirection.Output
-            };
-
             var parametros = new SqlParameter[]
             {
-        new SqlParameter("@Operacion", "C"),
-        new SqlParameter("@idPuesto", DBNull.Value),
-        new SqlParameter("@Puesto", puesto.Puesto ?? (object)DBNull.Value),
-        new SqlParameter("@idDependencia", puesto.IdDependencia),
-        new SqlParameter("@Descripcion", puesto.Descripcion ?? (object)DBNull.Value),
-        mensajeError
+                new SqlParameter("@Operacion", "C"),
+                new SqlParameter("@idPuesto", DBNull.Value),
+                new SqlParameter("@Puesto", puesto.Puesto ?? (object)DBNull.Value),
+                new SqlParameter("@idDependencia", puesto.IdDependencia),
+                new SqlParameter("@Descripcion", puesto.Descripcion ?? (object)DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+
             };
 
             _accesoBD.EjecutarSPconDT("sp_Puestos_CRUD", parametros);
 
-
-            var resultado = mensajeError.Value?.ToString();
-            if (!string.IsNullOrEmpty(resultado))
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
             {
-
-                Console.WriteLine("Mensaje del SP (Crear): " + resultado);
+                throw new Exception("Error SP: " + mensajeError);
             }
         }
 
         public void ModificarPuesto(PuestosModel puesto)
         {
-            var mensajeError = new SqlParameter("@MensajeError", SqlDbType.VarChar, 500)
-            {
-                Direction = ParameterDirection.Output
-            };
-
             var parametros = new SqlParameter[]
             {
-        new SqlParameter("@Operacion", "U"),
-        new SqlParameter("@idPuesto", puesto.IdPuesto),
-        new SqlParameter("@Puesto", puesto.Puesto ?? (object)DBNull.Value),
-        new SqlParameter("@idDependencia", puesto.IdDependencia),
-        new SqlParameter("@Descripcion", puesto.Descripcion ?? (object)DBNull.Value),
-        mensajeError
+                new SqlParameter("@Operacion", "U"),
+                new SqlParameter("@idPuesto", puesto.IdPuesto),
+                new SqlParameter("@Puesto", puesto.Puesto ?? (object)DBNull.Value),
+                new SqlParameter("@idDependencia", puesto.IdDependencia),
+                new SqlParameter("@Descripcion", puesto.Descripcion ?? (object)DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             _accesoBD.EjecutarSPconDT("sp_Puestos_CRUD", parametros);
 
-
-            var resultado = mensajeError.Value?.ToString();
-            if (!string.IsNullOrEmpty(resultado))
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
             {
-                Console.WriteLine("Mensaje del SP (Modificar): " + resultado);
+                throw new Exception("Error SP: " + mensajeError);
             }
         }
-
 
         public void EliminarPuesto(int id)
         {
-            var mensajeError = new SqlParameter("@MensajeError", SqlDbType.VarChar, 500)
-            {
-                Direction = ParameterDirection.Output
-            };
-
             var parametros = new SqlParameter[]
             {
-        new SqlParameter("@Operacion", "D"),
-        new SqlParameter("@idPuesto", id),
-        new SqlParameter("@Puesto", DBNull.Value),
-        new SqlParameter("@idDependencia", DBNull.Value),
-        new SqlParameter("@Descripcion", DBNull.Value),
-        mensajeError
+                new SqlParameter("@Operacion", "D"),
+                new SqlParameter("@idPuesto", id),
+                new SqlParameter("@Puesto", DBNull.Value),
+                new SqlParameter("@idDependencia", DBNull.Value),
+                new SqlParameter("@Descripcion", DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             _accesoBD.EjecutarSPconDT("sp_Puestos_CRUD", parametros);
 
-            // Opcional: revisar si el SP devolvió algún error
-            string mensaje = mensajeError.Value?.ToString();
-            if (!string.IsNullOrWhiteSpace(mensaje))
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
             {
-                throw new Exception(mensaje); // O manejarlo como prefieras
+                throw new Exception("Error SP: " + mensajeError);
             }
         }
 
-    
-
-    }
+    }//fin class
 }

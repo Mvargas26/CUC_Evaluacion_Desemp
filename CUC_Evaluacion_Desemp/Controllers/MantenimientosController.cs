@@ -85,40 +85,60 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 var conglomeradosSeleccionados = collection["IdConglomeradosSeleccionados"];
 
-                foreach (var id in conglomeradosSeleccionados)
+                if (!string.IsNullOrEmpty(conglomeradosSeleccionados))
                 {
-                    FuncionarioXConglomeradoModel relacion = new FuncionarioXConglomeradoModel
-                    {
-                        IdFuncionario = idFuncionario,
-                        IdConglomerado = Convert.ToInt32(id)
-                    };
+                    var ids = conglomeradosSeleccionados.Split(',');
 
-                    _servicioMantenimientos.FuncionarioXConglomerado.CrearFuncionarioXConglomerado(relacion);
+                    foreach (var id in ids)
+                    {
+                        if (int.TryParse(id, out int idConglomerado))
+                        {
+                            FuncionarioXConglomeradoModel relacion = new FuncionarioXConglomeradoModel
+                            {
+                                IdFuncionario = idFuncionario,
+                                IdConglomerado = idConglomerado
+                            };
+
+                            _servicioMantenimientos.FuncionarioXConglomerado.CrearFuncionarioXConglomerado(relacion);
+                        }
+                    }
                 }
 
 
                 var areasSeleccionadas = collection["IdAreasSeleccionadas"];
 
-                foreach (var id in areasSeleccionadas)
+                if (!string.IsNullOrEmpty(areasSeleccionadas))
                 {
-                    FuncionarioPorAreaModel relacion = new FuncionarioPorAreaModel
-                    {
-                        cedulaFuncionario = idFuncionario,
-                        idArea = Convert.ToInt32(id)
-                    };
+                    var ids = areasSeleccionadas.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                               .Select(x => x.Trim())
+                                               .ToArray();
 
-                    _servicioMantenimientos.FuncionarioPorArea.CrearFuncionarioPorArea(relacion);
+                    foreach (var id in ids)
+                    {
+                        if (int.TryParse(id, out int idArea))
+                        {
+                            FuncionarioPorAreaModel relacion = new FuncionarioPorAreaModel
+                            {
+                                cedulaFuncionario = idFuncionario,  
+                                idArea = idArea
+                            };
+
+                            _servicioMantenimientos.FuncionarioPorArea.CrearFuncionarioPorArea(relacion);
+                        }
+                    }
                 }
 
                 TempData["MensajeExito"] = $"Creado correctamente.";
                 return RedirectToAction("ManteniFuncionarios");
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                TempData["MensajeError"] = $"Error al crear: {ex.Message}";
+                TempData["MensajeError"] = $"Error al crear.";
                 return RedirectToAction("ManteniFuncionarios");
             }
         }
+       
+        
         #endregion
 
         #region Puestos
@@ -158,15 +178,16 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 }
                 else
                 {
-              
-                    return View("CreaPuesto", nuevoPuesto); 
+                    return RedirectToAction(nameof(ManteniPuesto));
                 }
             }
             catch (Exception ex)
             {
-                
-                TempData["MensajeError"] = $"Error al crear el puesto: {ex.Message}";
-                return View("CreaPuesto", nuevoPuesto); 
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                   ? "¡ ALERTA! Este registro ya existe."
+                   : "Error al procesar la solicitud.";
+
+                return RedirectToAction(nameof(ManteniPuesto));
             }
         }
 
@@ -183,13 +204,16 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 }
                 else
                 {
-                    return View(puestoModificado);
+                    return RedirectToAction(nameof(ManteniPuesto));
                 }
             }
             catch (Exception ex)
             {
-                TempData["MensajeError"] = $"Error al actualizar el puesto: {ex.Message}";
-                return View(puestoModificado);
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                   ? "¡ ALERTA! Este registro ya existe."
+                   : "Error al procesar la solicitud.";
+
+                return RedirectToAction(nameof(ManteniPuesto));
             }
         }
 
@@ -205,13 +229,13 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 else
                 {
                     _servicioMantenimientos.Puestos.EliminarPuesto(id);
-                    TempData["MensajeExito"] = $"Puesto {puesto.Puesto} eliminado correctamente.";
+                    TempData["MensajeExito"] = $"Puesto eliminado correctamente.";
                 }
                 return RedirectToAction(nameof(ManteniPuesto));
             }
             catch
             {
-                TempData["MensajeError"] = "No puede borrar este puesto, verifique las relaciones.";
+                TempData["MensajeError"] = "No puede borrar este puesto,esta siendo utilizado.";
                 return RedirectToAction(nameof(ManteniPuesto));
             }
         }

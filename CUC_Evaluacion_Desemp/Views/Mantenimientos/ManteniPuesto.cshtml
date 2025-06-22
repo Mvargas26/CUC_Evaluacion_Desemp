@@ -1,4 +1,7 @@
-﻿
+﻿@using Entidades
+@{
+    var dependencias = ViewBag.ListarDependencias as IEnumerable<DependenciasModel>;
+}
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Gestión de Puestos";
@@ -36,7 +39,7 @@
                     <th>ID</th>
                     <th>Puesto</th>
                     <th>Descripción</th>
-
+                    <th>Dependencias</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -47,7 +50,7 @@
                         <td>@Puestos.IdPuesto</td>
                         <td>@Puestos.Puesto</td>
                         <td>@Puestos.Descripcion</td>
-
+                        <td>@(dependencias?.FirstOrDefault(d => d.IdDependencia == Puestos.IdDependencia)?.Dependencia ?? "Sin asignar")</td>
                         <td>
                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarPuesto-@Puestos.IdPuesto">
                                 <i class="fas fa-edit"></i>
@@ -64,7 +67,7 @@
     </div>
 </div>
 
-@* Modal para CREAR *@
+@* -------------------------------------------------------------------Modal para CREAR *@
 <div class="modal fade" id="modalCrearPuesto" tabindex="-1" aria-labelledby="modalCrearPuestoLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -105,32 +108,43 @@
     </div>
 </div>
 
-@* Modal para EDITAR *@
-@foreach (var Puestos in Model)
+@* -----------------------------------------------------------Modal para EDITAR *@
+@foreach (var puesto in Model)
 {
-    <div class="modal fade" id="modalEditarPuesto-@Puestos.IdPuesto" tabindex="-1" aria-labelledby="modalEditarPuestoLabel-@Puestos.IdPuesto" aria-hidden="true">
+    <div class="modal fade" id="modalEditarPuesto-@puesto.IdPuesto" tabindex="-1" aria-labelledby="modalEditarPuestoLabel-@puesto.IdPuesto" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalEditarPuestoLabel-@Puestos.IdPuesto">Editar Puesto</h5>
+                    <h5 class="modal-title" id="modalEditarPuestoLabel-@puesto.IdPuesto">Editar Puesto</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <form action="@Url.Action("EditaPuesto", "Mantenimientos")" method="post">
                     <div class="modal-body">
-                        <input type="hidden" name="IdPuesto" value="@Puestos.IdPuesto" />
-                        <input type="hidden" name="IdDependencia" value="@Puestos.IdDependencia" />
+                        <input type="hidden" name="IdPuesto" value="@puesto.IdPuesto" />
 
                         <div class="mb-3">
                             <label class="form-label">Nombre del Puesto</label>
-                            <input type="text" class="form-control" name="Puesto" value="@Puestos.Puesto" required />
+                            <input type="text" class="form-control" name="Puesto" value="@puesto.Puesto" required />
                         </div>
 
+                        <div class="mb-3">
+                            <label class="form-label">Dependencia</label>
+                            <select class="form-select" name="IdDependencia" required>
+                                <option value="">Seleccione una dependencia</option>
+                                @foreach (var dependencia in dependencias)
+                                {
+                                    <option value="@dependencia.IdDependencia"
+                                            selected="@(dependencia.IdDependencia == puesto.IdDependencia)">
+                                        @dependencia.Dependencia
+                                    </option>
+                                }
+                            </select>
+                        </div>
 
                         <div class="mb-3">
                             <label class="form-label">Descripción</label>
-                            <textarea class="form-control" name="Descripcion" rows="3">@Puestos.Descripcion</textarea>
+                            <textarea class="form-control" name="Descripcion" rows="3">@puesto.Descripcion</textarea>
                         </div>
-
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -143,7 +157,7 @@
 }
 
 
-@* Modal para ELIMINAR *@
+@* ---------------------------------------------Modal para ELIMINAR *@
 @foreach (var Puestos in Model)
 {
     <div class="modal fade" id="modalEliminarPuesto-@Puestos.IdPuesto" tabindex="-1" aria-labelledby="modalEliminarPuestoLabel-@Puestos.IdPuesto" aria-hidden="true">
