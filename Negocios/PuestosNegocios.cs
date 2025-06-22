@@ -57,23 +57,23 @@ namespace Negocios
 
         public List<PuestosModel> ListarPuesto()
         {
-
-            var mensajeError = new SqlParameter("@MensajeError", SqlDbType.VarChar, 500)
-            {
-                Direction = ParameterDirection.Output
-            };
-
             var parametros = new SqlParameter[]
             {
-        new SqlParameter("@Operacion", "R"),
-        new SqlParameter("@idPuesto", DBNull.Value),
-        new SqlParameter("@Puesto", DBNull.Value),
-        new SqlParameter("@idDependencia", DBNull.Value),
-        new SqlParameter("@Descripcion", DBNull.Value),
-        mensajeError
+                new SqlParameter("@Operacion", "R"),
+                new SqlParameter("@idPuesto", DBNull.Value),
+                new SqlParameter("@Puesto", DBNull.Value),
+                new SqlParameter("@idDependencia", DBNull.Value),
+                new SqlParameter("@Descripcion", DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             DataTable dt = _accesoBD.EjecutarSPconDT("sp_Puestos_CRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
 
             var lista = new List<PuestosModel>();
             foreach (DataRow row in dt.Rows)

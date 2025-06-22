@@ -23,11 +23,19 @@ namespace Negocios
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Operacion ", "S"),
-            new SqlParameter("@idDependencia ", id)
+                new SqlParameter("@Operacion ", "S"),
+                new SqlParameter("@idDependencia ", id),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+
             };
 
             DataTable dt = _accesoBD.EjecutarSPconDT("idDependencia", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
 
             if (dt.Rows.Count == 0)
                 return null;
@@ -45,23 +53,19 @@ namespace Negocios
         {
             try
             {
-                var mensajeError = new SqlParameter("@MensajeError", SqlDbType.VarChar, 500)
-                {
-                    Direction = ParameterDirection.Output
-                };
-
                 var parametros = new SqlParameter[]
-                {
-            new SqlParameter("@Operacion", "R"),
-            mensajeError
-                };
+              {
+                new SqlParameter("@Operacion", "R"),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+
+              };
 
                 DataTable dt = _accesoBD.EjecutarSPconDT("sp_DependenciasCRUD", parametros);
 
-                string error = mensajeError.Value?.ToString();
-                if (!string.IsNullOrEmpty(error))
+                string mensajeError = parametros.Last().Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(mensajeError))
                 {
-                    throw new Exception("Error desde SP: " + error);
+                    throw new Exception("Error SP: " + mensajeError);
                 }
 
                 List<DependenciasModel> lista = new List<DependenciasModel>();
@@ -88,15 +92,23 @@ namespace Negocios
             {
                 var parametros = new SqlParameter[]
                 {
-                new SqlParameter("@Operacion", "C"),
-                new SqlParameter("@Dependencia", departamento.Dependencia)
+                    new SqlParameter("@Operacion", "C"),
+                    new SqlParameter("@Dependencia", departamento.Dependencia),
+                    new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+
                 };
 
                 _accesoBD.EjecutarSPconDT("sp_DependenciasCRUD", parametros);
+
+                string mensajeError = parametros.Last().Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(mensajeError))
+                {
+                    throw new Exception("Error SP: " + mensajeError);
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al crear el departamento: " + ex.Message);
+                throw new Exception("Error al crear : " + ex.Message);
             }
         }
 
@@ -106,12 +118,20 @@ namespace Negocios
             {
                 var parametros = new SqlParameter[]
                 {
-                new SqlParameter("@Operacion ", "U"),
-                new SqlParameter("@idDependencia ", departamento.IdDependencia),
-                new SqlParameter("@Dependencia ", departamento.Dependencia)
+                    new SqlParameter("@Operacion ", "U"),
+                    new SqlParameter("@idDependencia ", departamento.IdDependencia),
+                    new SqlParameter("@Dependencia ", departamento.Dependencia),
+                    new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+
                 };
 
                 _accesoBD.EjecutarSPconDT("sp_DependenciasCRUD ", parametros);
+
+                string mensajeError = parametros.Last().Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(mensajeError))
+                {
+                    throw new Exception("Error SP: " + mensajeError);
+                }
             }
             catch (Exception ex)
             {
@@ -125,11 +145,18 @@ namespace Negocios
             {
                 var parametros = new SqlParameter[]
                 {
-                new SqlParameter("@Operacion", "D"),
-                new SqlParameter("@idDependencia", id)
+                    new SqlParameter("@Operacion", "D"),
+                    new SqlParameter("@idDependencia", id),
+                    new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
                 };
 
                 _accesoBD.EjecutarSPconDT("sp_DependenciasCRUD ", parametros);
+
+                string mensajeError = parametros.Last().Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(mensajeError))
+                {
+                    throw new Exception("Error SP: " + mensajeError);
+                }
             }
             catch (Exception ex)
             {

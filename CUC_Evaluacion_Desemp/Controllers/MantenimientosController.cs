@@ -141,9 +141,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
-
-
-
         [HttpPost]
         public ActionResult CreaPuesto(PuestosModel nuevoPuesto)
         {
@@ -173,8 +170,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
-     
-            
         [HttpPost]
         public ActionResult EditaPuesto(PuestosModel puestoModificado)
         {
@@ -355,9 +350,12 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
             catch (Exception ex)
             {
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                   ? "¡ ALERTA! Este registro ya existe."
+                   : "Error al procesar la solicitud.";
 
-                TempData["MensajeError"] = $"Error al crear: {ex.Message}";
-                return View("CrearDependencia", newDependencia);
+                return RedirectToAction(nameof(ManteniDependencias));
+
             }
         }
         
@@ -370,9 +368,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 TempData["MensajeExito"] = $"Eliminado correctamente.";
                 return RedirectToAction(nameof(ManteniDependencias));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                TempData["MensajeError"] = "No se puede eliminar porque esta siendo utilizada. "+ex.Message;
+                TempData["MensajeError"] = "No se puede eliminar porque esta siendo utilizada. ";
                 return RedirectToAction(nameof(ManteniDependencias));
             }
         }
@@ -389,7 +387,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
             catch (Exception ex)
             {
-                TempData["MensajeError"] = "Error al editar."+ex.Message;
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                   ? "¡ ALERTA! Este registro ya existe."
+                   : "Error al procesar la solicitud.";
+
                 return RedirectToAction(nameof(ManteniDependencias));
             }
         }
@@ -403,9 +404,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var Roles = _servicioMantenimientos.Roles.ListarRoles();
                 return View(Roles);
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                TempData["MensajeError"] = $"Error al obtener la lista: {ex.Message}";
+                TempData["MensajeError"] = $"Error al obtener la lista.";
                 return View(new List<PuestosModel>());
             }
         }
@@ -419,10 +420,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 TempData["MensajeExito"] = $"{newRol.Rol} creado correctamente.";
                 return RedirectToAction(nameof(ManteniRoles));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
-                TempData["MensajeError"] = $"Error al crear: {ex.Message}";
+                TempData["MensajeError"] = $"Error al crear.";
                 return View("ManteniRoles", newRol);
             }
         }
@@ -436,9 +437,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 TempData["MensajeExito"] = $"Eliminado correctamente.";
                 return RedirectToAction(nameof(ManteniRoles));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                TempData["MensajeError"] = "No se puede eliminar porque esta siendo utilizada."+ ex.Message;
+                TempData["MensajeError"] = "No se puede eliminar porque esta siendo utilizada.";
                 return RedirectToAction(nameof(ManteniRoles));
             }
         }
@@ -453,9 +454,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return RedirectToAction(nameof(ManteniRoles));
 
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                TempData["MensajeError"] = "Error al editar. "+ ex.Message;
+                TempData["MensajeError"] = "Error al editar. ";
                 return RedirectToAction(nameof(ManteniRoles));
             }
         }
@@ -469,9 +470,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var Carreras = _servicioMantenimientos.Carreras.ListarCarreras();
                 return View(Carreras);
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                TempData["MensajeError"] = $"Error al obtener la lista: {ex.Message}";
+                TempData["MensajeError"] = $"Error al obtener la lista:";
                 return View(new List<CarrerasModel>());
             }
         }
@@ -485,10 +486,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 TempData["MensajeExito"] = $"{newCarrera.NombreCarrera} creado correctamente.";
                 return RedirectToAction(nameof(ManteniCarreras));
             }
-            catch (Exception ex)
+            catch (Exception )
             {
 
-                TempData["MensajeError"] = $"Error al crear: {ex.Message}";
+                TempData["MensajeError"] = $"Error al crear:";
                 return View("ManteniCarreras", newCarrera);
             }
         }
@@ -502,9 +503,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 TempData["MensajeExito"] = $"Eliminado correctamente.";
                 return RedirectToAction(nameof(ManteniCarreras));
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                TempData["MensajeError"] = "No se puede eliminar porque esta siendo utilizada." + ex.Message;
+                TempData["MensajeError"] = "No se puede eliminar porque esta siendo utilizada." ;
                 return RedirectToAction(nameof(ManteniCarreras));
             }
         }
@@ -519,9 +520,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return RedirectToAction(nameof(ManteniCarreras));
 
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                TempData["MensajeError"] = "Error al editar. " + ex.Message;
+                TempData["MensajeError"] = "Error al editar. " ;
                 return RedirectToAction(nameof(ManteniCarreras));
             }
         }
