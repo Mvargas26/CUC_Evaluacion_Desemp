@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Negocios
 {
@@ -19,16 +17,25 @@ namespace Negocios
             _accesoBD = accesoBD;
         }
 
-
         public List<AreasModel> ListarArea()
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Operacion", "SELECT"),
-            new SqlParameter("@idArea", DBNull.Value)
+                new SqlParameter("@Operacion", "R"),
+                new SqlParameter("@idArea", DBNull.Value),
+                new SqlParameter("@NombreArea", DBNull.Value),
+                new SqlParameter("@Descripcion", DBNull.Value),
+                new SqlParameter("@Estado", DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             DataTable dt = _accesoBD.EjecutarSPconDT("sp_AreasCRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
 
             var lista = new List<AreasModel>();
             foreach (DataRow row in dt.Rows)
@@ -38,23 +45,32 @@ namespace Negocios
                     idArea = Convert.ToInt32(row["idArea"]),
                     NombreArea = row["NombreArea"].ToString(),
                     Descripcion = row["Descripcion"].ToString(),
-
+                    Estado = Convert.ToBoolean(row["Estado"])
                 });
             }
 
             return lista;
-
         }
 
         public AreasModel ConsultarAreaID(int idArea)
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Operacion", "R"),
-            new SqlParameter("@idArea", idArea)
+                new SqlParameter("@Operacion", "R"),
+                new SqlParameter("@idArea", idArea),
+                new SqlParameter("@NombreArea", DBNull.Value),
+                new SqlParameter("@Descripcion", DBNull.Value),
+                new SqlParameter("@Estado", DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             DataTable dt = _accesoBD.EjecutarSPconDT("sp_AreasCRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
 
             if (dt.Rows.Count == 0)
                 return null;
@@ -66,6 +82,7 @@ namespace Negocios
                 idArea = Convert.ToInt32(row["idArea"]),
                 NombreArea = row["NombreArea"].ToString(),
                 Descripcion = row["Descripcion"].ToString(),
+                Estado = Convert.ToBoolean(row["Estado"])
             };
         }
 
@@ -73,41 +90,63 @@ namespace Negocios
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Operacion", "C"),
-            new SqlParameter("@NombreArea", area.NombreArea),
-            new SqlParameter("@Descripcion", area.Descripcion)
-
-
+                new SqlParameter("@Operacion", "C"),
+                new SqlParameter("@idArea", DBNull.Value),
+                new SqlParameter("@NombreArea", area.NombreArea),
+                new SqlParameter("@Descripcion", area.Descripcion),
+                new SqlParameter("@Estado", area.Estado),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             _accesoBD.EjecutarSPconDT("sp_AreasCRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
         }
 
         public void ModificarArea(AreasModel area)
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Operacion", "U"),
-            new SqlParameter("@idArea", area.idArea),
-            new SqlParameter("@NombreArea", area.NombreArea),
-            new SqlParameter("@Descripcion", area.Descripcion)
-
+                new SqlParameter("@Operacion", "U"),
+                new SqlParameter("@idArea", area.idArea),
+                new SqlParameter("@NombreArea", area.NombreArea),
+                new SqlParameter("@Descripcion", area.Descripcion),
+                new SqlParameter("@Estado", area.Estado),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             _accesoBD.EjecutarSPconDT("sp_AreasCRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
         }
 
         public void EliminarArea(int id)
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Operacion", "D"),
-            new SqlParameter("@idArea", id)
+                new SqlParameter("@Operacion", "D"),
+                new SqlParameter("@idArea", id),
+                new SqlParameter("@NombreArea", DBNull.Value),
+                new SqlParameter("@Descripcion", DBNull.Value),
+                new SqlParameter("@Estado", DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             _accesoBD.EjecutarSPconDT("sp_AreasCRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
         }
-
-
-    }//fin class
-}//fin space
+    }
+}

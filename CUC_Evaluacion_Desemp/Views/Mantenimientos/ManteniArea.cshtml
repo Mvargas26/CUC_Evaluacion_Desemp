@@ -1,10 +1,14 @@
-﻿@{
+﻿@using Entidades
+@{
+    var dependencias = ViewBag.ListarDependencias as IEnumerable<DependenciasModel>;
+}
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Gestión de Areas";
 }
 
 <div class="container mt-4">
-    <h2 class="mb-4">Gestión de Areas</h2>
+    <h2 class="mb-4">Mantenimiento Areas</h2>
 
 
     @if (TempData["MensajeExito"] != null)
@@ -14,12 +18,17 @@
         </div>
     }
 
-
+    @if (TempData["MensajeError"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["MensajeError"]
+        </div>
+    }
 
     <div class="d-flex justify-content-between">
-        <a href="/Mantenimientos/CreaArea" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Crear Nueva Area
-        </a>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrearArea">
+            <i class="fas fa-plus"></i> Crear
+        </button>
     </div>
 
 
@@ -28,27 +37,27 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Nombre del Area</th>
-                    <th>Descripcion</th>
+                    <th>Area</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var area in Model)
+                @foreach (var Areas in Model)
                 {
                     <tr>
-                        <td>@area.idArea</td>
-                        <td>@area.NombreArea</td>
-                        <td>@area.Descripcion</td>
-
+                        <td>@Areas.idArea</td>
+                        <td>@Areas.NombreArea</td>
+                        <td>@Areas.Descripcion</td>
+                        <td>@(Areas.Estado ? "Activo" : "Inactivo")</td>
                         <td>
-                            <a href="/Mantenimientos/EditaArea/@area.idArea" class="btn btn-primary btn-sm">
-                                <i class="fas fa-edit"></i> Modificar Area
-                            </a>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarArea-@Areas.idArea">
+                                <i class="fas fa-edit"></i>
+                            </button>
 
-
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminarArea-@area.idArea">
-                                <i class="fas fa-trash-alt"></i> Eliminar Area
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminarArea-@Areas.idArea">
+                                <i class="fas fa-trash-alt"></i>
                             </button>
                         </td>
                     </tr>
@@ -59,23 +68,107 @@
 </div>
 
 
-@foreach (var area in Model)
+<div class="modal fade" id="modalCrearArea" tabindex="-1" aria-labelledby="modalCrearAreaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCrearAreaLabel">Nuevo Área</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form action="@Url.Action("CreaArea", "Mantenimientos")" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nuevoAreaNombre" class="form-label">Nombre del Área</label>
+                        <input type="text" class="form-control" id="nuevoAreaNombre" name="NombreArea" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" name="Descripcion" id="Descripcion" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Estado" class="form-label">Estado</label>
+                        <select class="form-select" id="Estado" name="Estado" required>
+                            <option value="true" selected>Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Área</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+@foreach (var Area in Model)
 {
-    <div class="modal fade" id="modalEliminarArea-@area.idArea" tabindex="-1" aria-labelledby="modalEliminarAreaLabel-@area.idArea" aria-hidden="true">
+    <div class="modal fade" id="modalEditarArea-@Area.idArea" tabindex="-1" aria-labelledby="modalEditarAreaLabel-@Area.idArea" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalEliminarAreaLabel-@area.idArea">Confirmar eliminación</h5>
+                    <h5 class="modal-title" id="modalEditarAreaLabel-@Area.idArea">Editar Area</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <form action="@Url.Action("EditaArea", "Mantenimientos")" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="idArea" value="@Area.idArea" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Nombre del Area</label>
+                            <input type="text" class="form-control" name="NombreArea" value="@Area.NombreArea" required />
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea class="form-control" name="Descripcion" rows="3">@Area.Descripcion</textarea>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label for="Estado" class="form-label">Estado</label>
+                            <select class="form-select" id="Estado" name="Estado" required>
+                                <option value="true" selected>Activo</option>
+                                <option value="false">Inactivo</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@foreach (var Areas in Model)
+{
+    <div class="modal fade" id="modalEliminarArea-@Areas.idArea" tabindex="-1" aria-labelledby="modalEliminarAreaLabel-@Areas.idArea" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEliminarAreaLabel-@Areas.idArea">Confirmar eliminación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    ¿Realmente desea eliminar el Area <strong>@area.NombreArea</strong>?
+                    ¿Realmente desea eliminar el Area <strong>@Areas.NombreArea</strong>?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-
                     <form action="@Url.Action("EliminarArea", "Mantenimientos")" method="post">
-                        <input type="hidden" name="id" value="@area.idArea" />
+                        <input type="hidden" name="id" value="@Areas.idArea" />
                         <button type="submit" class="btn btn-danger">Sí</button>
                     </form>
                 </div>
@@ -84,5 +177,4 @@
     </div>
 }
 
-
-
+<script defer src="~/sources/js/accionOcultarCerrarMensajes.js"></script>

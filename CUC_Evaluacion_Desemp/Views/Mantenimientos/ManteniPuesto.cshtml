@@ -67,7 +67,7 @@
     </div>
 </div>
 
-@* -------------------------------------------------------------------Modal para CREAR *@
+
 <div class="modal fade" id="modalCrearPuesto" tabindex="-1" aria-labelledby="modalCrearPuestoLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -108,7 +108,7 @@
     </div>
 </div>
 
-@* -----------------------------------------------------------Modal para EDITAR *@
+
 @foreach (var puesto in Model)
 {
     <div class="modal fade" id="modalEditarPuesto-@puesto.IdPuesto" tabindex="-1" aria-labelledby="modalEditarPuestoLabel-@puesto.IdPuesto" aria-hidden="true">
@@ -157,7 +157,7 @@
 }
 
 
-@* ---------------------------------------------Modal para ELIMINAR *@
+
 @foreach (var Puestos in Model)
 {
     <div class="modal fade" id="modalEliminarPuesto-@Puestos.IdPuesto" tabindex="-1" aria-labelledby="modalEliminarPuestoLabel-@Puestos.IdPuesto" aria-hidden="true">

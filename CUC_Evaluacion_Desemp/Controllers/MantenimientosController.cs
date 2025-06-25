@@ -259,12 +259,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
-        public ActionResult CreaArea()
-        {
-            return View("CreaArea", new AreasModel());
-        }
-
-
+  
         [HttpPost]
         public ActionResult CreaArea(AreasModel nuevoArea)
         {
@@ -292,12 +287,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return View("CreaArea", nuevoArea);
             }
         }
-
-
-        public ActionResult EditaArea(int id)
-        {
-            return View(_servicioMantenimientos.Areas.ConsultarAreaID(id));
-        }
+            
 
 
         [HttpPost]
@@ -313,13 +303,13 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 }
                 else
                 {
-                    return View("EditaArea", areaModificado);
+                    return View("ManteniArea", areaModificado);
                 }
             }
             catch (Exception ex)
             {
                 TempData["MensajeError"] = $"Error al actualizar la area: {ex.Message}";
-                return View("EditaArea", areaModificado);
+                return View("ManteniArea", areaModificado);
             }
         }
 
