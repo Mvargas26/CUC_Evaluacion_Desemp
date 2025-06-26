@@ -79,8 +79,10 @@
                     @Html.DropDownListFor(m => m.Carreras, new SelectList(Model.Carreras, "idCarrera", "NombreCarrera"), "Ninguna", new { @class = "form-select" })
                 </div>
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Jefes, "Jefe Inmediato:", new { @class = "form-label" })
-                    @Html.DropDownListFor(m => m.Jefes, new SelectList(Model.Jefes, "Cedula", "NombreCompleto"), "Seleccione", new { @class = "form-select", required = "required" })
+                    @Html.LabelFor(m => m.Funcionario.CedJefeInmediato, "Jefe Inmediato:", new { @class = "form-label" })
+                    @Html.DropDownListFor(m => m.Funcionario.CedJefeInmediato,new SelectList(Model.Jefes, "Cedula", "NombreCompleto"),
+                        "Seleccione",new { @class = "form-select", required = "required" })
+                    @Html.ValidationMessageFor(m => m.Funcionario.CedJefeInmediato, "", new { @class = "text-danger" })
                 </div>
             </div>
             @*********************************** Fila 4*@

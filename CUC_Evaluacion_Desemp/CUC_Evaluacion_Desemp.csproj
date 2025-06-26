@@ -144,6 +144,7 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Controllers\AuthController.cs" />
+    <Compile Include="Controllers\EvaluacionController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MantenimientosController.cs" />
     <Compile Include="Global.asax.cs">
@@ -227,6 +228,9 @@
     <Content Include="Views\Mantenimientos\ManteniDependencias.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniRoles.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniCarreras.cshtml" />
+    <Content Include="Views\Evaluacion\SeleccionarSubalterno.cshtml" />
+    <Content Include="Views\Evaluacion\ConglomeradosPorFunc.cshtml" />
+    <Content Include="Views\Evaluacion\EvaluacionSubalterno.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

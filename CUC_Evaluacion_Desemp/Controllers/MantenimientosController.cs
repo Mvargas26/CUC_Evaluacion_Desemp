@@ -252,10 +252,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var area = _servicioMantenimientos.Areas.ListarArea();
                 return View(area);
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                TempData["MensajeError"] = $"Error al obtener las areas: {ex.Message}";
-                return View(new List<AreasModel>());
+                TempData["MensajeError"] = "Error al obtener las areas.";
+                return RedirectToAction(nameof(ManteniArea));
             }
         }
 
@@ -280,10 +280,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     return View("CreaArea", nuevoArea);
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
 
-                TempData["MensajeError"] = $"Error al crear la area: {ex.Message}";
+                TempData["MensajeError"] = "Error al crear el area.";
                 return View("CreaArea", nuevoArea);
             }
         }
@@ -306,10 +306,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     return View("ManteniArea", areaModificado);
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                TempData["MensajeError"] = $"Error al actualizar la area: {ex.Message}";
-                return View("ManteniArea", areaModificado);
+                TempData["MensajeError"] = $"Error al actualizar la area.";
+                return RedirectToAction(nameof(ManteniArea));
             }
         }
 

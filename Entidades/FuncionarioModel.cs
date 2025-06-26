@@ -27,6 +27,7 @@ namespace Entidades
         public string Estado { get; set; }
         public string CodigoSeguridad { get; set; }
         public string Telefono { get; set; }
+        public string CedJefeInmediato { get; set; }
 
 
 

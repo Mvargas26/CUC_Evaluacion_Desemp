@@ -91,7 +91,8 @@ namespace Negocios
                     Password = row["password"].ToString(),
                     Rol = row["Rol"].ToString(),
                     Puesto = row["Puesto"].ToString(),
-                    Estado = row["Estado"].ToString()
+                    Estado = row["Estado"].ToString(),
+                    CedJefeInmediato = row["cedJefeInmediato"].ToString()
                 });
             }
 
@@ -114,6 +115,7 @@ namespace Negocios
             new SqlParameter("@IdEstadoFuncionario", funcionario.IdEstadoFuncionario),
             new SqlParameter("@CodigoSeguridad", funcionario.CodigoSeguridad),
             new SqlParameter("@Telefono", funcionario.Telefono),
+            new SqlParameter("@cedJefeInmediato", funcionario.CedJefeInmediato),
             new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
@@ -145,6 +147,7 @@ namespace Negocios
             new SqlParameter("@Estado", funcionario.Estado),
             new SqlParameter("@CodigoSeguridad", funcionario.CodigoSeguridad),
             new SqlParameter("@IdDepartamento", funcionario.IdDepartamento),
+            new SqlParameter("@cedJefeInmediato", funcionario.CedJefeInmediato),
             new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
@@ -226,6 +229,61 @@ namespace Negocios
 
             return lista;
         }
+
+        public List<FuncionarioModel> ListarSubAlternosPorJefe(string cedJefatura)
+        {
+            var parametros = new SqlParameter[]
+            {
+            new SqlParameter("@cedJefe", cedJefatura)
+            };
+
+            DataTable dt = _accesoBD.EjecutarSPconDT("ListarSubAlternosPorJefe", parametros);
+
+            var lista = new List<FuncionarioModel>();
+            foreach (DataRow row in dt.Rows)
+            {
+                lista.Add(new FuncionarioModel
+                {
+                    Cedula = row["cedula"].ToString(),
+                    Nombre = row["nombre"].ToString(),
+                    Apellido1 = row["apellido1"].ToString(),
+                    Apellido2 = row["apellido2"].ToString(),
+                    IdRol = Convert.ToInt32(row["idRol"].ToString()),
+                    IdPuesto = Convert.ToInt32(row["idPuesto"].ToString()),
+                    IdEstadoFuncionario = Convert.ToInt32(row["idEstadoFuncionario"].ToString()),
+                    Dependencia = row["Dependencia"].ToString(),
+                    CedJefeInmediato = row["cedJefeInmediato"].ToString()
+                });
+            }
+
+            return lista;
+        }
+
+
+        public List<ConglomeradoModel> ConglomeradosPorFunc(string cedFuncionario)
+        {
+            var parametros = new SqlParameter[]
+            {
+                new SqlParameter("@idFuncionario", cedFuncionario )
+
+            };
+
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_ConglomeradosPorFunc", parametros);
+
+            var lista = new List<ConglomeradoModel>();
+            foreach (DataRow row in dt.Rows)
+            {
+                lista.Add(new ConglomeradoModel
+                {
+                    IdConglomerado = Convert.ToInt32(row["idConglomerado"].ToString()),
+                    NombreConglomerado = row["nombreConglomerado"].ToString()
+                   
+                });
+            }
+
+            return lista;
+        }
+
     }
 
 }//fin space
