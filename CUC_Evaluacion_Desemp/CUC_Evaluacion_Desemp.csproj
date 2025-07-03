@@ -230,7 +230,8 @@
     <Content Include="Views\Mantenimientos\ManteniCarreras.cshtml" />
     <Content Include="Views\Evaluacion\SeleccionarSubalterno.cshtml" />
     <Content Include="Views\Evaluacion\ConglomeradosPorFunc.cshtml" />
-    <Content Include="Views\Evaluacion\EvaluacionSubalterno.cshtml" />
+    <Content Include="Views\Evaluacion\EvaluarSubalterno.cshtml" />
+    <Content Include="Views\Evaluacion\SeleccionarPeriodo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

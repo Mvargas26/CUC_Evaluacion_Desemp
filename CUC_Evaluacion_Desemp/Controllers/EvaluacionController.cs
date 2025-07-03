@@ -44,7 +44,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             {
                 if (string.IsNullOrEmpty(cedulaSeleccionada))
                 {
-                    TempData["Error"] = "Debe seleccionar un subalterno.";
+                    TempData["MensajeError"] = "Debe seleccionar un subalterno.";
                     return RedirectToAction("SeleccionarSubalterno");
                 }
 
@@ -62,6 +62,14 @@ namespace CUC_Evaluacion_Desemp.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(cedulaSeleccionada))
+                {
+                    TempData["MensajeError"] = "Debe seleccionar un Conglomerado para el funcionario a evaluar.";
+                    return RedirectToAction("SeleccionarSubalterno");
+                }
+
+                ViewBag.cedulaSeleccionada = cedulaSeleccionada;
+
                 var listaConglomerados = _servicioMantenimientos.Funcionario.ConglomeradosPorFunc(cedulaSeleccionada);
                     return View(listaConglomerados);
             }
@@ -73,14 +81,52 @@ namespace CUC_Evaluacion_Desemp.Controllers
         
         }
 
+        [HttpPost]
+        public ActionResult SeleccionarPeriodo(FormCollection coleccion)
+        {
+            try
+            {
+                string cedulaSeleccionada = coleccion["cedulaSeleccionada"];
+                string idConglomerado = coleccion["idConglomerado"];
+
+                ViewBag.cedulaSeleccionada = cedulaSeleccionada;
+                ViewBag.idConglomerado = idConglomerado;
+
+                var periodos = _servicioMantenimientos.Periodos.ListarPeriodosAnioActual();
+                return View(periodos);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener la lista.";
+                return RedirectToAction(nameof(SeleccionarSubalterno));
+            }
+        }
+
+        [HttpPost]
+        public ActionResult EvaluarSubalterno(FormCollection coleccion)
+        {
+            string cedulaSeleccionada = coleccion["cedulaSeleccionada"];
+            string idConglomerado = coleccion["idConglomerado"];
+            string idPeriodo = coleccion["idPeriodo"];
+
+            // Validación básica
+            if (string.IsNullOrEmpty(cedulaSeleccionada) || string.IsNullOrEmpty(idConglomerado))
+            {
+                TempData["MensajeError"] = "Debe seleccionar un conglomerado.";
+                return RedirectToAction("SeleccionarConglomeradoSubalterno");
+            }
+
+
+
+
+            return View();
+        }
+
         #endregion
 
         #region EvaFuncionario
 
-        public ActionResult EvaluacionSubalterno()
-        {
-            return View();
-        }
+
 
         #endregion
 

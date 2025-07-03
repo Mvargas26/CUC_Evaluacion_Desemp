@@ -8,18 +8,18 @@
 <div class="container mt-4 mb-5">
     <h2 class="mb-3">Seleccione el conglomerado a Evaluar para este funcionario:</h2>
 
-    @if (TempData["Error"] != null)
+    @if (TempData["MensajeError"] != null)
     {
         <div class="alert alert-danger">
-            @TempData["Error"]
+            @TempData["MensajeError"]
         </div>
     }
 
     <p>Por favor, seleccione de la siguiente lista el conglomerado al que desea evaluar.</p>
 
-    @using (Html.BeginForm("EvaluacionSubalterno", "Evaluacion", FormMethod.Get))
+    @using (Html.BeginForm("SeleccionarPeriodo", "Evaluacion", FormMethod.Post))
     {
-        <input type="hidden" name="idFuncionario" value="@ViewBag.IdFuncionario" />
+        <input type="hidden" name="cedulaSeleccionada" value="@ViewBag.cedulaSeleccionada" />
 
         <table class="table table-striped">
             <thead>
