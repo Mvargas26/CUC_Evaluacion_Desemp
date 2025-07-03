@@ -35,7 +35,7 @@ namespace Negocios.Services
 
         public FuncionarioPorAreaNegocios FuncionarioPorArea { get; }
         public CarrerasNegocios Carreras { get; }
-        public PeriodosEvaluacionNegocios Periodos {  get; }
+        public PeriodosNegocios Periodos {  get; }
 
 
         public MantenimientosService(
@@ -57,7 +57,7 @@ namespace Negocios.Services
             AreasNegocios areas,
             FuncionarioPorAreaNegocios funcionarioPorArea,
             CarrerasNegocios carreras,
-            PeriodosEvaluacionNegocios periodos
+            PeriodosNegocios periodos
             )
         {
             Funcionario = funcionario;

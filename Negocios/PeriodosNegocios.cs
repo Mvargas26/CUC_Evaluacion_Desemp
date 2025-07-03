@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace Negocios
 {
-    public class PeriodosEvaluacionNegocios
+    public class PeriodosNegocios
     {
         private readonly IAccesoBD _accesoBD;
 
-        public PeriodosEvaluacionNegocios(IAccesoBD accesoBD)
+        public PeriodosNegocios(IAccesoBD accesoBD)
         {
             _accesoBD = accesoBD;
         }
