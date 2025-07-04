@@ -223,14 +223,15 @@
     <Content Include="Views\Mantenimientos\Index.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniFuncionarios.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniPuesto.cshtml" />
+    <Content Include="Views\Mantenimientos\CreaArea.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniArea.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniDependencias.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniRoles.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniCarreras.cshtml" />
     <Content Include="Views\Evaluacion\SeleccionarSubalterno.cshtml" />
     <Content Include="Views\Evaluacion\ConglomeradosPorFunc.cshtml" />
-    <Content Include="Views\Evaluacion\EvaluacionSubalterno.cshtml" />
-    <Content Include="Views\Mantenimientos\ModificarFuncionario.cshtml" />
+    <Content Include="Views\Evaluacion\EvaluarSubalterno.cshtml" />
+    <Content Include="Views\Evaluacion\SeleccionarPeriodo.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

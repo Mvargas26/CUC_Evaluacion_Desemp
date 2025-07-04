@@ -26,7 +26,7 @@ namespace Negocios.Services
         EstadoFuncionariosNegocios EstadoFuncionarios { get; }
         AreasNegocios Areas { get; }
         FuncionarioPorAreaNegocios FuncionarioPorArea { get; }
-
         CarrerasNegocios Carreras { get; }
+        PeriodosNegocios Periodos { get;}
     }
 }

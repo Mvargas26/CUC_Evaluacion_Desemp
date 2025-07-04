@@ -102,7 +102,7 @@
     <Compile Include="MetasNegocios.cs" />
     <Compile Include="MetaXObjetivoNegocios.cs" />
     <Compile Include="ObjetivoNegocios.cs" />
-    <Compile Include="PeriodosEvaluacionNegocios.cs" />
+    <Compile Include="PeriodosNegocios.cs" />
     <Compile Include="PesosConglomeradoNegocios.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PuestosNegocios.cs" />

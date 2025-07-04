@@ -18,11 +18,7 @@
     <p>Por favor, seleccione de la siguiente lista el subalterno al que desea evaluar.</p>
 
     <div class="alert alert-info ">
-        <p>
-            La siguiente lista contiene los funcionarios que:<br/>
-            •	Son sus subalternos.<br />
-            •	Su estado en el sistema es “Activo”.
-        </p>
+            La lista contiene sus subalternos con estado "Activo".
     </div>
 
     @using (Html.BeginForm("SeleccionarSubalterno", "Evaluacion", FormMethod.Post))
@@ -69,3 +65,6 @@
         </div>
     }
 </div>
+
+<script defer src="~/sources/js/accionOcultarCerrarMensajes.js"></script>
+
