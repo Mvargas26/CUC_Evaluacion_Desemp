@@ -1,0 +1,147 @@
+﻿@model Entidades.FuncionarioViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Modificacion de Funcionario";
+}
+<div class="container mt-4">
+    <h2 class="mb-4">Modificacion de Funcionario</h2>
+    @********************************************************* mENSAJES eXITO Y eRROR*@
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["MensajeExito"]
+        </div>
+    }
+
+    @if (TempData["MensajeError"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["MensajeError"]
+        </div>
+    }
+    @*********************************************************FORM*@
+    @using (Html.BeginForm("ModificarFuncionario", "Mantenimientos", FormMethod.Post))
+    {
+        <div class="container">
+
+            <!-- Fila 1 -->
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    @Html.LabelFor(m => m.Funcionario.Cedula, "Cedula:", new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.Funcionario.Cedula, new { @class = "form-control", required = "required", maxlength = "15", minlength = "8", pattern = ".*\\S.*" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    @Html.LabelFor(m => m.Funcionario.Nombre, "Nombre:", new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.Funcionario.Nombre, new { @class = "form-control", required = "required", maxlength = "100", pattern = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    @Html.LabelFor(m => m.Funcionario.Apellido1, "Primer apellido:", new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.Funcionario.Apellido1, new { @class = "form-control", required = "required", maxlength = "100", pattern = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$" })
+                </div>
+            </div>
+
+            <!-- Fila 2 -->
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    @Html.LabelFor(m => m.Funcionario.Apellido2, "Segundo apellido:", new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.Funcionario.Apellido2, new { @class = "form-control", required = "required", maxlength = "100", pattern = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    @Html.LabelFor(m => m.Funcionario.Correo, "Correo:", new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.Funcionario.Correo, new { @class = "form-control", type = "email", required = "required", maxlength = "255" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    @Html.LabelFor(m => m.Funcionario.Password, "Contraseña:", new { @class = "form-label" })
+                    @Html.PasswordFor(m => m.Funcionario.Password, new { @class = "form-control", required = "required", maxlength = "100" })
+                </div>
+            </div>
+
+            <!-- Fila 3 -->
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    @Html.LabelFor(m => m.Funcionario.IdRol, "Rol:", new { @class = "form-label" })
+                    @Html.DropDownListFor(m => m.Funcionario.IdRol, new SelectList(Model.Roles, "IdRol", "Rol", Model.Funcionario.IdRol), "Seleccione", new { @class = "form-select", required = "required" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    @Html.LabelFor(m => m.Funcionario.IdPuesto, "Puesto:", new { @class = "form-label" })
+                    @Html.DropDownListFor(m => m.Funcionario.IdPuesto, new SelectList(Model.Puestos, "IdPuesto", "Puesto", Model.Funcionario.IdPuesto), "Seleccione", new { @class = "form-select", required = "required" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    @Html.LabelFor(m => m.Funcionario.IdEstadoFuncionario, "Estado:", new { @class = "form-label" })
+                    @Html.DropDownListFor(m => m.Funcionario.IdEstadoFuncionario, new SelectList(Model.EstadosFuncionario, "IdEstadoFuncionario", "Estado", Model.Funcionario.IdEstadoFuncionario), "Seleccione", new { @class = "form-select", required = "required" })
+                </div>
+            </div>
+
+    
+
+
+            <!-- Fila 4 -->
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    @Html.LabelFor(m => m.Funcionario.Telefono, "Telefono:", new { @class = "form-label" })
+                    @Html.TextBoxFor(m => m.Funcionario.Telefono, new { @class = "form-control", type = "text", required = "required", maxlength = "20" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    @Html.Label("Carrera:", new { @class = "form-label" })
+                    @Html.DropDownListFor(m => m.Carreras, new SelectList(Model.Carreras, "idCarrera", "NombreCarrera"), "Ninguna", new { @class = "form-select" })
+                </div>
+                <div class="col-md-4 mb-3">
+                    @Html.Label("Jefe Inmediato:", new { @class = "form-label" })
+                    @Html.DropDownListFor(m => m.Funcionario.CedJefeInmediato, new SelectList(Model.Jefes, "Cedula", "NombreCompleto", Model.Funcionario.CedJefeInmediato), "Seleccione", new { @class = "form-select", required = "required" })
+                    @Html.ValidationMessageFor(m => m.Funcionario.CedJefeInmediato, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <!-- Checks de Conglomerados -->
+            <hr />
+            <div class="mb-3">
+                <label class="form-label">Seleccione los conglomerados de este funcionario:</label>
+                <div class="row row-cols-1 row-cols-md-2 g-2">
+                    @foreach (var item in Model.Conglomerados)
+                    {
+                        var isChecked = Model.IdConglomeradosSeleccionados.Contains(item.IdConglomerado);
+                        <div class="col">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="IdConglomeradosSeleccionados" value="@item.IdConglomerado" @(isChecked ? "checked" : "") />
+                                <label class="form-check-label">@item.NombreConglomerado</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <span id="checkboxErrorConglomerado" class="text-danger" style="display:none;">Debe seleccionar al menos un conglomerado.</span>
+            </div>
+
+            <!-- Checks de Áreas -->
+            <hr />
+            <div class="mb-3">
+                <label class="form-label">Seleccione las Areas de este funcionario:</label>
+                <div class="row row-cols-1 row-cols-md-2 g-2">
+                    @foreach (var item in Model.Areas)
+                    {
+                        <div class="col">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="IdAreasSeleccionadas" value="@item.idArea" />
+                                <label class="form-check-label">@item.NombreArea</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <span id="checkboxErrorArea" class="text-danger" style="display:none;">Debe seleccionar al menos una Area.</span>
+            </div>
+            <!-- Botones -->
+            <div class="d-flex justify-content-between">
+                <a href="@Url.Action("ManteniFuncionarios", "Mantenimientos")" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+            </div>
+
+        </div>
+
+        <script defer src="~/sources/js/Vistas/CrearFuncionario/CrearFuncionarioJS.js"></script>
+    }
+
+</div>
+<script defer src="~/sources/js/accionOcultarCerrarMensajes.js"></script>

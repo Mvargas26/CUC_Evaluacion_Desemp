@@ -18,5 +18,8 @@ namespace Entidades
         public List <AreasModel>  Areas { get; set; }
         public List <FuncionarioModel> Jefes { get; set; }
         public List <CarrerasModel> Carreras { get; set; }
+
+        public List<int> IdConglomeradosSeleccionados { get; set; }
+        public List<int> IdAreasSeleccionadas { get; set; }
     }
 }

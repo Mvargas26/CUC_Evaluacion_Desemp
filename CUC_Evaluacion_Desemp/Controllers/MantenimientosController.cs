@@ -137,8 +137,124 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return RedirectToAction("ManteniFuncionarios");
             }
         }
-       
-        
+
+        // GET: Cargar vista para modificar funcionario
+        public ActionResult ModificarFuncionario(string cedula)
+        {
+            try
+            {
+                var funcionario = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(cedula);
+                if (funcionario == null)
+                {
+                    TempData["MensajeError"] = "Funcionario no encontrado.";
+                    return RedirectToAction("ManteniFuncionarios");
+                }
+
+                var puestos = _servicioMantenimientos.Puestos.ListarPuesto();
+                var conglomerados = _servicioMantenimientos.Conglomerados.ListarConglomerados();
+                var dependencias = _servicioMantenimientos.Dependencias.ListarDependencias();
+                var roles = _servicioMantenimientos.Roles.ListarRoles();
+                var estadosFunc = _servicioMantenimientos.EstadoFuncionarios.ListarEstadosFuncionario();
+                var areas = _servicioMantenimientos.Areas.ListarArea();
+                var jefes = _servicioMantenimientos.Funcionario.ListarJefes();
+                var carreras = _servicioMantenimientos.Carreras.ListarCarreras();
+
+                var congActuales = _servicioMantenimientos.Funcionario.ConglomeradosPorFunc(cedula);
+                //var areasActuales = _servicioMantenimientos.Funcionario.AreasPorFuncionario(cedula);
+
+                FuncionarioViewModel viewModel = new FuncionarioViewModel
+                {
+                    Funcionario = funcionario,
+                    Puestos = puestos,
+                    Conglomerados = conglomerados,
+                    Dependencias = dependencias,
+                    Roles = roles,
+                    EstadosFuncionario = estadosFunc,
+                    Areas = areas,
+                    Jefes = jefes,
+                    Carreras = carreras,
+                    IdConglomeradosSeleccionados = congActuales.Select(c => c.IdConglomerado).ToList(),
+
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = $"Error al cargar datos del funcionario: {ex.Message}";
+                return RedirectToAction("ManteniFuncionarios");
+            }
+        }
+
+        // POST: Guardar cambios al funcionario
+        [HttpPost]
+        public ActionResult ModificarFuncionario(FuncionarioViewModel model, FormCollection collection)
+        {
+            try
+            {
+                string cedula = model.Funcionario.Cedula;
+
+                // ✅ Si el campo de contraseña viene vacío, recuperamos la actual
+                if (string.IsNullOrWhiteSpace(model.Funcionario.Password))
+                {
+                    var actual = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(cedula);
+                    if (actual != null)
+                    {
+                        model.Funcionario.Password = actual.Password;
+                    }
+                }
+
+                // Actualiza datos principales
+                _servicioMantenimientos.Funcionario.ModificarFuncionario(model.Funcionario);
+
+                // Actualiza conglomerados
+                _servicioMantenimientos.FuncionarioXConglomerado.EliminarPorFuncionario(cedula);
+                var conglomeradosSeleccionados = collection["IdConglomeradosSeleccionados"];
+                if (!string.IsNullOrEmpty(conglomeradosSeleccionados))
+                {
+                    foreach (var id in conglomeradosSeleccionados.Split(','))
+                    {
+                        if (int.TryParse(id, out int idConglomerado))
+                        {
+                            _servicioMantenimientos.FuncionarioXConglomerado.CrearFuncionarioXConglomerado(new FuncionarioXConglomeradoModel
+                            {
+                                IdFuncionario = cedula,
+                                IdConglomerado = idConglomerado
+                            });
+                        }
+                    }
+                }
+
+                // Actualiza áreas
+                _servicioMantenimientos.Funcionario.EliminarFuncionario(cedula);
+                var areasSeleccionadas = collection["IdAreasSeleccionadas"];
+                if (!string.IsNullOrEmpty(areasSeleccionadas))
+                {
+                    foreach (var id in areasSeleccionadas.Split(','))
+                    {
+                        if (int.TryParse(id, out int idArea))
+                        {
+                            _servicioMantenimientos.FuncionarioPorArea.CrearFuncionarioPorArea(new FuncionarioPorAreaModel
+                            {
+                                cedulaFuncionario = cedula,
+                                idArea = idArea
+                            });
+                        }
+                    }
+                }
+
+                TempData["MensajeExito"] = "Funcionario modificado correctamente.";
+                return RedirectToAction("ManteniFuncionarios");
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = $"Error al modificar: {ex.Message}";
+                return RedirectToAction("ManteniFuncionarios");
+            }
+        }
+
+
+
         #endregion
 
         #region Puestos
@@ -277,14 +393,14 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 else
                 {
 
-                    return View("CreaArea", nuevoArea);
+                    return View("ManteniArea", nuevoArea);
                 }
             }
             catch (Exception )
             {
 
                 TempData["MensajeError"] = "Error al crear el area.";
-                return View("CreaArea", nuevoArea);
+                return View("ManteniArea", nuevoArea);
             }
         }
             

@@ -64,7 +64,13 @@ namespace Negocios
                 Puesto = row["Puesto"].ToString(),
                 Estado = row["Estado"].ToString(),
                 CodigoSeguridad = row["CodigoSeguridad"]?.ToString(),
-                IdDepartamento = Convert.ToInt32(row["idDepartamento"])
+                Telefono = row["telefono"].ToString(),
+                CedJefeInmediato = row["cedJefeInmediato"].ToString(),
+                IdRol = Convert.ToInt32(row["idRol"]),
+                IdPuesto = Convert.ToInt32(row["idPuesto"]),
+                IdEstadoFuncionario = Convert.ToInt32(row["idEstadoFuncionario"]),
+
+
             };
         }
 

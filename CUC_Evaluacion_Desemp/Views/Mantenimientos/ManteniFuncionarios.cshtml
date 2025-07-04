@@ -56,7 +56,7 @@
                         <td>@dt.Puesto</td>
                         <td>@dt.Estado</td>
                         <td>
-                            <a href="@Url.Action("EditaFuncionario", "Mantenimientos", new { cedula = dt.Cedula })" class="btn btn-primary btn-sm">
+                            <a href="@Url.Action("ModificarFuncionario", "Mantenimientos", new { cedula = dt.Cedula })" class="btn btn-primary btn-sm">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <button type="button" class="btn btn-danger btn-sm"
@@ -71,6 +71,8 @@
         </table>
     </div>
 </div>
+
+
 
 @*------------------------------------------------------------------MODAL ELIMINAR*@
 @foreach (var dt in Model)
