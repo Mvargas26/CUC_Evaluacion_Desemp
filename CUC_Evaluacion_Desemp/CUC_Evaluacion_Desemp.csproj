@@ -232,6 +232,7 @@
     <Content Include="Views\Evaluacion\ConglomeradosPorFunc.cshtml" />
     <Content Include="Views\Evaluacion\EvaluarSubalterno.cshtml" />
     <Content Include="Views\Evaluacion\SeleccionarPeriodo.cshtml" />
+    <Content Include="Views\Mantenimientos\ManteniPeriodos.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

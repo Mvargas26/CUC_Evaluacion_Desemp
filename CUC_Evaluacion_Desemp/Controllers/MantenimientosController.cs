@@ -657,6 +657,103 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
         #endregion
+
+
+        #region Periodos
+
+        public ActionResult ManteniPeriodos()
+        {
+            try
+            {
+                var periodo = _servicioMantenimientos.Periodos.ListarPeriodos();
+                return View(periodo);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener los periodos.";
+                return RedirectToAction(nameof(ManteniPeriodos));
+            }
+        }
+
+
+        [HttpPost]
+        public ActionResult CrearPeriodo(PeriodosModel nuevoPeriodo)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+
+                    _servicioMantenimientos.Periodos.CrearPeriodo(nuevoPeriodo);
+
+
+                    TempData["MensajeExito"] = $"Periodo {nuevoPeriodo.Nombre} creado correctamente.";
+                    return RedirectToAction(nameof(ManteniPeriodos));
+                }
+                else
+                {
+
+                    return View("ManteniPeriodos", nuevoPeriodo);
+                }
+            }
+            catch (Exception)
+            {
+
+                TempData["MensajeError"] = "Error al crear el periodo.";
+                return View("ManteniPeriodos", nuevoPeriodo);
+            }
+        }
+
+
+
+        [HttpPost]
+        public ActionResult ModificarPeriodo(PeriodosModel periodoModificado)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _servicioMantenimientos.Periodos.ModificarPeriodo(periodoModificado);
+                    TempData["MensajeExito"] = $" {periodoModificado.Nombre} fue modificado correctamente.";
+                    return RedirectToAction(nameof(ManteniPeriodos));
+                }
+                else
+                {
+                    return View("ManteniPeriodos", periodoModificado);
+                }
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = $"Error al actualizar el periodo.";
+                return RedirectToAction(nameof(ManteniPeriodos));
+            }
+        }
+
+        public ActionResult EliminarPeriodo(int id)
+        {
+            try
+            {
+                var periodo = _servicioMantenimientos.Periodos.ObtenerPeriodoID(id);
+                if (periodo == null)
+                {
+                    TempData["MensajeError"] = $"El periodo con ID {id} no fue encontrado.";
+                }
+                else
+                {
+                    _servicioMantenimientos.Periodos.EliminarPeriodo(id);
+                    TempData["MensajeExito"] = $"Periodo {periodo.Nombre} eliminado correctamente.";
+                }
+                return RedirectToAction(nameof(ManteniPeriodos));
+            }
+            catch
+            {
+                TempData["MensajeError"] = "No puede borrar esta periodo, verifique las relaciones.";
+                return RedirectToAction(nameof(ManteniPeriodos));
+            }
+        }
+
+        #endregion
+
     }//fin class
 
 }
