@@ -173,50 +173,49 @@ namespace Negocios
             };
         }
 
-        public (List<ObjetivoModel>, List<CompetenciasModel>) ListarObjYCompetenciasXConglomerado(int idConglomerado)
-        {
-            var parametros = new SqlParameter[]
-            {
-            new SqlParameter("@idConglomerado", idConglomerado)
-            };
+        //public (List<ObjetivoModel>, List<CompetenciasModel>) ListarObjYCompetenciasXConglomerado(int idConglomerado)
+        //{
+        //    var parametros = new SqlParameter[]
+        //    {
+        //    new SqlParameter("@idConglomerado", idConglomerado)
+        //    };
 
-            DataSet ds = _accesoBD.EjecutarSPconDS("sp_ListaObjetivosYCompetencias", parametros);
+        //    DataSet ds = _accesoBD.EjecutarSPconDS("sp_ListaObjetivosYCompetencias", parametros);
 
-            var listaObjetivos = new List<ObjetivoModel>();
-            var listaCompetencias = new List<CompetenciasModel>();
+        //    var listaObjetivos = new List<ObjetivoModel>();
+        //    var listaCompetencias = new List<CompetenciasModel>();
 
-            if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
-            {
-                foreach (DataRow row in ds.Tables[0].Rows)
-                {
-                    listaObjetivos.Add(new ObjetivoModel
-                    {
-                        IdObjetivo = Convert.ToInt32(row["idObjetivo"]),
-                        Objetivo = row["Objetivo"].ToString(),
-                        Porcentaje = Convert.ToDecimal(row["PorcentajeObjetivo"]),
-                        IdTipoObjetivo = row.Table.Columns.Contains("idTipoObjetivo") && row["idTipoObjetivo"] != DBNull.Value ?
-                                          Convert.ToInt32(row["idTipoObjetivo"]) : (int?)null
-                    });
-                }
-            }
+        //    if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+        //    {
+        //        foreach (DataRow row in ds.Tables[0].Rows)
+        //        {
+        //            listaObjetivos.Add(new ObjetivoModel
+        //            {
+        //                IdObjetivo = Convert.ToInt32(row["idObjetivo"]),
+        //                Objetivo = row["Objetivo"].ToString(),
+        //                Porcentaje = Convert.ToDecimal(row["PorcentajeObjetivo"]),
+        //                IdTipoObjetivo = row.Table.Columns.Contains("idTipoObjetivo") && row["idTipoObjetivo"] != DBNull.Value ?
+        //                                  Convert.ToInt32(row["idTipoObjetivo"]) : (int?)null
+        //            });
+        //        }
+        //    }
 
-            if (ds.Tables.Count > 1 && ds.Tables[1].Rows.Count > 0)
-            {
-                foreach (DataRow row in ds.Tables[1].Rows)
-                {
-                    listaCompetencias.Add(new CompetenciasModel
-                    {
-                        IdCompetencia = Convert.ToInt32(row["idCompetencia"]),
-                        Competencia = row["Competencia"].ToString(),
-                        Porcentaje = Convert.ToDecimal(row["Porcentaje"]),
-                        IdTipoCompetencia = (int)(row.Table.Columns.Contains("idTipoCompetencia") && row["idTipoCompetencia"] != DBNull.Value ?
-                                             Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null)
-                    });
-                }
-            }
+        //    if (ds.Tables.Count > 1 && ds.Tables[1].Rows.Count > 0)
+        //    {
+        //        foreach (DataRow row in ds.Tables[1].Rows)
+        //        {
+        //            listaCompetencias.Add(new CompetenciasModel
+        //            {
+        //                IdCompetencia = Convert.ToInt32(row["idCompetencia"]),
+        //                Competencia = row["Competencia"].ToString(),
+        //                TiposIdTipoCompetencia = (int)(row.Table.Columns.Contains("idTipoCompetencia") && row["idTipoCompetencia"] != DBNull.Value ?
+        //                                     Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null)
+        //            });
+        //        }
+        //    }
 
-            return (listaObjetivos, listaCompetencias);
-        }
+        //    return (listaObjetivos, listaCompetencias);
+        //}
 
         public (List<EvaluacionXObjetivoModel>, List<EvaluacionXcompetenciaModel>) Listar_objetivosYCompetenciasXEvaluacion(int idEvaluacion)
         {

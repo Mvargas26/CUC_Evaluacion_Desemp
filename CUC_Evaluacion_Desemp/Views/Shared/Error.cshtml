@@ -1,14 +1,25 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Error</title>
 </head>
 <body>
-    <hgroup>
-        <h1>Error.</h1>
-        <h2>Error al procesar la solicitud.</h2>
-    </hgroup>
+
+    <div style="display: flex; flex-direction: column; align-items: center; margin: 20px 0;">
+        <img src="~/sources/img/osoError.gif"
+             style="width: 300px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"
+             alt="Error" />
+
+        @if (TempData["MensajeError"] != null)
+        {
+            <div class="alert alert-danger mt-3" role="alert" style="text-align: center; width: 300px;">
+                @TempData["MensajeError"]
+            </div>
+        }
+    </div>
 </body>
 </html>
+
+<script type="text/javascript" async src="https://tenor.com/embed.js"></script>

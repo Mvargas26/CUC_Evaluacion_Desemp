@@ -197,6 +197,7 @@
     <Content Include="sources\img\LogoCUCFondoBlanco.jpg" />
     <Content Include="sources\img\LogoCUCFondoNegro.png" />
     <Content Include="sources\img\LogoCUCsinFondo.png" />
+    <Content Include="sources\img\osoError.gif" />
     <Content Include="sources\js\accionOcultarCerrarMensajes.js" />
     <Content Include="sources\js\EventoSubMenu.js" />
     <Content Include="sources\js\scripts.js" />
@@ -233,6 +234,7 @@
     <Content Include="Views\Evaluacion\EvaluarSubalterno.cshtml" />
     <Content Include="Views\Evaluacion\SeleccionarPeriodo.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniPeriodos.cshtml" />
+    <Content Include="Views\Mantenimientos\ManteniCompetencias.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

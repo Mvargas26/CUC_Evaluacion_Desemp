@@ -18,85 +18,65 @@ namespace Negocios
         {
             _accesoBD = accesoBD;
         }
-
-        public CompetenciasModel ConsultarCompetenciaID(int idCompetencia)
+        public List<CompetenciasModel> ListarCompetencias()
         {
             try
             {
                 var parametros = new SqlParameter[]
                 {
-                new SqlParameter("@Operacion", "R"),
-                new SqlParameter("@idCompetencia", idCompetencia)
+            new SqlParameter("@Accion", "READ_FULL"),
+            new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
                 };
 
-                DataTable dt = _accesoBD.EjecutarSPconDT("sp_Competencias_CRUD", parametros);
+                DataTable dt = _accesoBD.EjecutarSPconDT("sp_CompetenciasCRUD", parametros);
 
-                if (dt.Rows.Count == 0)
-                    return null;
+                string mensajeError = parametros.Last().Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(mensajeError))
+                {
+                    throw new Exception("Error SP: " + mensajeError);
+                }
 
-                DataRow row = dt.Rows[0];
-
-                return new CompetenciasModel
+                return dt.AsEnumerable().Select(row => new CompetenciasModel
                 {
                     IdCompetencia = Convert.ToInt32(row["idCompetencia"]),
                     Competencia = row["Competencia"].ToString(),
-                    Porcentaje = Convert.ToDecimal(row["Porcentaje"]),
-                    IdTipoCompetencia = (int)(row["idTipoCompetencia"] != DBNull.Value ? Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null)
-                };
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error al consultar la competencia por ID: " + ex.Message);
-            }
-        }
-
-        public List<CompetenciasModel> ListarCompetencias()
-        {
-            List<CompetenciasModel> lista = new List<CompetenciasModel>();
-
-            try
-            {
-                var parametros = new SqlParameter[]
-                {
-                new SqlParameter("@Operacion", "R"),
-                new SqlParameter("@idCompetencia", DBNull.Value)
-                };
-
-                DataTable dt = _accesoBD.EjecutarSPconDT("sp_Competencias_CRUD", parametros);
-
-                foreach (DataRow row in dt.Rows)
-                {
-                    lista.Add(new CompetenciasModel
+                    Descripcion = row["Descripcion"].ToString(),
+                    TipoCompetencia = new TiposCompetenciasModel
                     {
-                        IdCompetencia = Convert.ToInt32(row["idCompetencia"]),
-                        Competencia = row["Competencia"].ToString(),
-                        Porcentaje = Convert.ToDecimal(row["Porcentaje"]),
+                        IdTipoCompetencia = Convert.ToInt32(row["idTipoCompetencia"]),
                         Tipo = row["Tipo"].ToString(),
-                        IdTipoCompetencia = (int)(row["idTipoCompetencia"] != DBNull.Value ? Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null)
-                    });
-                }
+                        Ambito = row["Ambito"].ToString()
+                    }
+                }).ToList();
             }
             catch (Exception ex)
             {
                 throw new Exception("Error al listar las competencias: " + ex.Message);
             }
-
-            return lista;
         }
 
-        public void CrearCompetencia(CompetenciasModel competencia)
+        public bool CrearCompetencia(CompetenciasModel competencia)
         {
             try
             {
                 var parametros = new SqlParameter[]
                 {
-                new SqlParameter("@Operacion", "C"),
-                new SqlParameter("@Competencia", competencia.Competencia),
-                new SqlParameter("@Calificacion", competencia.Porcentaje),
-                new SqlParameter("@idTipoCompetencia", competencia.IdTipoCompetencia)
+            new SqlParameter("@Accion", "CREATE"),
+            new SqlParameter("@Competencia", competencia.Competencia),
+            new SqlParameter("@Descripcion", competencia.Descripcion),
+            new SqlParameter("@idTipoCompetencia", competencia.IdTipoCompetencia),
+            new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
                 };
 
-                _accesoBD.EjecutarSPconDT("sp_Competencias_CRUD", parametros);
+                _accesoBD.EjecutarSPconDT("sp_CompetenciasCRUD", parametros);
+
+                string mensajeError = parametros.Last().Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(mensajeError) && !mensajeError.Contains("exitosamente"))
+                {
+                    throw new Exception("Error SP: " + mensajeError);
+                }
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -104,20 +84,29 @@ namespace Negocios
             }
         }
 
-        public void ModificarCompetencia(CompetenciasModel competencia)
+        public bool ModificarCompetencia(CompetenciasModel competencia)
         {
             try
             {
                 var parametros = new SqlParameter[]
                 {
-                new SqlParameter("@Operacion", "U"),
-                new SqlParameter("@idCompetencia", competencia.IdCompetencia),
-                new SqlParameter("@Competencia", competencia.Competencia),
-                new SqlParameter("@Calificacion", competencia.Porcentaje),
-                new SqlParameter("@idTipoCompetencia", competencia.IdTipoCompetencia)
+            new SqlParameter("@Accion", "UPDATE"),
+            new SqlParameter("@idCompetencia", competencia.IdCompetencia),
+            new SqlParameter("@Competencia", competencia.Competencia),
+            new SqlParameter("@Descripcion", competencia.Descripcion),
+            new SqlParameter("@idTipoCompetencia", competencia.TipoCompetencia.IdTipoCompetencia),
+            new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
                 };
 
-                _accesoBD.EjecutarSPconDT("sp_Competencias_CRUD", parametros);
+                _accesoBD.EjecutarSPconDT("sp_CompetenciasCRUD", parametros);
+
+                string mensajeError = parametros.Last().Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(mensajeError) && !mensajeError.Contains("exitosamente"))
+                {
+                    throw new Exception("Error SP: " + mensajeError);
+                }
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -125,17 +114,26 @@ namespace Negocios
             }
         }
 
-        public void EliminarCompetencia(int id)
+        public bool EliminarCompetencia(int idCompetencia)
         {
             try
             {
                 var parametros = new SqlParameter[]
                 {
-                new SqlParameter("@Operacion", "D"),
-                new SqlParameter("@idCompetencia", id)
+            new SqlParameter("@Accion", "DELETE"),
+            new SqlParameter("@idCompetencia", idCompetencia),
+            new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
                 };
 
-                _accesoBD.EjecutarSPconDT("sp_Competencias_CRUD", parametros);
+                _accesoBD.EjecutarSPconDT("sp_CompetenciasCRUD", parametros);
+
+                string mensajeError = parametros.Last().Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(mensajeError) && !mensajeError.Contains("exitosamente"))
+                {
+                    throw new Exception("Error SP: " + mensajeError);
+                }
+
+                return true;
             }
             catch (Exception ex)
             {

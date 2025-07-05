@@ -68,7 +68,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             catch (Exception ex)
             {
                 TempData["MensajeError"] = $"Error al crear: {ex.Message}";
-                return View();
+                return View("Error");
             }
         }
 
@@ -134,7 +134,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             catch (Exception )
             {
                 TempData["MensajeError"] = $"Error al crear.";
-                return RedirectToAction("ManteniFuncionarios");
+                return View("Error");
             }
         }
 
@@ -179,10 +179,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 return View(viewModel);
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                TempData["MensajeError"] = $"Error al cargar datos del funcionario: {ex.Message}";
-                return RedirectToAction("ManteniFuncionarios");
+                TempData["MensajeError"] = $"Error al cargar datos del funcionario.";
+                return View("Error");
             }
         }
 
@@ -246,10 +246,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 TempData["MensajeExito"] = "Funcionario modificado correctamente.";
                 return RedirectToAction("ManteniFuncionarios");
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                TempData["MensajeError"] = $"Error al modificar: {ex.Message}";
-                return RedirectToAction("ManteniFuncionarios");
+                TempData["MensajeError"] = $"Error al modificar.";
+                return View("Error");
             }
         }
 
@@ -270,10 +270,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 return View(puestos);
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                TempData["MensajeError"] = $"Error al obtener los puestos: {ex.Message}";
-                return View(new List<PuestosModel>());
+                TempData["MensajeError"] = $"Error al obtener los puestos.";
+                return View("Error");
             }
         }
 
@@ -462,9 +462,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var Dependencias = _servicioMantenimientos.Dependencias.ListarDependencias();
                 return View(Dependencias);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                TempData["MensajeError"] = $"Error al obtener los puestos: {ex.Message}";
+                TempData["MensajeError"] = $"Error al obtener la lista";
                 return View(new List<PuestosModel>());
             }
         }
@@ -754,6 +754,46 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
         #endregion
 
+        #region Competencias
+
+        public ActionResult ManteniCompetencias()
+        {
+            try
+            {
+                var competencias = _servicioMantenimientos.Competencias.ListarCompetencias();
+                var tiposCompetencia = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
+
+                ViewBag.TiposCompetencia = tiposCompetencia;
+
+                return View(competencias);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener las competencias.";
+                return View("Error");
+
+            }
+        }
+        [HttpPost]
+        public ActionResult CrearCompetencia(CompetenciasModel newCompetencia)
+        {
+            try
+            {
+                _servicioMantenimientos.Competencias.CrearCompetencia(newCompetencia);
+                TempData["MensajeExito"] = $"Competencia '{newCompetencia.Competencia}' creada correctamente.";
+                return RedirectToAction(nameof(ManteniCompetencias));
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                    ? "¡ALERTA! Esta competencia ya existe."
+                    : "Error al crear la competencia: ";
+
+                return RedirectToAction(nameof(ManteniCompetencias));
+            }
+        }
+
+        #endregion
     }//fin class
 
 }
