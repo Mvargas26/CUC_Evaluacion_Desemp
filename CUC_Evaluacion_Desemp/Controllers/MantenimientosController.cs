@@ -845,6 +845,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return View("Error");
             }
         }//fin SeleccionarSubalterno
+        
         [HttpPost]
         public ActionResult AsignarComportamientosYNiveles(string idCompetenciaSelec)
         {
@@ -872,6 +873,24 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 TempData["MensajeError"] = "Error al asignar.";
                 return View("Error");
             }
+        }
+
+        [HttpPost]
+        public ActionResult GuardarComportYNivelesAsignados(int idCompetencia,List<CompetenciaPorComportamiento> comportamientos,
+            List<ComportamientoPorNivel> descripciones)
+        {
+            try
+            {
+
+                return View();
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
         }
         #endregion
     }//fin class

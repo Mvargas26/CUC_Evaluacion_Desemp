@@ -56,31 +56,40 @@
     </table>
 
     <div class="mt-3">
-        <button type="button" class="btn btn-success" onclick="pasarAPrevizualizacion()">Pasar a Previsualización</button>
+        <button type="button" class="btn btn-outline-success" onclick="pasarAPrevizualizacion()">Pasar a Previsualización</button>
     </div>
 
 </div>
 
 @*TABLA DE COMO QUEDARIA EN LA EVALUACION*@
 
-<div class="table-responsive">
-    <h3>@competencia.Competencia</h3>
-    <h3 hidden>@competencia.IdCompetencia</h3>
-    <p>@competencia.Descripcion</p>
+@using (Html.BeginForm("GuardarComportYNivelesAsignados", "Mantenimientos", FormMethod.Post))
+{
+    <input type="hidden" name="idCompetencia" value="@competencia.IdCompetencia" />
 
-    <table class="table table-bordered table-hover">
-        <thead class="thead-light">
-            <tr id="headerPreview">
-                <th>Comportamientos</th>
-                <!--  niveles dinámicamente -->
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="previewBody">
-            <!-- Filas dinámicamente -->
-        </tbody>
-    </table>
-</div>
+    <div class="table-responsive">
+        <h3>@competencia.Competencia</h3>
+        <p>@competencia.Descripcion</p>
+
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr id="headerPreview">
+                    <th>Comportamientos</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="previewBody">
+                <!-- Aquí agregamos las filas dinamicamnete, ver JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-5">
+        <button type="submit" class="btn btn-primary btn-lg btn-block">Guardar</button>
+    </div>
+}
+
+
 
 @using System.Web.Helpers
 @{

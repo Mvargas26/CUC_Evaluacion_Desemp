@@ -1,4 +1,7 @@
-﻿let columnasUsadas = [];
+﻿
+let columnasUsadas = [];
+let totalDescripciones = 0;
+let totalComportamientos = 0;
 
 function pasarAPrevizualizacion() {
     const columnas = nombresNiveles;
@@ -26,7 +29,9 @@ function pasarAPrevizualizacion() {
         if (descripcion !== "") {
             nivelesSeleccionados.push({
                 nombre: columnas[index],
-                descripcion: descripcion
+                descripcion: descripcion,
+                idNivel: tr.querySelector("input[name*='idNivel']").value,
+                nombreNivel: columnas[index]
             });
             if (!columnasUsadas.includes(columnas[index])) {
                 columnasUsadas.push(columnas[index]);
@@ -54,23 +59,90 @@ function pasarAPrevizualizacion() {
         const td = document.createElement("td");
         td.classList.add(`nivel-${normalizarTexto(nivel)}`);
         td.textContent = encontrado ? encontrado.descripcion : "";
+
+        if (encontrado) {
+            td.innerHTML += `
+                <input type="hidden" name="descripciones[${totalDescripciones}].idComportamiento" value="${idComport}" />
+                <input type="hidden" name="descripciones[${totalDescripciones}].idNivel" value="${encontrado.idNivel}" />
+                <input type="hidden" name="descripciones[${totalDescripciones}].descripcion" value="${encontrado.descripcion}" />
+                <input type="hidden" name="descripciones[${totalDescripciones}].NombreNivel" value="${encontrado.nombreNivel}" />
+            `;
+            totalDescripciones++;
+        }
+
         fila.appendChild(td);
     });
 
     const tdAcciones = document.createElement("td");
-    tdAcciones.innerHTML = `<button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)"><i class="fas fa-trash-alt"></i></button>`;
+    const maxNivel = Math.max(...nivelesSeleccionados.map(n => parseInt(n.idNivel)));
+
+    tdAcciones.innerHTML = `
+        <input type="hidden" name="comportamientos[${totalComportamientos}].idComportamiento" value="${idComport}" />
+        <input type="hidden" name="comportamientos[${totalComportamientos}].Observaciones" value="" />
+        <input type="hidden" name="comportamientos[${totalComportamientos}].NivelObtenido" value="${maxNivel}" />
+        <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)"><i class="fas fa-trash-alt"></i></button>
+    `;
     fila.appendChild(tdAcciones);
+
+    totalComportamientos++;
 
     tablaBody.appendChild(fila);
 }
 
 function eliminarFila(boton) {
     const fila = boton.closest("tr");
-    if (fila) fila.remove();
+    if (!fila) return;
+
+    fila.remove();
+    reindexarInputs();
 }
 
 function normalizarTexto(texto) {
     return texto
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
         .toLowerCase().replace(/\s+/g, "-");
+}
+function reindexarInputs() {
+    const filas = document.querySelectorAll("#previewBody tr");
+    totalDescripciones = 0;
+    totalComportamientos = 0;
+
+    filas.forEach((fila, i) => {
+        const idComport = fila.dataset.idcomport;
+        const inputsDesc = fila.querySelectorAll("input[name^='descripciones']");
+        const inputsComp = fila.querySelectorAll("input[name^='comportamientos']");
+
+        let nivelCount = 0;
+        inputsDesc.forEach(input => {
+            if (input.name.includes(".idComportamiento")) {
+                input.name = `descripciones[${totalDescripciones}].idComportamiento`;
+            }
+            if (input.name.includes(".idNivel")) {
+                input.name = `descripciones[${totalDescripciones}].idNivel`;
+            }
+            if (input.name.includes(".descripcion")) {
+                input.name = `descripciones[${totalDescripciones}].descripcion`;
+            }
+            if (input.name.includes(".NombreNivel")) {
+                input.name = `descripciones[${totalDescripciones}].NombreNivel`;
+            }
+
+            nivelCount++;
+            if (nivelCount % 4 === 0) totalDescripciones++; // Suponiendo 4 niveles máx por comportamiento
+        });
+
+        inputsComp.forEach(input => {
+            if (input.name.includes(".idComportamiento")) {
+                input.name = `comportamientos[${totalComportamientos}].idComportamiento`;
+            }
+            if (input.name.includes(".Observaciones")) {
+                input.name = `comportamientos[${totalComportamientos}].Observaciones`;
+            }
+            if (input.name.includes(".NivelObtenido")) {
+                input.name = `comportamientos[${totalComportamientos}].NivelObtenido`;
+            }
+        });
+
+        totalComportamientos++;
+    });
 }

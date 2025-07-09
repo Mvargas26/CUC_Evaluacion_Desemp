@@ -89,8 +89,10 @@
     <Compile Include="AuthModels\RecuperarPasswordViewModel.cs" />
     <Compile Include="AuthModels\ReestablecerPasswordViewModel.cs" />
     <Compile Include="CarrerasModel.cs" />
+    <Compile Include="CompetenciaPorComportamiento.cs" />
     <Compile Include="CompetenciasModel.cs" />
     <Compile Include="ComportamientoModel.cs" />
+    <Compile Include="ComportamientoPorNivel.cs" />
     <Compile Include="ConglomeradoModel.cs" />
     <Compile Include="DependenciasModel.cs" />
     <Compile Include="EstadoEvaluacionModel.cs" />
