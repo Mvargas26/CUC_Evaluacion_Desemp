@@ -94,7 +94,7 @@ namespace Negocios
             new SqlParameter("@idCompetencia", competencia.IdCompetencia),
             new SqlParameter("@Competencia", competencia.Competencia),
             new SqlParameter("@Descripcion", competencia.Descripcion),
-            new SqlParameter("@idTipoCompetencia", competencia.TipoCompetencia.IdTipoCompetencia),
+            new SqlParameter("@idTipoCompetencia", competencia.IdTipoCompetencia),
             new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
                 };
 

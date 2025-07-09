@@ -793,6 +793,43 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult EditarCompetencia(CompetenciasModel CompetenciaModificada)
+        {
+            try
+            {
+                _servicioMantenimientos.Competencias.ModificarCompetencia(CompetenciaModificada);
+                TempData["MensajeExito"] = $"Competencia '{CompetenciaModificada.Competencia}' editada correctamente.";
+                return RedirectToAction(nameof(ManteniCompetencias));
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                    ? "¡ALERTA! Esta competencia ya existe."
+                    : "Error al modificar la competencia. ";
+
+                return RedirectToAction(nameof(ManteniCompetencias));
+            }
+        }
+
+        [HttpPost]
+        public ActionResult EliminarCompetencia(int id)
+        {
+            try
+            {
+                _servicioMantenimientos.Competencias.EliminarCompetencia(id);
+                TempData["MensajeExito"] = $"Competencia eliminada correctamente.";
+                return RedirectToAction(nameof(ManteniCompetencias));
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                    ? "¡ALERTA! Esta competencia ya existe."
+                    : "Error al eliminar. ";
+
+                return RedirectToAction(nameof(ManteniCompetencias));
+            }
+        }
         #endregion
     }//fin class
 
