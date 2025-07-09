@@ -21,6 +21,7 @@ namespace Negocios.Services
         public DependenciasNegocios Dependencias { get; }
         public RolesNegocios Roles { get; }
         public CompetenciasNegocios Competencias { get; }
+        public EvaluacionesNegocio Evaluaciones { get; }
         public EstadoEvaluacionNegocios EstadoEvaluacion { get; }
         public EvaluacionXcompetenciaNegocios EvaluacionXcompetencia { get; }
         public FuncionarioXConglomeradoNegocios FuncionarioXConglomerado { get; }
@@ -57,7 +58,8 @@ namespace Negocios.Services
             AreasNegocios areas,
             FuncionarioPorAreaNegocios funcionarioPorArea,
             CarrerasNegocios carreras,
-            PeriodosNegocios periodos
+            PeriodosNegocios periodos,
+            EvaluacionesNegocio evaluaciones
             )
         {
             Funcionario = funcionario;
@@ -79,6 +81,7 @@ namespace Negocios.Services
             FuncionarioPorArea = funcionarioPorArea;
             Carreras = carreras;
             Periodos = periodos;
+            Evaluaciones = evaluaciones;
         }
     }
 }

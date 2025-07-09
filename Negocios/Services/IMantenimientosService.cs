@@ -15,6 +15,7 @@ namespace Negocios.Services
         DependenciasNegocios Dependencias { get; }
         RolesNegocios Roles { get; }
         CompetenciasNegocios Competencias { get; }
+        EvaluacionesNegocio Evaluaciones { get; }
         EstadoEvaluacionNegocios EstadoEvaluacion { get; }
         EvaluacionXcompetenciaNegocios EvaluacionXcompetencia { get; }
         FuncionarioXConglomeradoNegocios FuncionarioXConglomerado { get; }

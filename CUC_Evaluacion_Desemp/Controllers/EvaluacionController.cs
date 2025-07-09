@@ -105,21 +105,45 @@ namespace CUC_Evaluacion_Desemp.Controllers
         [HttpPost]
         public ActionResult EvaluarSubalterno(FormCollection coleccion)
         {
-            string cedulaSeleccionada = coleccion["cedulaSeleccionada"];
-            string idConglomerado = coleccion["idConglomerado"];
-            string idPeriodo = coleccion["idPeriodo"];
-
-            // Validación básica
-            if (string.IsNullOrEmpty(cedulaSeleccionada) || string.IsNullOrEmpty(idConglomerado))
+            try
             {
-                TempData["MensajeError"] = "Debe seleccionar un conglomerado.";
-                return RedirectToAction("SeleccionarConglomeradoSubalterno");
+                string cedulaSeleccionada = coleccion["cedulaSeleccionada"];
+                int idConglomerado = Convert.ToInt32(coleccion["idConglomerado"]);
+                string idPeriodo = coleccion["idPeriodo"];
+
+                if (string.IsNullOrEmpty(cedulaSeleccionada) || string.IsNullOrEmpty(coleccion["idConglomerado"]))
+                {
+                    TempData["MensajeError"] = "Debe seleccionar un funcionario y un conglomerado.";
+                    return RedirectToAction("SeleccionarSubalterno");
+                }
+
+                //obtenemos el funcionario
+                var subalterno = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(cedulaSeleccionada);
+                //obtenemos los pesos de su conglomerado
+                var PesosConglomerados = _servicioMantenimientos.Conglomerados.ConsultarPesosXConglomerado(idConglomerado);
+                // Obtenemos tipos de Objetivos
+                ViewData["ListaTiposObjetivos"] = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
+                //Obtenemos tipos de competencias
+                ViewData["ListaTiposCompetencias"] = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
+                //Obtenemos la lista de conglomerados
+                ViewData["ListaConglomerados"] = _servicioMantenimientos.Conglomerados.ListarConglomerados();
+                //obtenemos los objetivos y competencias relacionadas a este congloemrado
+                var (listaObjetivos, listaCompetencias) = _servicioMantenimientos.Evaluaciones.ListarObjYCompetenciasXConglomerado(idConglomerado);
+                ViewBag.ListaObjetivos = listaObjetivos;
+                ViewBag.ListaCompetencias = listaCompetencias;
+                //pasamos el id Congloemrado y los pesos a la vista
+                ViewBag.PesosConglomerados = PesosConglomerados;
+                ViewBag.IdConglomerado = idConglomerado;
+
+
+                return View(subalterno);
+
             }
-
-
-
-
-            return View();
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = "Error al obtener las competencias...."+ex.Message;
+                return View("Error");
+            }
         }
 
         #endregion
