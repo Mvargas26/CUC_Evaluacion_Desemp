@@ -90,6 +90,7 @@
     <Compile Include="AuthModels\ReestablecerPasswordViewModel.cs" />
     <Compile Include="CarrerasModel.cs" />
     <Compile Include="CompetenciasModel.cs" />
+    <Compile Include="ComportamientoModel.cs" />
     <Compile Include="ConglomeradoModel.cs" />
     <Compile Include="DependenciasModel.cs" />
     <Compile Include="EstadoEvaluacionModel.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="FuncionarioXConglomeradoModel.cs" />
     <Compile Include="MetaModel.cs" />
     <Compile Include="MetaXObjetivoModel.cs" />
+    <Compile Include="NivelCompetenciaModel.cs" />
     <Compile Include="ObjetivoModel.cs" />
     <Compile Include="PeriodosModel.cs" />
     <Compile Include="PesosConglomeradoModel.cs" />

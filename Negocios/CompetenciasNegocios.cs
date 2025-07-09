@@ -54,6 +54,47 @@ namespace Negocios
                 throw new Exception("Error al listar las competencias: " + ex.Message);
             }
         }
+        public CompetenciasModel ConsultarCompetenciaPorId(int idCompetencia)
+        {
+            try
+            {
+                var parametros = new SqlParameter[]
+                {
+            new SqlParameter("@Accion", "READ"),
+            new SqlParameter("@idCompetencia", idCompetencia),
+            new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+                };
+
+                DataTable dt = _accesoBD.EjecutarSPconDT("sp_CompetenciasCRUD", parametros);
+
+                string mensajeError = parametros.Last().Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(mensajeError))
+                {
+                    throw new Exception("Error SP: " + mensajeError);
+                }
+
+                if (dt.Rows.Count == 0)
+                    return null;
+
+                DataRow row = dt.Rows[0];
+
+                return new CompetenciasModel
+                {
+                    IdCompetencia = Convert.ToInt32(row["idCompetencia"]),
+                    Competencia = row["Competencia"].ToString(),
+                    Descripcion = row["Descripcion"].ToString(),
+                    TipoCompetencia = new TiposCompetenciasModel
+                    {
+                        IdTipoCompetencia = Convert.ToInt32(row["idTipoCompetencia"])
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al consultar la competencia: " + ex.Message);
+            }
+        }
+
 
         public bool CrearCompetencia(CompetenciasModel competencia)
         {

@@ -190,6 +190,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="sources\css\alerta.css" />
+    <Content Include="sources\css\AsignarComportamientosYNiveles.css" />
     <Content Include="sources\css\IndexStyle.css" />
     <Content Include="sources\css\login.css" />
     <Content Include="sources\css\styles.css" />
@@ -201,6 +202,7 @@
     <Content Include="sources\js\accionOcultarCerrarMensajes.js" />
     <Content Include="sources\js\EventoSubMenu.js" />
     <Content Include="sources\js\scripts.js" />
+    <Content Include="sources\js\Vistas\AsignarComportamientosYNiveles\asignarComportamientos.js" />
     <Content Include="sources\js\Vistas\CrearFuncionario\CrearFuncionarioJS.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -235,6 +237,8 @@
     <Content Include="Views\Evaluacion\SeleccionarPeriodo.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniPeriodos.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniCompetencias.cshtml" />
+    <Content Include="Views\Mantenimientos\AsignarComportamientosYNiveles.cshtml" />
+    <Content Include="Views\Mantenimientos\SelecCompetenciaParaAsignarComportamientos.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

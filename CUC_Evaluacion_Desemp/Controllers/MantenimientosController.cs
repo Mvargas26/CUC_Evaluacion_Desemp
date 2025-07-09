@@ -830,6 +830,49 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return RedirectToAction(nameof(ManteniCompetencias));
             }
         }
+
+        public ActionResult SelecCompetenciaParaAsignarComportamientos()
+        {
+            try
+            {
+                var listaCompetencias = _servicioMantenimientos.Competencias.ListarCompetencias();
+
+                return View(listaCompetencias);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener la lista.";
+                return View("Error");
+            }
+        }//fin SeleccionarSubalterno
+        [HttpPost]
+        public ActionResult AsignarComportamientosYNiveles(string idCompetenciaSelec)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(idCompetenciaSelec))
+                {
+                    TempData["MensajeError"] = "Debe seleccionar una competencia.";
+                    return RedirectToAction("SelecCompetenciaParaAsignarComportamientos");
+                }
+
+                var competencia = _servicioMantenimientos.Competencias.ConsultarCompetenciaPorId(Convert.ToInt32(idCompetenciaSelec));
+                var listaComportamientos = _servicioMantenimientos.Comportamientos.ListarComportamientos();
+                var listaNiveles = _servicioMantenimientos.NivelesComportamientos.ListarNivelesComportamientos();
+
+                ViewBag.listaComportamientos = listaComportamientos;
+                ViewBag.listaNiveles = listaNiveles;
+                ViewBag.competencia = competencia;
+
+
+                return View();
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al asignar.";
+                return View("Error");
+            }
+        }
         #endregion
     }//fin class
 

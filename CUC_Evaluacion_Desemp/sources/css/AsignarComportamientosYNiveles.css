@@ -1,0 +1,29 @@
+﻿.table-responsive {
+    margin: 20px 0;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table td {
+    vertical-align: top;
+}
+
+.nivel-basico {
+    background-color: #fff3cd;
+}
+
+.nivel-intermedio {
+    background-color: #d1ecf1;
+}
+
+.nivel-avanzado {
+    background-color: #d4edda;
+}
+
+.nivel-destacado {
+    background-color: #c3e6cb;
+}

@@ -1,0 +1,95 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Evaluación del Desempeño CUC";
+}
+
+@{
+    var competencia = ViewBag.competencia as Entidades.CompetenciasModel;
+}
+
+<link rel="stylesheet" href="~/sources/css/AsignarComportamientosYNiveles.css" />
+
+
+<div class="mb-5">
+    @*----------------- SELECCIONA EL COMPORTAMIENTO*@
+    <h3>Elegir Comportamiento:</h3>
+    <div class="row g-3 align-items-center">
+        <div class="col-auto">
+            <label for="selectComportamiento" class="col-form-label">Elija un Comportamiento:</label>
+        </div>
+        <div class="col-auto">
+            <!-- Combobox con datos dinámicos para Comportamientos -->
+            <select id="selectComportamiento" class="form-select">
+                @foreach (var comportamiento in ViewBag.listaComportamientos as List<Entidades.ComportamientoModel>)
+                {
+                    <option value="@comportamiento.idComport|@comportamiento.Nombre">
+                        @comportamiento.idComport - @comportamiento.Nombre
+                    </option>
+                }
+            </select>
+        </div>
+    </div>
+    <br />
+    @*----------------- Asigna Niveles y Detalle*@
+    <table class="table table-bordered" id="tablaNiveles">
+        <thead>
+            <tr>
+                <th>Nivel</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var nivel in ViewBag.listaNiveles as List<Entidades.NivelComportamientoModel>)
+            {
+                <tr>
+                    <td>
+                        @nivel.nombre
+                        <input type="hidden" name="Niveles[@nivel.idNivel].idNivel" value="@nivel.idNivel" />
+                        <input type="hidden" name="Niveles[@nivel.idNivel].nombre" value="@nivel.nombre" />
+                    </td>
+                    <td>
+                        <input type="text" id="inputDescripcion_@nivel.idNivel" name="Niveles[@nivel.idNivel].Descripcion" class="form-control" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="mt-3">
+        <button type="button" class="btn btn-success" onclick="pasarAPrevizualizacion()">Pasar a Previsualización</button>
+    </div>
+
+</div>
+
+@*TABLA DE COMO QUEDARIA EN LA EVALUACION*@
+
+<div class="table-responsive">
+    <h3>@competencia.Competencia</h3>
+    <h3 hidden>@competencia.IdCompetencia</h3>
+    <p>@competencia.Descripcion</p>
+
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+            <tr id="headerPreview">
+                <th>Comportamientos</th>
+                <!--  niveles dinámicamente -->
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="previewBody">
+            <!-- Filas dinámicamente -->
+        </tbody>
+    </table>
+</div>
+
+@using System.Web.Helpers
+@{
+    var nombres = (ViewBag.listaNiveles as List<Entidades.NivelComportamientoModel>)?.Select(n => n.nombre).ToList();
+}
+<script>
+    const nombresNiveles = @Html.Raw(Json.Encode(nombres));
+</script>
+
+<script src="~/sources/js/vistas/AsignarComportamientosYNiveles/asignarComportamientos.js"></script>
+
+

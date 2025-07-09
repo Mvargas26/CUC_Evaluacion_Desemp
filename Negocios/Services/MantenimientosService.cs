@@ -37,6 +37,8 @@ namespace Negocios.Services
         public FuncionarioPorAreaNegocios FuncionarioPorArea { get; }
         public CarrerasNegocios Carreras { get; }
         public PeriodosNegocios Periodos {  get; }
+        public ComportamientosNegocios Comportamientos { get; }
+        public NivelesComportamientosNegocios NivelesComportamientos { get; }
 
 
         public MantenimientosService(
@@ -59,7 +61,9 @@ namespace Negocios.Services
             FuncionarioPorAreaNegocios funcionarioPorArea,
             CarrerasNegocios carreras,
             PeriodosNegocios periodos,
-            EvaluacionesNegocio evaluaciones
+            EvaluacionesNegocio evaluaciones,
+            ComportamientosNegocios comportamientos,
+            NivelesComportamientosNegocios nivelesComportamientos
             )
         {
             Funcionario = funcionario;
@@ -82,6 +86,8 @@ namespace Negocios.Services
             Carreras = carreras;
             Periodos = periodos;
             Evaluaciones = evaluaciones;
+            Comportamientos = comportamientos;
+            NivelesComportamientos = nivelesComportamientos;
         }
     }
 }

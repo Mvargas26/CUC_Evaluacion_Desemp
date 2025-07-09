@@ -33,7 +33,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             catch (Exception)
             {
                 TempData["MensajeError"] = "Error al obtener la lista.";
-                return RedirectToAction(nameof(SeleccionarSubalterno));
+                return View("Error");
             }
         }//fin SeleccionarSubalterno
 
