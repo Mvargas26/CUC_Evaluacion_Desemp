@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace Entidades
 {
@@ -16,5 +17,8 @@ namespace Entidades
         public string Tipo { get; set; }
         public int? IdTipoObjetivo { get; set; }
 
-    }//fin class
-}//fin space
+
+        public List<SelectListItem> TiposObjetivos { get; set; }
+
+    }
+}

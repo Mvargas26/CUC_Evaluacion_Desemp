@@ -893,7 +893,124 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
         }
         #endregion
-    }//fin class
+
+        #region Objetivos
+
+        public ActionResult ManteniObjetivos()
+        {
+            try
+            {
+                var objetivo = _servicioMantenimientos.Objetivo.ListarObjetivos();
+                return View(objetivo);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener los objetivos.";
+                return View("Error");
+            }
+        }
+              
+
+
+
+        [HttpPost]
+        public ActionResult CrearObjetivo(ObjetivoModel nuevoObjetivo)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+
+                    _servicioMantenimientos.Objetivo.CrearObjetivo(nuevoObjetivo);
+
+
+                    TempData["MensajeExito"] = $"Objetivo {nuevoObjetivo.Objetivo} creado correctamente.";
+                    return RedirectToAction(nameof(ManteniObjetivos));
+                }
+                else
+                {
+
+                    return View("ManteniObjetivos", nuevoObjetivo);
+                }
+            }
+            catch (Exception)
+            {
+
+                TempData["MensajeError"] = "Error al crear el objejtivo.";
+                return View("Error");
+            }
+        }
+
+
+
+
+        [HttpPost]
+        public ActionResult ModificarObjetivo(ObjetivoModel objetivoModificado)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _servicioMantenimientos.Objetivo.ModificarObjetivo(objetivoModificado);
+                    TempData["MensajeExito"] = $" {objetivoModificado.Objetivo} fue modificado correctamente.";
+                    return RedirectToAction(nameof(ManteniObjetivos));
+                }
+                else
+                {
+                   
+                   
+                    return View(objetivoModificado);
+                }
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = $"Error al actualizar el objetivo.";
+                return View("Error");
+            }
+        }
+
+        public ActionResult ModificarObjetivo(int id)
+        {
+            var objetivo = _servicioMantenimientos.Objetivo.ConsultarObjetivoID(id);
+            if (objetivo == null)
+            {
+                TempData["MensajeError"] = $"El objetivo con ID {id} no fue encontrado.";
+                return RedirectToAction(nameof(ManteniObjetivos));
+            }
+
+         
+            return View(objetivo);
+        }
+
+        public ActionResult EliminarObjetivo(int id)
+        {
+            try
+            {
+                var objetivo = _servicioMantenimientos.Objetivo.ConsultarObjetivoID(id); 
+
+                if (objetivo == null)
+                {
+                    TempData["MensajeError"] = $"El objetivo con ID {id} no fue encontrado.";
+                }
+                else
+                {
+                    _servicioMantenimientos.Objetivo.EliminarObjetivo(id); 
+                    TempData["MensajeExito"] = $"Objetivo '{objetivo.Objetivo}' eliminado correctamente.";
+                }
+
+                return RedirectToAction(nameof(ManteniObjetivos));
+            }
+            catch
+            {
+                TempData["MensajeError"] = "No puede borrar este objetivo, verifique las relaciones.";
+                return View("Error");
+            }
+        }
+
+   
+
+        #endregion
+    }
 
 }
 

@@ -239,6 +239,7 @@
     <Content Include="Views\Mantenimientos\ManteniCompetencias.cshtml" />
     <Content Include="Views\Mantenimientos\AsignarComportamientosYNiveles.cshtml" />
     <Content Include="Views\Mantenimientos\SelecCompetenciaParaAsignarComportamientos.cshtml" />
+    <Content Include="Views\Mantenimientos\ManteniObjetivos.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

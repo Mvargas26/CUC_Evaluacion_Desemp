@@ -24,10 +24,21 @@ namespace Negocios
             var parametros = new SqlParameter[]
             {
             new SqlParameter("@Operacion", "R"),
-            new SqlParameter("@idObjetivo", idObjetivo)
+            new SqlParameter("@idObjetivo", idObjetivo),
+            new SqlParameter("@Objetivo", DBNull.Value),
+            new SqlParameter("@Porcentaje", DBNull.Value),
+            new SqlParameter("@idTipoObjetivo", DBNull.Value),
+            new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+
             };
 
             DataTable dt = _accesoBD.EjecutarSPconDT("sp_Objetivos_CRUD", parametros);
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
+
 
             if (dt.Rows.Count == 0)
                 return null;
@@ -49,10 +60,20 @@ namespace Negocios
             var parametros = new SqlParameter[]
             {
             new SqlParameter("@Operacion", "R"),
-            new SqlParameter("@idObjetivo", DBNull.Value)
+            new SqlParameter("@idObjetivo", DBNull.Value),
+            new SqlParameter("@Objetivo", DBNull.Value),
+            new SqlParameter("@Porcentaje", DBNull.Value),
+            new SqlParameter("@idTipoObjetivo", DBNull.Value),
+            new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             DataTable dt = _accesoBD.EjecutarSPconDT("sp_Objetivos_CRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
 
             var lista = new List<ObjetivoModel>();
             foreach (DataRow row in dt.Rows)
@@ -76,12 +97,20 @@ namespace Negocios
             var parametros = new SqlParameter[]
             {
             new SqlParameter("@Operacion", "C"),
+              new SqlParameter("@idObjetivo", DBNull.Value),
             new SqlParameter("@Objetivo", objetivo.Objetivo),
             new SqlParameter("@Porcentaje", objetivo.Porcentaje),
-            new SqlParameter("@idTipoObjetivo", objetivo.IdTipoObjetivo ?? (object)DBNull.Value)
+            new SqlParameter("@idTipoObjetivo", objetivo.IdTipoObjetivo ?? (object)DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+
             };
 
             _accesoBD.EjecutarSPconDT("sp_Objetivos_CRUD", parametros);
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
         }
 
         public void ModificarObjetivo(ObjetivoModel objetivo)
@@ -92,10 +121,17 @@ namespace Negocios
             new SqlParameter("@idObjetivo", objetivo.IdObjetivo),
             new SqlParameter("@Objetivo", objetivo.Objetivo),
             new SqlParameter("@Porcentaje", objetivo.Porcentaje),
-            new SqlParameter("@idTipoObjetivo", objetivo.IdTipoObjetivo ?? (object)DBNull.Value)
+            new SqlParameter("@idTipoObjetivo", objetivo.IdTipoObjetivo ?? (object)DBNull.Value),
+              new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             _accesoBD.EjecutarSPconDT("sp_Objetivos_CRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
         }
 
         public void EliminarObjetivo(int id)
@@ -103,10 +139,21 @@ namespace Negocios
             var parametros = new SqlParameter[]
             {
             new SqlParameter("@Operacion", "D"),
-            new SqlParameter("@idObjetivo", id)
+            new SqlParameter("@idObjetivo", id),
+            new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             _accesoBD.EjecutarSPconDT("sp_Objetivos_CRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
         }
+
+
+
+
     }
-}//fin class
+}
