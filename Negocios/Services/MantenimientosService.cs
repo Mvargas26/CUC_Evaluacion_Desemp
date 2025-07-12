@@ -40,6 +40,9 @@ namespace Negocios.Services
         public ComportamientosNegocios Comportamientos { get; }
         public NivelesComportamientosNegocios NivelesComportamientos { get; }
 
+        public CompetenciaPorComportamientoNegocios CompetenciaPorComportamiento { get; }
+        public ComportamientoPorNivelNegocios ComportamientoPorNivel { get; }
+
 
         public MantenimientosService(
             FuncionarioNegocios funcionario,
@@ -63,7 +66,11 @@ namespace Negocios.Services
             PeriodosNegocios periodos,
             EvaluacionesNegocio evaluaciones,
             ComportamientosNegocios comportamientos,
-            NivelesComportamientosNegocios nivelesComportamientos
+            NivelesComportamientosNegocios nivelesComportamientos,
+            CompetenciaPorComportamientoNegocios competenciaPorComportamiento,
+            ComportamientoPorNivelNegocios comportamientoPorNivel
+
+
             )
         {
             Funcionario = funcionario;
@@ -88,6 +95,8 @@ namespace Negocios.Services
             Evaluaciones = evaluaciones;
             Comportamientos = comportamientos;
             NivelesComportamientos = nivelesComportamientos;
+            CompetenciaPorComportamiento = competenciaPorComportamiento;
+            ComportamientoPorNivel = comportamientoPorNivel;
         }
     }
 }

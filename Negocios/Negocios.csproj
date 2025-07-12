@@ -86,7 +86,9 @@
   <ItemGroup>
     <Compile Include="AreasNegocios.cs" />
     <Compile Include="CarrerasNegocios.cs" />
+    <Compile Include="CompetenciaPorComportamientoNegocios.cs" />
     <Compile Include="CompetenciasNegocios.cs" />
+    <Compile Include="ComportamientoPorNivelNegocios.cs" />
     <Compile Include="ComportamientosNegocios.cs" />
     <Compile Include="ConglomeradosNegocios.cs" />
     <Compile Include="CorreoService.cs" />

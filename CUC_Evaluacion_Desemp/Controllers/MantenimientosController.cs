@@ -876,22 +876,69 @@ namespace CUC_Evaluacion_Desemp.Controllers
         }
 
         [HttpPost]
-        public ActionResult GuardarComportYNivelesAsignados(int idCompetencia,List<CompetenciaPorComportamiento> comportamientos,
-            List<ComportamientoPorNivel> descripciones)
+        public ActionResult GuardarComportYNivelesAsignados(FormCollection form)
         {
             try
             {
+                //Instanciamos las listas a utilizar
+                List<CompetenciaPorComportamiento> comportamientos = new List<CompetenciaPorComportamiento>();
+                List<ComportamientoPorNivel> descripciones = new List<ComportamientoPorNivel>();
 
-                return View();
+                // tomamos el id de la competencia
+                int idCompetencia = Convert.ToInt32(form["idCompetencia"]);
+
+                //llenamos la lista con los comportmaientos elejidos
+                int i = 0;
+                while (form[$"comportamientos[{i}].idComportamiento"] != null)
+                {
+                    var comp = new CompetenciaPorComportamiento
+                    {
+                        idComportamiento = Convert.ToInt32(form[$"comportamientos[{i}].idComportamiento"]),
+                        idCompetencia = idCompetencia
+                    };
+                    comportamientos.Add(comp);
+                    i++;
+                }
+
+                //ahora la lista con los niveles
+                int j = 0;
+                while (form[$"descripciones[{j}].idComportamiento"] != null)
+                {
+                    var desc = new ComportamientoPorNivel
+                    {
+                        idComportamiento = Convert.ToInt32(form[$"descripciones[{j}].idComportamiento"]),
+                        idNivel = Convert.ToInt32(form[$"descripciones[{j}].idNivel"]),
+                        descripcion = form[$"descripciones[{j}].descripcion"],
+                        idCompetencia= idCompetencia
+                    };
+                    descripciones.Add(desc);
+                    j++;
+                }
+
+                //guardamos los comportamientos
+                foreach (var comportamiento in comportamientos)
+                {
+                    _servicioMantenimientos.CompetenciaPorComportamiento.InsertarCompetenciaPorComportamiento(comportamiento);
+                }
+
+                foreach (var descripcion in descripciones)
+                {
+                    _servicioMantenimientos.ComportamientoPorNivel.InsertarComportamientoPorNivel(descripcion);
+                }
+                
+
+                return RedirectToAction("ManteniCompetencias");
 
             }
             catch (Exception)
             {
-
-                throw;
+                TempData["MensajeError"] = "Error al asignar.";
+                return View("Error");
             }
 
         }
+        
+        
         #endregion
 
         #region Objetivos
@@ -909,10 +956,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return View("Error");
             }
         }
-              
-
-
-
         [HttpPost]
         public ActionResult CrearObjetivo(ObjetivoModel nuevoObjetivo)
         {
@@ -940,10 +983,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return View("Error");
             }
         }
-
-
-
-
         [HttpPost]
         public ActionResult ModificarObjetivo(ObjetivoModel objetivoModificado)
         {
@@ -968,7 +1007,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return View("Error");
             }
         }
-
         public ActionResult ModificarObjetivo(int id)
         {
             var objetivo = _servicioMantenimientos.Objetivo.ConsultarObjetivoID(id);
@@ -981,7 +1019,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
          
             return View(objetivo);
         }
-
         public ActionResult EliminarObjetivo(int id)
         {
             try
@@ -1006,9 +1043,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return View("Error");
             }
         }
-
-   
-
         #endregion
     }
 

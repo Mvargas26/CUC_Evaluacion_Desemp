@@ -24,7 +24,8 @@ function pasarAPrevizualizacion() {
     const nivelesSeleccionados = [];
 
     niveles.forEach((tr, index) => {
-        const input = tr.querySelector("input[type='text']");
+        const input = tr.querySelector("textarea");
+        //console.log(`Nivel #${index}`, input, "Valor:", input?.value);
         const descripcion = input.value.trim();
         if (descripcion !== "") {
             nivelesSeleccionados.push({
@@ -87,8 +88,14 @@ function pasarAPrevizualizacion() {
     totalComportamientos++;
 
     tablaBody.appendChild(fila);
-}
 
+    limpiarTextAreasDeNiveles();
+
+}//fin funcion
+
+//******************************************************************************************
+//******************         Funciones Internas            *********************************
+//******************************************************************************************
 function eliminarFila(boton) {
     const fila = boton.closest("tr");
     if (!fila) return;
@@ -145,4 +152,12 @@ function reindexarInputs() {
 
         totalComportamientos++;
     });
-}
+    
+}//fin funcion
+
+function limpiarTextAreasDeNiveles() {
+    const textareas = document.querySelectorAll("#tablaNiveles textarea");
+    textareas.forEach(textarea => {
+        textarea.value = "";
+    });
+}//fin funcion

@@ -10,7 +10,9 @@ namespace Entidades
     {
         public int idComportamiento {  get; set; }
         public int idNivel { get; set; }
+        public int idCompetencia { get; set; }
         public string descripcion { get; set; }
-        public string   NombreNivel { get; set; }
+
+
     }//fin class
 }

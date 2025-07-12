@@ -48,7 +48,8 @@
                         <input type="hidden" name="Niveles[@nivel.idNivel].nombre" value="@nivel.nombre" />
                     </td>
                     <td>
-                        <input type="text" id="inputDescripcion_@nivel.idNivel" name="Niveles[@nivel.idNivel].Descripcion" class="form-control" />
+                        @*<input type="text" id="inputdescripcion_@nivel.idnivel" name="niveles[@nivel.idnivel].descripcion" class="form-control" />*@
+                        <textarea id="inputdescripcion_@nivel.idNivel" name="niveles[@nivel.idNivel].descripcion" class="form-control" rows="3"></textarea>
                     </td>
                 </tr>
             }

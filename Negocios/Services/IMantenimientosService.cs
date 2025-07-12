@@ -29,8 +29,10 @@ namespace Negocios.Services
         FuncionarioPorAreaNegocios FuncionarioPorArea { get; }
         CarrerasNegocios Carreras { get; }
         PeriodosNegocios Periodos { get;}
-
         ComportamientosNegocios Comportamientos { get; }
         NivelesComportamientosNegocios NivelesComportamientos { get; }
+
+        CompetenciaPorComportamientoNegocios CompetenciaPorComportamiento { get; }
+        ComportamientoPorNivelNegocios ComportamientoPorNivel { get; }
     }
 }
