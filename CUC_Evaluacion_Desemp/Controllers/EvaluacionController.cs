@@ -129,11 +129,16 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 ViewData["ListaConglomerados"] = _servicioMantenimientos.Conglomerados.ListarConglomerados();
                 //obtenemos los objetivos y competencias relacionadas a este congloemrado
                 var (listaObjetivos, listaCompetencias) = _servicioMantenimientos.Evaluaciones.ListarObjYCompetenciasXConglomerado(idConglomerado);
+
+                //Obtenemos las competencias, comportamientos y descrp Transversales id 2500
+                var transversales = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegocios(2500, "PorTipo");
+
+                //pasamos todo a la vista
                 ViewBag.ListaObjetivos = listaObjetivos;
                 ViewBag.ListaCompetencias = listaCompetencias;
-                //pasamos el id Congloemrado y los pesos a la vista
                 ViewBag.PesosConglomerados = PesosConglomerados;
                 ViewBag.IdConglomerado = idConglomerado;
+                ViewBag.transversales = transversales;
 
 
                 return View(subalterno);

@@ -19,11 +19,12 @@ namespace Negocios
             _accesoBD = accesoBD;
         }
 
-        public List<ObtenerComportamientosYDescripcionesModel> ListarComportamientosYDescripcionesNegocios(int idCompetencia)
+        public List<ObtenerComportamientosYDescripcionesModel> ListarComportamientosYDescripcionesNegocios(int idparametro,string operacion)
         {
             var parametros = new SqlParameter[]
             {
-        new SqlParameter("@idCompetencia", idCompetencia),
+        new SqlParameter("@idParametro", idparametro),
+        new SqlParameter("@operacion", operacion),
         new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
             };
 

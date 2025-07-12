@@ -966,7 +966,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
         {
             try
             {
-                var lista = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegocios(idCompetencia);
+                var lista = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegocios(idCompetencia, "PorCompetencia");
                 return Json(lista, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)

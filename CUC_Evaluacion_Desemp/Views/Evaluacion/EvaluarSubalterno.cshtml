@@ -21,7 +21,7 @@
 <div class="container mt-4 mb-5">
     <!-- Encabezado principal -->
     <h2 class="mb-2 text-center">Gestión Institucional de Recursos Humanos</h2>
-    <h4 class="mb-4 text-center">Evaluación del Desempeño 2025</h4>
+    <h4 class="mb-4 text-center">Evaluación del Desempeño @DateTime.Now.Year</h4>
 
     <!-- Texto introductorio -->
     <p>
@@ -87,7 +87,7 @@
                     <li>
                         <strong>Funcionario:</strong> @Model.Nombre @Model.Apellido1 @Model.Apellido2
                     </li>
-                    <li><strong>Clase Puesto:</strong> @Model.Puesto</li>
+                    <li><strong>Puesto:</strong> @Model.Puesto</li>
                 </ul>
             </div>
             <div class="col-md-6">
@@ -157,60 +157,21 @@
 
     <!-- SECCIÓN para elegir Competencias y agregarlas a su propia tabla -->
     <div class="mb-5">
-        <h3>Elegir Competencias:</h3>
-        <div class="row g-3 align-items-center">
-            <div class="col-auto">
-                <label for="selectCompetencia" class="col-form-label">Elija 1 Competencia:</label>
-            </div>
-            <div class="col-auto">
-                <!-- Combobox con datos dinámicos para competencias -->
-                <select id="selectCompetencia" class="form-select">
-                    @foreach (var competencia in ViewBag.ListaCompetencias as List<Entidades.CompetenciasModel>)
-                    {
-                        <option value="@competencia.IdCompetencia|@competencia.Competencia|@competencia.IdTipoCompetencia| @competencia.IdTipoCompetencia">
-                            @competencia.IdCompetencia - @competencia.Competencia
-                        </option>
-                    }
-                </select>
-            </div>
-        </div>
+        <h3>Competencias Transversales:</h3>
         <br />
-        <div class="row g-3 align-items-center">
 
-            <div class="col-auto">
-                <label for="inputMetaComp" class="col-form-label">Meta de la Competencia:</label>
-            </div>
-            <div class="col-auto">
-                <input type="text" id="inputMetaComp" class="form-control" required />
-            </div>
-            <div class="col-auto">
-                <label for="inputPesoComp" class="col-form-label">Peso de la meta:</label>
-            </div>
-            <div class="col-auto">
-                <input type="number" id="inputPesoComp" class="form-control" min="1" step="1" required />
-            </div>
-            <div class="col-auto">
-                <button type="button" class="btn btn-success" onclick="agregarFilaCompetencias()">Agregar fila</button>
-            </div>
-        </div>
     </div>
 
     <!-- Tabla específica para Competencias -->
-    <div class="mb-5">
-        <table id="tablaCompetencias" class="table table-bordered mt-3">
-            <thead>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
                 <tr>
-                    <th>ID</th>
-                    <th>Competencia</th>
-                    <th>Tipo</th>
-                    <th>Peso</th>
-                    <th>Meta</th>
-                    <th>Actual</th>
-                    <th>Acciones</th>
+                    <th colspan="5" class="text-center">Competencias Transversales</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Inicia vacía -->
+            <tbody id="previewBody">
+                <!-- Aquí se llenará todo dinámicamente -->
             </tbody>
         </table>
     </div>
@@ -303,4 +264,13 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="~/js/vista_EvaluacionSubalterno/tablas_planificarEva.js"></script>
     <script src="~/js/vista_EvaluacionSubalterno/enviarTablas.js"></script>
+    <script src="~/sources/js/vistas/EvaluarSubAlterno/ListarTransversales.js"></script>
+
+    @using Newtonsoft.Json
+    <script>
+        const transversalesData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.transversales));
+        document.addEventListener("DOMContentLoaded", function () {
+            renderizarTablaAgrupada(transversalesData);
+        });
+    </script>
 }
