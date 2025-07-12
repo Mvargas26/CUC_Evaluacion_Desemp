@@ -108,6 +108,7 @@
     <Compile Include="MetaXObjetivoModel.cs" />
     <Compile Include="NivelCompetenciaModel.cs" />
     <Compile Include="ObjetivoModel.cs" />
+    <Compile Include="ObtenerComportamientosYDescripcionesModel.cs" />
     <Compile Include="PeriodosModel.cs" />
     <Compile Include="PesosConglomeradoModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

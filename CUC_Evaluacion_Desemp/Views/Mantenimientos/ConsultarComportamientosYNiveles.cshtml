@@ -1,0 +1,51 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Evaluación del Desempeño CUC";
+}
+
+<h3>Elegir Competencia:</h3>
+<div class="row g-3 align-items-center">
+    <div class="col-auto">
+        <label for="selectCompetencia" class="col-form-label">Elija una Competencia:</label>
+    </div>
+    <div class="col-auto">
+        <!-- Combobox con datos dinámicos para Comportamientos -->
+        <select id="selectCompetencia" class="form-select">
+            <option selected disabled value="">Elija una opción</option>
+            @foreach (var competencia in Model)
+            {
+                <option value="@competencia.IdCompetencia|@competencia.Competencia">
+                    @competencia.IdCompetencia - @competencia.Competencia
+                </option>
+            }
+        </select>
+    </div>
+</div>
+<br/>
+<br/>
+<hr/>
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+            <tr id="competenciaTitleRow">
+                <th colspan="3" style="text-align: center; font-weight: bold; background-color: #f8f9fa; ">
+                </th>
+            </tr>
+            <tr id="competenciaDescRow">
+                <td colspan="3" style="text-align: center; font-weight:bolder">
+                    <!-- El contenido se actualizará dinámicamente -->
+                </td>
+            </tr>
+            <tr id="headerPreview">
+                <th>Comportamiento</th>
+                <th>Nivel</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody id="previewBody">
+            <!-- Contenido dinámico desde el JS -->
+        </tbody>
+    </table>
+</div>
+
+<script src="~/sources/js/vistas/ConsultarComportamientosYNiveles/ListarComportamientosYDescripcionesNegocios_JS.js"></script>

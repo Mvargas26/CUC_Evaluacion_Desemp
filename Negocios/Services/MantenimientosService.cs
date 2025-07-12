@@ -42,6 +42,7 @@ namespace Negocios.Services
 
         public CompetenciaPorComportamientoNegocios CompetenciaPorComportamiento { get; }
         public ComportamientoPorNivelNegocios ComportamientoPorNivel { get; }
+        public ObtenerComportamientosYDescripcionesNegocios ObtenerComportamientosYDescripciones {  get; }
 
 
         public MantenimientosService(
@@ -68,8 +69,8 @@ namespace Negocios.Services
             ComportamientosNegocios comportamientos,
             NivelesComportamientosNegocios nivelesComportamientos,
             CompetenciaPorComportamientoNegocios competenciaPorComportamiento,
-            ComportamientoPorNivelNegocios comportamientoPorNivel
-
+            ComportamientoPorNivelNegocios comportamientoPorNivel,
+            ObtenerComportamientosYDescripcionesNegocios obtenerComportamientosYDescripciones
 
             )
         {
@@ -97,6 +98,7 @@ namespace Negocios.Services
             NivelesComportamientos = nivelesComportamientos;
             CompetenciaPorComportamiento = competenciaPorComportamiento;
             ComportamientoPorNivel = comportamientoPorNivel;
+            ObtenerComportamientosYDescripciones = obtenerComportamientosYDescripciones;
         }
     }
 }

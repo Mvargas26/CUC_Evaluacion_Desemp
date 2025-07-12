@@ -939,6 +939,38 @@ namespace CUC_Evaluacion_Desemp.Controllers
         }
         
         
+        public ActionResult ConsultarComportamientosYNiveles() 
+        {
+            try
+            {
+                var listaCompetencias = _servicioMantenimientos.Competencias.ListarCompetencias();
+
+                return View(listaCompetencias);
+
+            }
+            catch (Exception)
+            {
+
+                TempData["MensajeError"] = "Error al obtener las competencias.";
+                return View("Error");
+            }
+        
+        }
+
+        //Este metodo es el que trae los comportamientos y niveles con JS, cada que cambia el combo
+        [HttpGet]
+        public JsonResult ObtenerComportamientosYDescripcionesPorCompetencia(int idCompetencia)
+        {
+            try
+            {
+                var lista = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegocios(idCompetencia);
+                return Json(lista, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = true, mensaje = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
         #endregion
 
         #region Objetivos

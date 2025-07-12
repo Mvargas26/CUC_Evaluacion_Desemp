@@ -34,5 +34,6 @@ namespace Negocios.Services
 
         CompetenciaPorComportamientoNegocios CompetenciaPorComportamiento { get; }
         ComportamientoPorNivelNegocios ComportamientoPorNivel { get; }
+        ObtenerComportamientosYDescripcionesNegocios ObtenerComportamientosYDescripciones { get; }
     }
 }

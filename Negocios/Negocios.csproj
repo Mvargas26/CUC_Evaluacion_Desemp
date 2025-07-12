@@ -94,6 +94,7 @@
     <Compile Include="CorreoService.cs" />
     <Compile Include="DependenciasNegocios.cs" />
     <Compile Include="NivelesCompetenciasNegocios.cs" />
+    <Compile Include="ObtenerComportamientosYDescripcionesNegocios.cs" />
     <Compile Include="Unix_DependenciasNegocios.cs" />
     <Compile Include="EstadoEvaluacionNegocios.cs" />
     <Compile Include="EstadoFuncionariosNegocios.cs" />

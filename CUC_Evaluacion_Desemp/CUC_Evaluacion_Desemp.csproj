@@ -203,6 +203,7 @@
     <Content Include="sources\js\EventoSubMenu.js" />
     <Content Include="sources\js\scripts.js" />
     <Content Include="sources\js\Vistas\AsignarComportamientosYNiveles\asignarComportamientos.js" />
+    <Content Include="sources\js\Vistas\ConsultarComportamientosYNiveles\ListarComportamientosYDescripcionesNegocios_JS.js" />
     <Content Include="sources\js\Vistas\CrearFuncionario\CrearFuncionarioJS.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -240,6 +241,7 @@
     <Content Include="Views\Mantenimientos\AsignarComportamientosYNiveles.cshtml" />
     <Content Include="Views\Mantenimientos\SelecCompetenciaParaAsignarComportamientos.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniObjetivos.cshtml" />
+    <Content Include="Views\Mantenimientos\ConsultarComportamientosYNiveles.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
