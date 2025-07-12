@@ -3,27 +3,50 @@
     ViewBag.Title = "Evaluación del Desempeño CUC";
 }
 
-<h3>Elegir Competencia:</h3>
-<div class="row g-3 align-items-center">
-    <div class="col-auto">
-        <label for="selectCompetencia" class="col-form-label">Elija una Competencia:</label>
+@{
+    var tiposCompetencias = ViewBag.tiposCompetencias as List<Entidades.TiposCompetenciasModel>;
+}
+<div class="row g-3">
+    @*---------------------------Combo Tipo*@
+    <div class="col-md-3">
+        <h3>Elegir Tipo Competencia:</h3>
+        <div class="col-auto">
+            <label for="selectTipoCompetencia" class="col-form-label">Elija un Tipo:</label>
+        </div>
+        <div class="col-auto">
+            <select id="selectTipoCompetencia" class="form-select">
+                <option selected disabled value="">Elija una opción</option>
+                @foreach (var tipoCompetencia in tiposCompetencias)
+                {
+                    <option value="@tipoCompetencia.IdTipoCompetencia">
+                        @tipoCompetencia.IdTipoCompetencia - @tipoCompetencia.Tipo
+                    </option>
+                }
+            </select>
+        </div>
     </div>
-    <div class="col-auto">
-        <!-- Combobox con datos dinámicos para Comportamientos -->
-        <select id="selectCompetencia" class="form-select">
-            <option selected disabled value="">Elija una opción</option>
-            @foreach (var competencia in Model)
-            {
-                <option value="@competencia.IdCompetencia|@competencia.Competencia">
-                    @competencia.IdCompetencia - @competencia.Competencia
-                </option>
-            }
-        </select>
+    @*---------------------------Combo Competencia*@
+    <div class="col-md-6">
+        <h3>Elegir Competencia:</h3>
+        <div class="col-auto">
+            <label for="selectCompetencia" class="col-form-label">Elija una Competencia:</label>
+        </div>
+        <div class="col-auto">
+            <!-- Combobox con datos dinámicos para Competencia -->
+            <select id="selectCompetencia" class="form-select">
+                <option selected disabled value="">Elija una opción</option>
+                @foreach (var competencia in Model)
+                {
+                    <option value="@competencia.IdCompetencia|@competencia.Competencia|@competencia.TipoCompetencia.IdTipoCompetencia"
+                            data-tipocompetencia="@competencia.TipoCompetencia.IdTipoCompetencia">
+                        @competencia.IdCompetencia - @competencia.Competencia - @competencia.TipoCompetencia.IdTipoCompetencia
+                    </option>
+                }
+            </select>
+        </div>
     </div>
 </div>
-<br/>
-<br/>
-<hr/>
+<hr />
 <div class="table-responsive">
     <table class="table table-bordered table-hover">
         <thead class="thead-light">
@@ -48,4 +71,5 @@
     </table>
 </div>
 
+<script src="~/sources/js/vistas/ConsultarComportamientosYNiveles/filtrarPorTipoCompetencia.js"></script>
 <script src="~/sources/js/vistas/ConsultarComportamientosYNiveles/ListarComportamientosYDescripcionesNegocios_JS.js"></script>

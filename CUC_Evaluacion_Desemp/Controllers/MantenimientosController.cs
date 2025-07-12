@@ -944,6 +944,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
             try
             {
                 var listaCompetencias = _servicioMantenimientos.Competencias.ListarCompetencias();
+                var tiposCompetencias = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
+
+                ViewBag.tiposCompetencias = tiposCompetencias;
 
                 return View(listaCompetencias);
 

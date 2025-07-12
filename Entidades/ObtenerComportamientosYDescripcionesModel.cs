@@ -11,6 +11,8 @@ namespace Entidades
         public int idCompetencia { get; set; }
         public string Competencia { get; set; }
         public string DescriCompetencia { get; set; }
+        public int idTipoCompetencia { get; set; }
+        public string Tipo { get; set; }
         public int idComport { get; set; }
         public string Comportamiento { get; set; }
         public string Nivel { get; set; }

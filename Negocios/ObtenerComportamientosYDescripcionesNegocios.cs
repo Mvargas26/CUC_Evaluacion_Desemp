@@ -43,6 +43,8 @@ namespace Negocios
                     idCompetencia = Convert.ToInt32(row["idCompetencia"]),
                     Competencia = row["Competencia"].ToString(),
                     DescriCompetencia = row["DescriCompetencia"].ToString(),
+                    idTipoCompetencia = Convert.ToInt32(row["idTipoCompetencia"]),
+                    Tipo = row["Tipo"].ToString(),
                     idComport = Convert.ToInt32(row["idComport"]),
                     Comportamiento = row["Comportamiento"].ToString(),
                     Nivel = row["Nivel"].ToString(),
