@@ -152,7 +152,24 @@ namespace Negocios
             }
         }
 
+        public List<TiposObjetivosModel> ListarTiposObjetivo()
+        {
+            var lista = new List<TiposObjetivosModel>();
+            var query = "sp_TiposObjetivo_Listar"; 
 
+            var dt = _accesoBD.EjecutarSPconDT(query); 
+
+            foreach (DataRow row in dt.Rows)
+            {
+                lista.Add(new TiposObjetivosModel
+                {
+                    IdTipoObjetivo = Convert.ToInt32(row["idTipoObjetivo"]),
+                    Tipo = row["Tipo"].ToString()
+                });
+            }
+
+            return lista;
+        }
 
 
     }

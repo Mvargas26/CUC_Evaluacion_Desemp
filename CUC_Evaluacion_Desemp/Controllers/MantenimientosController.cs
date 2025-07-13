@@ -983,6 +983,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
             try
             {
                 var objetivo = _servicioMantenimientos.Objetivo.ListarObjetivos();
+                var tipos = _servicioMantenimientos.Objetivo.ListarTiposObjetivo();
+                ViewBag.TiposObjetivo = tipos;
                 return View(objetivo);
             }
             catch (Exception)
@@ -1008,7 +1010,11 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 else
                 {
 
-                    return View("ManteniObjetivos", nuevoObjetivo);
+                    var tipos = _servicioMantenimientos.Objetivo.ListarTiposObjetivo();
+                    ViewBag.TiposObjetivo = tipos;
+
+                    var objetivos = _servicioMantenimientos.Objetivo.ListarObjetivos();
+                    return View("ManteniObjetivos", objetivos);
                 }
             }
             catch (Exception)
@@ -1031,9 +1037,12 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 }
                 else
                 {
-                   
-                   
-                    return View(objetivoModificado);
+
+                    var tipos = _servicioMantenimientos.Objetivo.ListarTiposObjetivo();
+                    ViewBag.TiposObjetivo = tipos;
+
+                    var objetivos = _servicioMantenimientos.Objetivo.ListarObjetivos();
+                    return View("ManteniObjetivos", objetivos);
                 }
             }
             catch (Exception)
