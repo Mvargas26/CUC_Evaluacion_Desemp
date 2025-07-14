@@ -658,7 +658,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
         }
         #endregion
 
-
         #region Periodos
 
         public ActionResult ManteniPeriodos()
@@ -671,7 +670,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             catch (Exception)
             {
                 TempData["MensajeError"] = "Error al obtener los periodos.";
-                return RedirectToAction(nameof(ManteniPeriodos));
+                return View("Error");
             }
         }
 
@@ -974,6 +973,88 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return Json(new { error = true, mensaje = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        public ActionResult ManteniTiposCompetencias()
+        {
+            try
+            {
+                var tiposCompetencias = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
+                var Conglomerados = _servicioMantenimientos.Conglomerados.ListarConglomerados();
+                ViewBag.Conglomerados = Conglomerados;
+
+                return View(tiposCompetencias);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener los tipos.";
+                return View("Error");
+            }
+        }
+        [HttpPost]
+        public ActionResult CrearTipoCompetencia(TiposCompetenciasModel nuevoTipo)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _servicioMantenimientos.TiposCompetencias.CrearTipoCompetencia(nuevoTipo);
+
+                    TempData["MensajeExito"] = $"Tipo de competencia '{nuevoTipo.Tipo}' creado correctamente.";
+                    return RedirectToAction(nameof(ManteniTiposCompetencias));
+                }
+                else
+                {
+                    return View("ManteniTipoCompetencia", nuevoTipo);
+                }
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al crear el tipo de competencia.";
+                return View("ManteniTipoCompetencia", nuevoTipo);
+            }
+        }
+        [HttpPost]
+        public ActionResult ModificarTipoCompetencia(TiposCompetenciasModel tipoModificado)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _servicioMantenimientos.TiposCompetencias.ModificarTipoCompetencia(tipoModificado);
+
+                    TempData["MensajeExito"] = $"Tipo de competencia '{tipoModificado.Tipo}' modificado correctamente.";
+                    return RedirectToAction(nameof(ManteniTiposCompetencias));
+                }
+                else
+                {
+                    return RedirectToAction("ManteniTiposCompetencias");
+                }
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al modificar el tipo de competencia.";
+                return RedirectToAction("ManteniTiposCompetencias");
+            }
+        }
+        [HttpPost]
+        public ActionResult EliminarTipoCompetencia(int id)
+        {
+            try
+            {
+                _servicioMantenimientos.TiposCompetencias.EliminarTipoCompetencia(id);
+
+                TempData["MensajeExito"] = "Tipo de competencia eliminado correctamente.";
+                return RedirectToAction(nameof(ManteniTiposCompetencias));
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al eliminar el tipo de competencia.";
+                return RedirectToAction(nameof(ManteniTiposCompetencias));
+            }
+        }
+
+
+
         #endregion
 
         #region Objetivos
@@ -1088,6 +1169,13 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
         #endregion
+
+        #region COnglomerados
+        
+
+        #endregion
+
+
     }
 
 }
