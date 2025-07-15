@@ -229,7 +229,6 @@
     <Content Include="Views\Mantenimientos\Index.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniFuncionarios.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniPuesto.cshtml" />
-    <Content Include="Views\Mantenimientos\CreaArea.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniArea.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniDependencias.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniRoles.cshtml" />

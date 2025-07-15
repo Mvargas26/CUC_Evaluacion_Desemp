@@ -5,7 +5,7 @@
     const partes = value.split("|");
     const idCompetencia = partes[0];
 
-    fetch(`/Mantenimientos/ObtenerComportamientosYDescripcionesPorCompetencia?idCompetencia=${idCompetencia}`)
+    fetch(`${urlBase}Mantenimientos/ObtenerComportamientosYDescripcionesPorCompetencia?idCompetencia=${idCompetencia}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {

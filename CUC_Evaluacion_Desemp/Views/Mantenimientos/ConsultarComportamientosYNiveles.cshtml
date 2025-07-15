@@ -2,6 +2,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Evaluación del Desempeño CUC";
 }
+<script>
+    var urlBase = '@Url.Content("~")';
+</script>
 
 @{
     var tiposCompetencias = ViewBag.tiposCompetencias as List<Entidades.TiposCompetenciasModel>;
