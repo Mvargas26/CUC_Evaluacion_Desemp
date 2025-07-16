@@ -56,6 +56,41 @@ namespace Negocios
             return lista;
         }
 
+        public List<ObtenerComportamientosYDescripcionesModel> ListarComportamientosYDescripcionesNegociosXCOnglo(int idConglomerado)
+        {
+            var parametros = new SqlParameter[]
+            {
+                new SqlParameter("@idConglomerado", idConglomerado),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
+            };
+
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_CompetenciasPorConglomerado", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError) && mensajeError != "OK")
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
+
+            var lista = new List<ObtenerComportamientosYDescripcionesModel>();
+            foreach (DataRow row in dt.Rows)
+            {
+                lista.Add(new ObtenerComportamientosYDescripcionesModel
+                {
+                    idCompetencia = Convert.ToInt32(row["idCompetencia"]),
+                    Competencia = row["Competencia"].ToString(),
+                    DescriCompetencia = row["DescriCompetencia"].ToString(),
+                    idTipoCompetencia = Convert.ToInt32(row["idTipoCompetencia"]),
+                    Tipo = row["Tipo"].ToString(),
+                    idComport = Convert.ToInt32(row["idComport"]),
+                    Comportamiento = row["Comportamiento"].ToString(),
+                    Nivel = row["Nivel"].ToString(),
+                    Descripcion = row["DescripcionNivel"].ToString()
+                });
+            }
+
+            return lista;
+        }
 
     }//fin class
 }

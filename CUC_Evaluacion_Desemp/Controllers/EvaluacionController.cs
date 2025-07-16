@@ -133,6 +133,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 //Obtenemos las competencias, comportamientos y descrp Transversales id 2500
                 var transversales = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegocios(2500, "PorTipo");
 
+                var CompetenciasDelConglomerado = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegociosXCOnglo(idConglomerado);
                 //pasamos todo a la vista
                 ViewBag.ListaObjetivos = listaObjetivos;
                 ViewBag.ListaCompetencias = listaCompetencias;
@@ -144,9 +145,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return View(subalterno);
 
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                TempData["MensajeError"] = "Error al obtener las competencias...."+ex.Message;
+                TempData["MensajeError"] = "Error al obtener las competencias.";
                 return View("Error");
             }
         }

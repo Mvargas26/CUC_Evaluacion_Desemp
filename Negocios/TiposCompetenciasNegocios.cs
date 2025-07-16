@@ -59,12 +59,12 @@ namespace Negocios
         {
             var parametros = new SqlParameter[]
             {
-        new SqlParameter("@Operacion", "SELECT"),
-        new SqlParameter("@idTipoCompetencia", DBNull.Value),
-        new SqlParameter("@Tipo", DBNull.Value),
-        new SqlParameter("@Ambito", DBNull.Value),
-        new SqlParameter("@idConglomeradoRelacionado", DBNull.Value),
-        new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
+                new SqlParameter("@Operacion", "SELECT"),
+                new SqlParameter("@idTipoCompetencia", DBNull.Value),
+                new SqlParameter("@Tipo", DBNull.Value),
+                new SqlParameter("@Ambito", DBNull.Value),
+                new SqlParameter("@idConglomeradoRelacionado", DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
             };
 
             DataTable dt = _accesoBD.EjecutarSPconDT("sp_tiposCompetencias_CRUD", parametros);
@@ -156,5 +156,44 @@ namespace Negocios
                 throw new Exception("Error SP: " + mensajeError);
             }
         }
+
+        public List<TiposCompetenciasModel> ListarTiposCompetenciasXConglomerado(int idConglo)
+        {
+            var parametros = new List<SqlParameter>
+    {
+        new SqlParameter("@Operacion","SELECTXCONGLO"),
+        new SqlParameter("@idTipoCompetencia", DBNull.Value),
+        new SqlParameter("@Tipo", DBNull.Value),
+        new SqlParameter("@Ambito", DBNull.Value),
+        new SqlParameter("@idConglomeradoRelacionado", DBNull.Value),
+        new SqlParameter("@idConglo", idConglo),
+        new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
+    };
+
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_tiposCompetencias_CRUD", parametros.ToArray());
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
+
+            var lista = new List<TiposCompetenciasModel>();
+            foreach (DataRow row in dt.Rows)
+            {
+                lista.Add(new TiposCompetenciasModel
+                {
+                    IdTipoCompetencia = Convert.ToInt32(row["idTipoCompetencia"]),
+                    Tipo = row["Tipo"].ToString(),
+                    Ambito = row["Ambito"] as string,
+                    IdConglomeradoRelacionado = row["idConglomeradoRelacionado"] != DBNull.Value
+                                    ? Convert.ToInt32(row["idConglomeradoRelacionado"])
+                                    : (int?)null
+                });
+            }
+
+            return lista;
+        }
+
     }//fin class
 }//fin space

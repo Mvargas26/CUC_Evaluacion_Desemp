@@ -54,6 +54,46 @@ namespace Negocios
                 throw new Exception("Error al listar las competencias: " + ex.Message);
             }
         }
+
+        public List<CompetenciasModel> ListarCompetenciasXTipo(int tipoCompetencia)
+        {
+            try
+            {
+                var parametros = new SqlParameter[]
+                {
+                    new SqlParameter("@Accion", "COMPETXTIPO"),
+                    new SqlParameter("@idCompetencia", DBNull.Value),
+                    new SqlParameter("@Competencia", DBNull.Value),
+                    new SqlParameter("@Descripcion", DBNull.Value),
+                    new SqlParameter("@idTipoCompetencia", tipoCompetencia),
+                    new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+                };
+
+                DataTable dt = _accesoBD.EjecutarSPconDT("sp_CompetenciasCRUD", parametros);
+
+                string mensajeError = parametros.Last().Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(mensajeError))
+                {
+                    throw new Exception("Error SP: " + mensajeError);
+                }
+
+                return dt.AsEnumerable().Select(row => new CompetenciasModel
+                {
+                    IdCompetencia = Convert.ToInt32(row["idCompetencia"]),
+                    Competencia = row["Competencia"].ToString(),
+                    Descripcion = row["Descripcion"].ToString(),
+                    IdTipoCompetencia = Convert.ToInt32(row["idTipoCompetencia"]),
+                    TipoCompetencia = new TiposCompetenciasModel
+                    {
+                        IdTipoCompetencia = Convert.ToInt32(row["idTipoCompetencia"])
+                    }
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al listar las competencias: " + ex.Message);
+            }
+        }
         public CompetenciasModel ConsultarCompetenciaPorId(int idCompetencia)
         {
             try
