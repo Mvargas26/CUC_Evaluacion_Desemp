@@ -244,6 +244,7 @@
     <Content Include="Views\Mantenimientos\ManteniObjetivos.cshtml" />
     <Content Include="Views\Mantenimientos\ConsultarComportamientosYNiveles.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniTiposCompetencias.cshtml" />
+    <Content Include="Views\Mantenimientos\ManteniComportamientos.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1171,7 +1171,105 @@ namespace CUC_Evaluacion_Desemp.Controllers
         #endregion
 
         #region COnglomerados
-        
+
+
+        #endregion
+
+        #region comportamientos
+
+        public ActionResult ManteniComportamientos()
+        {
+            try
+            {
+                var comportamiento = _servicioMantenimientos.Comportamientos.ListarComportamientos();
+                return View(comportamiento);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener los comportamientos.";
+                return RedirectToAction(nameof(ManteniComportamientos));
+            }
+        }
+
+
+        [HttpPost]
+        public ActionResult CreaComportamientos(ComportamientoModel nuevoComportamiento)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+
+                    _servicioMantenimientos.Comportamientos.InsertarComportamiento(nuevoComportamiento);
+
+
+                    TempData["MensajeExito"] = $"Comportamiento {nuevoComportamiento.Nombre} creado correctamente.";
+                    return RedirectToAction(nameof(ManteniComportamientos));
+                }
+                else
+                {
+
+                    return View("ManteniComportamientos", nuevoComportamiento);
+                }
+            }
+            catch (Exception)
+            {
+
+                TempData["MensajeError"] = "Error al crear el area.";
+                return View("ManteniComportamientos", nuevoComportamiento);
+            }
+        }
+
+
+
+        [HttpPost]
+        public ActionResult EditaComportamiento(ComportamientoModel comportamientoModificado)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _servicioMantenimientos.Comportamientos.ActualizarComportamiento(comportamientoModificado);
+                    TempData["MensajeExito"] = $" {comportamientoModificado.Nombre} fue modificado correctamente.";
+                    return RedirectToAction(nameof(ManteniComportamientos));
+                }
+                else
+                {
+                    return View("ManteniComportamientos", comportamientoModificado);
+                }
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = $"Error al actualizar el comportamiento.";
+                return RedirectToAction(nameof(ManteniComportamientos));
+            }
+        }
+
+        public ActionResult EliminarComportamiento(int id)
+        {
+            try
+            {
+                var comportamiento = _servicioMantenimientos.Comportamientos.ConsultarComportamientoID(id);
+                if (comportamiento == null)
+                {
+                    TempData["MensajeError"] = $"El comportamiento con ID {id} no fue encontrado.";
+                }
+                else
+                {
+                    _servicioMantenimientos.Comportamientos.EliminarComportamiento(id);
+                    TempData["MensajeExito"] = $"Comportamiento {comportamiento.Nombre} eliminado correctamente.";
+                }
+                return RedirectToAction(nameof(ManteniComportamientos));
+            }
+            catch
+            {
+                TempData["MensajeError"] = "No puede borrar este comportamiento, verifique las relaciones.";
+                return RedirectToAction(nameof(ManteniComportamientos));
+            }
+        }
+
+
+
 
         #endregion
 
