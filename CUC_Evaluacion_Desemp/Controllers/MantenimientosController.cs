@@ -1186,8 +1186,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
             catch (Exception)
             {
-                TempData["MensajeError"] = "Error al obtener los comportamientos.";
-                return RedirectToAction(nameof(ManteniComportamientos));
+                TempData["MensajeError"] = "Error al obtener los objetivos.";
+                return View("Error");
             }
         }
 
@@ -1215,8 +1215,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
             catch (Exception)
             {
 
-                TempData["MensajeError"] = "Error al crear el area.";
-                return View("ManteniComportamientos", nuevoComportamiento);
+                TempData["MensajeError"] = "Error al obtener los objetivos.";
+                return View("Error");
             }
         }
 
@@ -1240,8 +1240,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
             catch (Exception)
             {
-                TempData["MensajeError"] = $"Error al actualizar el comportamiento.";
-                return RedirectToAction(nameof(ManteniComportamientos));
+                TempData["MensajeError"] = "Error al obtener los objetivos.";
+                return View("Error");
             }
         }
 
@@ -1263,8 +1263,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
             catch
             {
-                TempData["MensajeError"] = "No puede borrar este comportamiento, verifique las relaciones.";
-                return RedirectToAction(nameof(ManteniComportamientos));
+                TempData["MensajeError"] = "Error al obtener los objetivos.";
+                return View("Error");
             }
         }
 
