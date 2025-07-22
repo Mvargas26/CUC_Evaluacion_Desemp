@@ -464,8 +464,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
             catch (Exception)
             {
-                TempData["MensajeError"] = $"Error al obtener la lista";
-                return View(new List<PuestosModel>());
+                TempData["MensajeError"] = "Error al cargar la lista.";
+                return View("Error");
             }
         }
 
@@ -1184,9 +1184,11 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var comportamiento = _servicioMantenimientos.Comportamientos.ListarComportamientos();
                 return View(comportamiento);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData["MensajeError"] = "Error al obtener los objetivos.";
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                   ? "¡ALERTA! Ya existe."
+                   : "Error al crear ";
                 return View("Error");
             }
         }
@@ -1212,11 +1214,12 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     return View("ManteniComportamientos", nuevoComportamiento);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                TempData["MensajeError"] = "Error al obtener los objetivos.";
-                return View("Error");
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                                   ? "¡ALERTA! Ya existe."
+                                   : "Error al crear.";
+                return RedirectToAction(nameof(ManteniComportamientos));
             }
         }
 
@@ -1238,10 +1241,12 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     return View("ManteniComportamientos", comportamientoModificado);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData["MensajeError"] = "Error al obtener los objetivos.";
-                return View("Error");
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                    ? "¡ALERTA! Ya existe."
+                    : "Error al crear ";
+                return RedirectToAction(nameof(ManteniComportamientos));
             }
         }
 
@@ -1263,8 +1268,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
             catch
             {
-                TempData["MensajeError"] = "Error al obtener los objetivos.";
-                return View("Error");
+                TempData["MensajeError"] = "Error al eliminar.";
+                return RedirectToAction(nameof(ManteniComportamientos));
             }
         }
 
