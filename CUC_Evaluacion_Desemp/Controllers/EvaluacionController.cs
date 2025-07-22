@@ -140,6 +140,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 ViewBag.PesosConglomerados = PesosConglomerados;
                 ViewBag.IdConglomerado = idConglomerado;
                 ViewBag.transversales = transversales;
+                ViewBag.CompetenciasDelConglomerado = CompetenciasDelConglomerado;
 
 
                 return View(subalterno);
