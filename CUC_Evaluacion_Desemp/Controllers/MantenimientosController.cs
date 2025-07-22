@@ -1090,19 +1090,15 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 }
                 else
                 {
+                    return RedirectToAction(nameof(ManteniObjetivos));
 
-                    var tipos = _servicioMantenimientos.Objetivo.ListarTiposObjetivo();
-                    ViewBag.TiposObjetivo = tipos;
-
-                    var objetivos = _servicioMantenimientos.Objetivo.ListarObjetivos();
-                    return View("ManteniObjetivos", objetivos);
                 }
             }
             catch (Exception)
             {
 
-                TempData["MensajeError"] = "Error al crear el objejtivo.";
-                return View("Error");
+                TempData["MensajeError"] = "Error al crear el objetivo.";
+                return RedirectToAction(nameof(ManteniObjetivos));
             }
         }
         [HttpPost]
@@ -1118,18 +1114,13 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 }
                 else
                 {
-
-                    var tipos = _servicioMantenimientos.Objetivo.ListarTiposObjetivo();
-                    ViewBag.TiposObjetivo = tipos;
-
-                    var objetivos = _servicioMantenimientos.Objetivo.ListarObjetivos();
-                    return View("ManteniObjetivos", objetivos);
+                    return RedirectToAction(nameof(ManteniObjetivos));
                 }
             }
             catch (Exception)
             {
                 TempData["MensajeError"] = $"Error al actualizar el objetivo.";
-                return View("Error");
+                return RedirectToAction(nameof(ManteniObjetivos));
             }
         }
         public ActionResult ModificarObjetivo(int id)
@@ -1164,8 +1155,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
             catch
             {
-                TempData["MensajeError"] = "No puede borrar este objetivo, verifique las relaciones.";
-                return View("Error");
+                TempData["MensajeError"] = "No puede borrar este objetivo, esta siendo utilizado.";
+                return RedirectToAction(nameof(ManteniObjetivos));
             }
         }
         #endregion
