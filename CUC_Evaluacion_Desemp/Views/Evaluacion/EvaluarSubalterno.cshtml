@@ -181,15 +181,18 @@
         <h3>Elegir Competencias relacionadas a este conglomerado:</h3>
         <div class="row g-3 align-items-center">
             <div class="col-auto">
-                <label for="selectObjetivo" class="col-form-label">Elija una competencia:</label>
+                <label for="CompetenciaElejida" class="col-form-label">Elija una competencia:</label>
             </div>
             <div class="col-auto">
                 <!-- Combobox con datos dinámicos para elejir competencia -->
-                <select id="selectObjetivo" class="form-select">
-                    @foreach (var objeto in ViewBag.CompetenciasDelConglomerado as List<Entidades.ObtenerComportamientosYDescripcionesModel>)
+                <select id="CompetenciaElejida" class="form-select">
+                    <option value="" selected disabled>Seleccione...</option>
+                    @foreach (var competencia in (ViewBag.CompetenciasDelConglomerado as List<Entidades.ObtenerComportamientosYDescripcionesModel>)
+                                                      .Select(c => c.Competencia)
+                                                      .Distinct()) //aqui devolvemos una ves cada competencia
                     {
-                        <option value="@objeto.Competencia">
-                            @objeto.Competencia
+                        <option value="@competencia">
+                            @competencia
                         </option>
                     }
                 </select>
@@ -198,8 +201,21 @@
         <br />
         <div class="row g-3 align-items-center">
             <div class="col-auto">
-                <button type="button" class="btn btn-success" onclick="agregarFilaObjetivos()">Agregar fila</button>
+                <button type="button" class="btn btn-success" onclick="agregarCompetenciaSelect()">Agregar Competencia</button>
             </div>
+        </div>
+        <!-- Tabla con los datos de la competencia elejidos -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th colspan="5" class="text-center">Competencias Seleccionadas</th>
+                    </tr>
+                </thead>
+                <tbody id="tbCompetenciasSelect">
+                    <!-- Aquí se llenará la tabla dinámicamente -->
+                </tbody>
+            </table>
         </div>
     </div>
     <hr />
@@ -289,15 +305,19 @@
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="~/js/vista_EvaluacionSubalterno/tablas_planificarEva.js"></script>
-    <script src="~/js/vista_EvaluacionSubalterno/enviarTablas.js"></script>
     <script src="~/sources/js/vistas/EvaluarSubAlterno/ListarTransversales.js"></script>
-
     @using Newtonsoft.Json
     <script>
-        const transversalesData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.transversales));
-        document.addEventListener("DOMContentLoaded", function () {
+         const transversalesData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.transversales));
+         document.addEventListener("DOMContentLoaded", function () {
             renderizarTablaAgrupada(transversalesData);
         });
     </script>
+    <script src="~/sources/js/vistas/EvaluarSubAlterno/agregarCompetenciasdelCombo.js"></script>
+    <script>
+        const competenciasData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.CompetenciasDelConglomerado));
+        document.addEventListener("DOMContentLoaded", function () {
+    });
+    </script>
 }
+
