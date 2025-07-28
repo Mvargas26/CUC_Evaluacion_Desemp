@@ -134,6 +134,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var transversales = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegocios(2500, "PorTipo");
 
                 var CompetenciasDelConglomerado = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegociosXCOnglo(idConglomerado);
+                var tiposdeObjetivos = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
                 //pasamos todo a la vista
                 ViewBag.ListaObjetivos = listaObjetivos;
                 ViewBag.ListaCompetencias = listaCompetencias;
@@ -141,6 +142,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 ViewBag.IdConglomerado = idConglomerado;
                 ViewBag.transversales = transversales;
                 ViewBag.CompetenciasDelConglomerado = CompetenciasDelConglomerado;
+                ViewBag.tiposdeObjetivos = tiposdeObjetivos;
 
 
                 return View(subalterno);

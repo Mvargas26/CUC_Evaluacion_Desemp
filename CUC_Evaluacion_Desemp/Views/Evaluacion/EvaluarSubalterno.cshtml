@@ -16,6 +16,7 @@
 @{
     var listaTiposObjetivos = ViewData["ListaTiposObjetivos"] as List<Entidades.TiposObjetivosModel>;
     var listaTiposCompetencias = ViewData["ListaTiposCompetencias"] as List<Entidades.TiposCompetenciasModel>;
+    var tiposdeObjetivos = ViewData["tiposdeObjetivos"] as List<Entidades.TiposObjetivosModel>;
 }
 
 <div class="container mt-4 mb-5">
@@ -107,8 +108,11 @@
                 <select id="selectObjetivo" class="form-select">
                     @foreach (var objetivo in ViewBag.ListaObjetivos as List<Entidades.ObjetivoModel>)
                     {
-                        <option value="@objetivo.IdObjetivo|@objetivo.Objetivo|@objetivo.Tipo|@objetivo.IdTipoObjetivo">
-                            @objetivo.IdObjetivo - @objetivo.Objetivo
+                        // mostramos el tipo correspondiente
+                        var tipo = tiposdeObjetivos?.FirstOrDefault(t => t.IdTipoObjetivo == objetivo.IdTipoObjetivo)?.Tipo ?? "Tipo no definido";
+
+                        <option value="@objetivo.IdObjetivo|@objetivo.Objetivo|@tipo|@objetivo.IdTipoObjetivo">
+                            Tipo: @tipo - @objetivo.Objetivo
                         </option>
                     }
                 </select>
@@ -217,106 +221,108 @@
                 </tbody>
             </table>
         </div>
-    <hr />
-    @*      input Observaciones *@
-    <div class="mb-5">
-        <h3>Observaciones:</h3>
-        <div class="col-auto">
-            <input type="text" id="txtObservaciones" class="form-control"
-                   placeholder="Ingrese sus observaciones aqui."
-                   value="Sin Observaciones." />
+        <hr />
+        @*      input Observaciones *@
+        <div class="mb-5">
+            <h3>Observaciones:</h3>
+            <div class="col-auto">
+                <input type="text" id="txtObservaciones" class="form-control"
+                       placeholder="Ingrese sus observaciones aqui."
+                       value="Sin Observaciones." />
+            </div>
         </div>
-    </div>
-    <hr />
+        <hr />
 
-    <!-- Resumen Final centrado y alineado -->
-    <div class="d-flex justify-content-center">
-        <div class="p-4" style="background-color: #f8d7da; max-width: 600px;">
-            <h5 class="text-center">Resumen para: @Model.Nombre @Model.Apellido1</h5>
-            <table id="tablaResultados" class="table table-borderless align-middle">
-                <thead>
-                    <tr>
-                        <th>Tipo</th>
-                        <th>Porcentaje</th>
-                        <th style="width: 100px;">Valor</th>
-                        <th class="d-none">id tipo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in ViewBag.PesosConglomerados)
-                    {
-                        var nombreTipo = listaTiposObjetivos?.FirstOrDefault(t => t.IdTipoObjetivo == item?.IdTipoObjetivo)?.Tipo;
-                        var nombreTipoCompet = listaTiposCompetencias?.FirstOrDefault(t => t.IdTipoCompetencia == item?.IdTipoCompetencia)?.Tipo;
-                        var nombreFinal = nombreTipo ?? nombreTipoCompet ?? "Desconocido";
+        <!-- Resumen Final centrado y alineado -->
+        <div class="d-flex justify-content-center">
+            <div class="p-4" style="background-color: #f8d7da; max-width: 600px;">
+                <h5 class="text-center">Resumen para: @Model.Nombre @Model.Apellido1</h5>
+                <table id="tablaResultados" class="table table-borderless align-middle">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Porcentaje</th>
+                            <th style="width: 100px;">Valor</th>
+                            <th class="d-none">id tipo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in ViewBag.PesosConglomerados)
+                        {
+                            var nombreTipo = listaTiposObjetivos?.FirstOrDefault(t => t.IdTipoObjetivo == item?.IdTipoObjetivo)?.Tipo;
+                            var nombreTipoCompet = listaTiposCompetencias?.FirstOrDefault(t => t.IdTipoCompetencia == item?.IdTipoCompetencia)?.Tipo;
+                            var nombreFinal = nombreTipo ?? nombreTipoCompet ?? "Desconocido";
 
-                        var idTipoObjetivo = item?.IdTipoObjetivo ?? 0;
-                        var idTipoCompetencia = item?.IdTipoCompetencia ?? 0;
-                        var idTipo = idTipoObjetivo != 0 ? idTipoObjetivo : idTipoCompetencia;
-                        var tipo = idTipoObjetivo != 0 ? "Objetivo" : "Competencia";
+                            var idTipoObjetivo = item?.IdTipoObjetivo ?? 0;
+                            var idTipoCompetencia = item?.IdTipoCompetencia ?? 0;
+                            var idTipo = idTipoObjetivo != 0 ? idTipoObjetivo : idTipoCompetencia;
+                            var tipo = idTipoObjetivo != 0 ? "Objetivo" : "Competencia";
+
+                            <tr>
+                                <td><strong>@nombreFinal</strong></td>
+                                <td><strong>@(item?.Porcentaje.ToString("0") ?? "0")%</strong></td>
+                                <td style="width: 100px;">
+                                    <input type="number" class="form-control input-calificacion"
+                                           placeholder="@(item?.Porcentaje.ToString("0") ?? "0")%" readonly />
+                                </td>
+                                <td class="d-none" data-tipo-id="@idTipo" data-tipo-categoria="@tipo">
+                                    @idTipo
+                                </td>
+                            </tr>
+                        }
 
                         <tr>
-                            <td><strong>@nombreFinal</strong></td>
-                            <td><strong>@(item?.Porcentaje.ToString("0") ?? "0")%</strong></td>
+                            <td><strong>Resultado:</strong></td>
+                            <td><strong> 100%</strong></td>
                             <td style="width: 100px;">
-                                <input type="number" class="form-control input-calificacion"
-                                       placeholder="@(item?.Porcentaje.ToString("0") ?? "0")%" readonly />
-                            </td>
-                            <td class="d-none" data-tipo-id="@idTipo" data-tipo-categoria="@tipo">
-                                @idTipo
+                                <input type="number" class="form-control" id="resultado-total" readonly />
                             </td>
                         </tr>
-                    }
-
-                    <tr>
-                        <td><strong>Resultado:</strong></td>
-                        <td><strong> 100%</strong></td>
-                        <td style="width: 100px;">
-                            <input type="number" class="form-control" id="resultado-total" readonly />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="text-center">
-                <button id="btnEnviarEvaluacion" class="btn btn-success mt-3">Enviar Evaluación</button>
+                    </tbody>
+                </table>
+                <div class="text-center">
+                    <button id="btnEnviarEvaluacion" class="btn btn-success mt-3">Enviar Evaluación</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal de confirmación -->
-<div class="modal fade" id="confirmacionModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title">Confirmación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                <p id="mensajeConfirmacion">¿Está seguro de realizar esta acción?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                <button type="button" class="btn btn-danger" id="btnEliminar">Sí</button>
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="confirmacionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">Confirmación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="mensajeConfirmacion">¿Está seguro de realizar esta acción?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-danger" id="btnEliminar">Sí</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-@section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="~/sources/js/vistas/EvaluarSubAlterno/ListarTransversales.js"></script>
-    @using Newtonsoft.Json
-    <script>
+    @section Scripts {
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="~/sources/js/vistas/EvaluarSubAlterno/ListarTransversales.js"></script>
+        @using Newtonsoft.Json
+        <script>
          const transversalesData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.transversales));
          document.addEventListener("DOMContentLoaded", function () {
             renderizarTablaAgrupada(transversalesData);
         });
-    </script>
-    <script src="~/sources/js/vistas/EvaluarSubAlterno/agregarCompetenciasdelCombo.js"></script>
-    <script>
+        </script>
+        <script src="~/sources/js/vistas/EvaluarSubAlterno/agregarCompetenciasdelCombo.js"></script>
+        <script>
         const competenciasData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.CompetenciasDelConglomerado));
         document.addEventListener("DOMContentLoaded", function () {
     });
-    </script>
-}
+        </script>
+        <script src="~/sources/js/vistas/EvaluarSubAlterno/agregarFilaObjetivos.js"></script>
+
+    }
 
