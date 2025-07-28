@@ -49,7 +49,8 @@
         const encabezado = document.createElement("tr");
         encabezado.innerHTML = `<th>Comportamientos</th>` +
             niveles.map(n => `<th>${n}</th>`).join("") +
-            `<th>Asignar</th><th>Observaciones</th>`;
+            "";
+        //    `<th>Asignar</th><th>Observaciones</th>`;
         contenedor.appendChild(encabezado);
 
         // Agrupar comportamientos
@@ -73,7 +74,7 @@
                 td.textContent = descripcionesPorNivel[nivel] || "";
                 fila.appendChild(td);
             });
-
+            /*
             // Columna Asignar
             const tdAsignar = document.createElement("td");
             tdAsignar.style.minWidth = "160px";
@@ -102,7 +103,7 @@
             inputObs.className = "form-control";
             tdObs.appendChild(inputObs);
             fila.appendChild(tdObs);
-
+                    */
             contenedor.appendChild(fila);
         });
 

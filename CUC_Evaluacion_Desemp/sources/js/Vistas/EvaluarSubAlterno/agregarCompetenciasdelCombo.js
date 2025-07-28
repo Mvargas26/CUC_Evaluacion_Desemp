@@ -13,12 +13,17 @@
     }
 
 function renderizarTablaCompetenciaSelect(data) {
-    const contenedor = document.getElementById("tbCompetenciasSelect");
-    contenedor.innerHTML = "";
+    const contenedor = document.querySelector("#tbCompetenciasSelect tbody");
+
+    if (data.length === 0) {
+        if (contenedor.querySelectorAll("tr").length === 0) {
+            contenedor.innerHTML = `<tr><td colspan="7" class="text-center">No se han asignado competencias</td></tr>`;
+        }
+        return;
+    }
 
     // Agrupar por competencia
     const competenciasMap = new Map();
-
     data.forEach(item => {
         if (!competenciasMap.has(item.idCompetencia)) {
             competenciasMap.set(item.idCompetencia, {
@@ -32,42 +37,50 @@ function renderizarTablaCompetenciaSelect(data) {
     });
 
     competenciasMap.forEach((competencia) => {
-        const grupoCompetencia = document.createElement("tbody");
-        grupoCompetencia.setAttribute('data-competencia-id', competencia.idCompetencia);
+        // Verificar si ya existe en la tabla
+        if (contenedor.querySelector(`tr[data-id='${competencia.idCompetencia}']`)) {
+            alert(`La competencia "${competencia.Competencia}" ya está agregada.`);
+            return;
+        }
+
+        const niveles = [...new Set(competencia.Datos.map(d => d.Nivel))].sort();
+        const totalColumnas = 1 + niveles.length; // calculamos cuantas columnas
 
         // Fila del título con botón eliminar
         const filaTitulo = document.createElement("tr");
-        filaTitulo.innerHTML = `
-            <th colspan="7" style="background-color: #f8f9fa; text-align: center;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-weight: bold ;color: #0d6efd;">Competencia: ${competencia.Competencia}</span>
-                    <button class="btn btn-danger btn-sm" onclick="eliminarCompetencia(${competencia.idCompetencia})">
-                        <i class="fas fa-trash-alt"></i> Eliminar
-                    </button>
-                </div>
-            </th>
+        filaTitulo.setAttribute("data-id", competencia.idCompetencia);
+        const thTitulo = document.createElement("th");
+        thTitulo.colSpan = totalColumnas;
+        thTitulo.style.backgroundColor = "#f8f9fa";
+        thTitulo.style.textAlign = "center";
+        thTitulo.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: bold; color: #0d6efd;">Competencia: ${competencia.Competencia}</span>
+                <button class="btn btn-danger btn-sm" onclick="eliminarCompetencia(${competencia.idCompetencia})">
+                    <i class="fas fa-trash-alt"></i> Eliminar
+                </button>
+            </div>
         `;
-        grupoCompetencia.appendChild(filaTitulo);
+        filaTitulo.appendChild(thTitulo);
+        contenedor.appendChild(filaTitulo);
 
-        // Descripción
+        // Fila de descripción
         const descripcion = document.createElement("tr");
         const tdDescripcion = document.createElement("td");
-        tdDescripcion.colSpan = 7;
+        tdDescripcion.colSpan = totalColumnas;
         tdDescripcion.className = "text-center";
         tdDescripcion.style.fontWeight = "bold";
         tdDescripcion.textContent = "Descripción: " + competencia.DescriCompetencia;
         descripcion.appendChild(tdDescripcion);
-        grupoCompetencia.appendChild(descripcion);
+        contenedor.appendChild(descripcion);
 
-        // Obtener niveles únicos
-        const niveles = [...new Set(competencia.Datos.map(d => d.Nivel))].sort();
-
-        // Encabezado de la tabla
+        // Encabezado de niveles
         const encabezado = document.createElement("tr");
         encabezado.innerHTML = `<th>Comportamientos</th>` +
             niveles.map(n => `<th>${n}</th>`).join("") +
-            `<th>Asignar</th><th>Observaciones</th>`;
-        grupoCompetencia.appendChild(encabezado);
+            "";
+        // + `<th>Asignar</th><th>Observaciones</th>`;
+        contenedor.appendChild(encabezado);
 
         // Agrupar comportamientos
         const comportamientoMap = new Map();
@@ -87,13 +100,14 @@ function renderizarTablaCompetenciaSelect(data) {
             tdComport.innerHTML = `<strong>${comportamiento}</strong>`;
             fila.appendChild(tdComport);
 
-            // Columnas para cada nivel
+            // Columnas de niveles
             niveles.forEach(nivel => {
                 const td = document.createElement("td");
                 td.textContent = descripcionesPorNivel[nivel] || "";
                 fila.appendChild(td);
             });
 
+            /*
             // Columna Asignar
             const tdAsignar = document.createElement("td");
             const select = document.createElement("select");
@@ -122,31 +136,51 @@ function renderizarTablaCompetenciaSelect(data) {
             inputObs.className = "form-control";
             tdObs.appendChild(inputObs);
             fila.appendChild(tdObs);
+            */
 
-            grupoCompetencia.appendChild(fila);
+            contenedor.appendChild(fila);
         });
 
-        // Espaciado entre competencias
+        // Fila de separación entre competencias
         const espacio = document.createElement("tr");
         const tdEspacio = document.createElement("td");
-        tdEspacio.colSpan = 7;
-        tdEspacio.innerHTML = "<hr />";
+        tdEspacio.colSpan = totalColumnas;
+        tdEspacio.innerHTML = "<hr/>";
         espacio.appendChild(tdEspacio);
-        grupoCompetencia.appendChild(espacio);
-
-        contenedor.appendChild(grupoCompetencia);
+        contenedor.appendChild(espacio);
     });
 }
+
+
 function eliminarCompetencia(idCompetencia) {
     if (confirm('¿Está seguro que desea eliminar esta competencia de la lista?')) {
-        // Encontrar y eliminar el grupo de la competencia
-        const elemento = document.querySelector(`tbody[data-competencia-id="${idCompetencia}"]`);
-        if (elemento) {
-            elemento.remove();
+        const contenedor = document.querySelector("#tbCompetenciasSelect tbody");
+
+        // Buscamos el título de la competencia
+        const filaTitulo = contenedor.querySelector(`tr[data-id="${idCompetencia}"]`);
+        if (filaTitulo) {
+            // Eliminamos todas las filas siguientes hasta el próximo separador <hr/> o fin de tabla
+            let filaActual = filaTitulo.nextElementSibling;
+            filaTitulo.remove();
+
+            while (filaActual) {
+                const siguiente = filaActual.nextElementSibling;
+                filaActual.remove();
+
+                // salimos cuando lleguemos al separador (<hr/> en td)
+                if (filaActual.querySelector("td hr")) break;
+                filaActual = siguiente;
+            }
         }
 
-        // Actualizar el array de datos
-         competenciasData = competenciasData.filter(item => item.idCompetencia !== idCompetencia);
+        // Actualizar array de datos global
+        competenciasData = competenciasData.filter(item => item.idCompetencia !== idCompetencia);
+
+        // Si ya no quedan competencias, mostrar mensaje vacío
+        if (contenedor.querySelectorAll("tr").length === 0) {
+            contenedor.innerHTML = `<tr><td colspan="7" class="text-center">No se han asignado competencias</td></tr>`;
+        }
     }
 }
+
 
