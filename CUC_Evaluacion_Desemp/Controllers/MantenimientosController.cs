@@ -1161,7 +1161,106 @@ namespace CUC_Evaluacion_Desemp.Controllers
         }
         #endregion
 
-        #region COnglomerados
+        #region Conglomerados
+        public ActionResult ManteniConglomerados()
+        {
+            try
+            {
+                var conglomerado = _servicioMantenimientos.Conglomerados.ListarConglomerados();
+               
+                return View(conglomerado);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener los conglomerados.";
+                return View("Error");
+            }
+        }
+        [HttpPost]
+        public ActionResult CrearConglomerado(ConglomeradoModel nuevoConglomerado)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+
+                    _servicioMantenimientos.Conglomerados.CrearConglomerado(nuevoConglomerado);
+
+
+                    TempData["MensajeExito"] = $"Conglomerado {nuevoConglomerado.NombreConglomerado} creado correctamente.";
+                    return RedirectToAction(nameof(ManteniConglomerados));
+                }
+                else
+                {
+                    return RedirectToAction(nameof(ManteniConglomerados));
+
+                }
+            }
+            catch (Exception)
+            {
+
+                TempData["MensajeError"] = "Error al crear el conglomerados.";
+                return View("Error");
+            }
+        }
+        [HttpPost]
+        public ActionResult ModificarConglomerado(ConglomeradoModel conglomeradoModificado)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _servicioMantenimientos.Conglomerados.ModificarConglomerado(conglomeradoModificado);
+                    TempData["MensajeExito"] = $" {conglomeradoModificado.NombreConglomerado} fue modificado correctamente.";
+                    return RedirectToAction(nameof(ManteniConglomerados));
+                }
+                else
+                {
+                    return RedirectToAction(nameof(ManteniConglomerados));
+                }
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = $"Error al actualizar el conglomerado.";
+                return View("Error");
+            }
+        }
+        public ActionResult ModificarConglomerado(int id)
+        {
+            var conglomerado = _servicioMantenimientos.Conglomerados.ConsultarConglomeradoID(id);
+            if (conglomerado == null)
+            {
+                TempData["MensajeError"] = $"El conglomerado con ID {id} no fue encontrado.";
+                return View("Error");
+            }
+
+
+            return View(conglomerado);
+        }
+        public ActionResult EliminarConglomerado(int id)
+        {
+            try
+            {
+                var conglomerado = _servicioMantenimientos.Conglomerados.ConsultarConglomeradoID(id);
+
+                if (conglomerado == null)
+                {
+                    TempData["MensajeError"] = $"El conglomerado con ID {id} no fue encontrado.";
+                }
+                else
+                {
+                    _servicioMantenimientos.Conglomerados.EliminarConglomerado(id);
+                    TempData["MensajeExito"] = $"Conglomerado '{conglomerado.NombreConglomerado}' eliminado correctamente.";
+                }
+
+                return RedirectToAction(nameof(ManteniConglomerados));
+            }
+            catch
+            {
+                TempData["MensajeError"] = "No puede borrar este conglomerado, esta siendo utilizado.";
+                return View("Error");
+            }
+        }
 
 
         #endregion
