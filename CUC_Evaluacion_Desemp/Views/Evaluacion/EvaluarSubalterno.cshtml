@@ -101,11 +101,12 @@
         <h3>Elegir Objetivos:</h3>
         <div class="row g-3 align-items-center">
             <div class="col-auto">
-                <label for="selectObjetivo" class="col-form-label">Elija 1 Objetivo:</label>
+                <label for="selectObjetivo" class="col-form-label">Elija un Objetivo:</label>
             </div>
             <div class="col-auto">
                 <!-- Combobox con datos dinámicos para objetivos -->
                 <select id="selectObjetivo" class="form-select">
+                    <option value="" selected disabled>Seleccione...</option>
                     @foreach (var objetivo in ViewBag.ListaObjetivos as List<Entidades.ObjetivoModel>)
                     {
                         // mostramos el tipo correspondiente
