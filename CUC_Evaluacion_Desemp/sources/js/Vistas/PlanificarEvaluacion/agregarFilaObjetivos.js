@@ -118,14 +118,20 @@ function actualizarSumasPorTipo() {
     });
 
     // Sumar pesos de competencias 
-    document.querySelectorAll('#tablaCompetencias tbody tr').forEach(row => {
-        const idTipo = row.querySelector('td:nth-child(3)')?.textContent.trim();
-        const peso = parseFloat(row.querySelector('td:nth-child(4)')?.textContent.replace('%', '') || '0');
-
-        if (idTipo) {
-            sumasPorTipo[idTipo] = (sumasPorTipo[idTipo] || 0) + peso;
+    document.querySelectorAll('#tbCompetenciasSelect tbody tr').forEach(row => {
+        const idTipo = row.getAttribute('data-id-tipo');
+        if (idTipo && tiposDefinidos[idTipo]) {
+            sumasPorTipo[idTipo] = tiposDefinidos[idTipo].porcentajeDeseado;
         }
     });
+    //const filasCompetencias = document.querySelectorAll('#tbCompetenciasSelect tbody tr');
+
+    //if (filasCompetencias.length > 0) {
+    //    // Si hay competencias, asignamos el valor deseado completo a cada tipo definido
+    //    for (const idTipo in tiposDefinidos) {
+    //        sumasPorTipo[idTipo] = tiposDefinidos[idTipo].porcentajeDeseado;
+    //    }
+    //}
 
     // Actualizar inputs en tablaResultados
     let sumaTotal = 0;

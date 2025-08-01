@@ -49,6 +49,7 @@ function renderizarTablaCompetenciaSelect(data) {
         // Fila del título con botón eliminar
         const filaTitulo = document.createElement("tr");
         filaTitulo.setAttribute("data-id", competencia.idCompetencia);
+        filaTitulo.setAttribute("data-id-tipo", competencia.Datos[0].idTipoCompetencia);//almacenamos el tipo de competencia tambien
         const thTitulo = document.createElement("th");
         thTitulo.colSpan = totalColumnas;
         thTitulo.style.backgroundColor = "#f8f9fa";

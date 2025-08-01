@@ -103,7 +103,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
         }
 
         [HttpPost]
-        public ActionResult EvaluarSubalterno(FormCollection coleccion)
+        public ActionResult PlanificarEvaluacion(FormCollection coleccion)
         {
             try
             {
@@ -155,6 +155,24 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult GuardarPlanificacion(string evaluacionData )
+        {
+            try
+            {
+                var data = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(evaluacionData);
+
+
+
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception)
+            {
+
+                return RedirectToAction("Index", "Home");
+            }
+
+        }
         #endregion
 
         #region EvaFuncionario

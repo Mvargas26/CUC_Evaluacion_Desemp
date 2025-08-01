@@ -206,7 +206,7 @@
         <br />
         <div class="row g-3 align-items-center">
             <div class="col-auto">
-                <button type="button" class="btn btn-success" onclick="agregarCompetenciaSelect()">Agregar Competencia</button>
+                <button type="button" class="btn btn-success" onclick="agregarCompetenciaSelect(); actualizarCompetenciasEnResultados();">Agregar Competencia</button>
             </div>
         </div>
         <!-- Tabla con los datos de la competencia elejidos -->
@@ -309,7 +309,7 @@
 
     @section Scripts {
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="~/sources/js/vistas/EvaluarSubAlterno/ListarTransversales.js"></script>
+        <script src="~/sources/js/vistas/PlanificarEvaluacion/ListarTransversales.js"></script>
         @using Newtonsoft.Json
         <script>
          const transversalesData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.transversales));
@@ -317,13 +317,16 @@
             renderizarTablaAgrupada(transversalesData);
         });
         </script>
-        <script src="~/sources/js/vistas/EvaluarSubAlterno/agregarCompetenciasdelCombo.js"></script>
+        <script src="~/sources/js/vistas/PlanificarEvaluacion/agregarCompetenciasdelCombo.js"></script>
         <script>
         const competenciasData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.CompetenciasDelConglomerado));
         document.addEventListener("DOMContentLoaded", function () {
     });
         </script>
-        <script src="~/sources/js/vistas/EvaluarSubAlterno/agregarFilaObjetivos.js"></script>
+        <script src="~/sources/js/vistas/PlanificarEvaluacion/agregarFilaObjetivos.js"></script>
+        <script src="~/sources/js/vistas/PlanificarEvaluacion/enviarTablas.js"></script>
+        <script src="~/sources/js/vistas/PlanificarEvaluacion/cambioEnTablaCompetencias.js"></script>
 
     }
+
 
