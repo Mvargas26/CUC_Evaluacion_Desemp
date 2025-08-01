@@ -91,6 +91,7 @@
     <Compile Include="CarrerasModel.cs" />
     <Compile Include="CompetenciaPorComportamiento.cs" />
     <Compile Include="CompetenciasModel.cs" />
+    <Compile Include="CompetenciaViewModel.cs" />
     <Compile Include="ComportamientoModel.cs" />
     <Compile Include="ComportamientoPorNivel.cs" />
     <Compile Include="ConglomeradoModel.cs" />

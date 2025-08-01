@@ -211,6 +211,7 @@
     <Content Include="sources\js\Vistas\PlanificarEvaluacion\cambioEnTablaCompetencias.js" />
     <Content Include="sources\js\Vistas\PlanificarEvaluacion\enviarTablas.js" />
     <Content Include="sources\js\Vistas\PlanificarEvaluacion\ListarTransversales.js" />
+    <Content Include="sources\js\Vistas\PlanificarEvaluacion\JS_Planificar.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
