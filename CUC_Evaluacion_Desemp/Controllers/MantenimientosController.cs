@@ -1196,11 +1196,13 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                    ? "¡ALERTA! Este nombre ya existe."
+                    : "Error al crear. ";
 
-                TempData["MensajeError"] = "Error al crear el conglomerados.";
-                return View("Error");
+                return RedirectToAction(nameof(ManteniConglomerados));
             }
         }
         [HttpPost]
@@ -1219,10 +1221,13 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     return RedirectToAction(nameof(ManteniConglomerados));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData["MensajeError"] = $"Error al actualizar el conglomerado.";
-                return View("Error");
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                   ? "¡ALERTA! Este nombre ya existe."
+                   : "Error al crear. ";
+
+                return RedirectToAction(nameof(ManteniConglomerados));
             }
         }
         public ActionResult ModificarConglomerado(int id)
@@ -1231,7 +1236,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             if (conglomerado == null)
             {
                 TempData["MensajeError"] = $"El conglomerado con ID {id} no fue encontrado.";
-                return View("Error");
+                return RedirectToAction(nameof(ManteniConglomerados));
             }
 
 
@@ -1258,7 +1263,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             catch
             {
                 TempData["MensajeError"] = "No puede borrar este conglomerado, esta siendo utilizado.";
-                return View("Error");
+                return RedirectToAction(nameof(ManteniConglomerados));
             }
         }
 
