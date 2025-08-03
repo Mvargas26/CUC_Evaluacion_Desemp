@@ -20,20 +20,23 @@ document.querySelector("#tablaObjetivos tbody").addEventListener("click", functi
 //*****************************   FUNCIONES
 //***********************************************************************
 //-----------TRANSVERSALES
-function renderizarTablaAgrupada(data) {
-    const contenedor = document.getElementById("previewBody");
+function renderizarTablaTransversales(data) {
+    const contenedor = document.getElementById("tbCompetenciasTransversales");
     contenedor.innerHTML = "";
 
     if (data.length === 0) {
-        contenedor.innerHTML = `<tr><td colspan="7" class="text-center">No se han asignado comportamientos</td></tr>`;
+        contenedor.innerHTML = `<tr><td colspan="7" class="text-center">No se han asignado competencias transversales</td></tr>`;
         return;
     }
 
     const competenciasMap = new Map();
 
+    // Agrupamos los datos por competencia
     data.forEach(item => {
         if (!competenciasMap.has(item.idCompetencia)) {
             competenciasMap.set(item.idCompetencia, {
+                idCompetencia: item.idCompetencia,
+                idTipoCompetencia: item.idTipoCompetencia,
                 Competencia: item.Competencia,
                 DescriCompetencia: item.DescriCompetencia,
                 Datos: []
@@ -42,40 +45,37 @@ function renderizarTablaAgrupada(data) {
         competenciasMap.get(item.idCompetencia).Datos.push(item);
     });
 
-    competenciasMap.forEach(({ Competencia, DescriCompetencia, Datos }) => {
-        // Título
-        const titulo = document.createElement("tr");
-        const thTitulo = document.createElement("th");
-        thTitulo.colSpan = 7;
-        thTitulo.className = "text-center";
-        thTitulo.style.backgroundColor = "#f8f9fa";
-        thTitulo.style.fontWeight = "bold";
-        thTitulo.textContent = "Competencia: " + Competencia;
-        titulo.appendChild(thTitulo);
-        contenedor.appendChild(titulo);
+    competenciasMap.forEach(({ idCompetencia, idTipoCompetencia, Competencia, DescriCompetencia, Datos }) => {
+        // Obtener niveles únicos y calcular columnas dinámicas
+        const niveles = [...new Set(Datos.map(d => d.Nivel))].sort();
+        const totalColumnas = 1 + niveles.length; // 1 columna de Comportamientos + N niveles
 
-        // Descripción
-        const descripcion = document.createElement("tr");
-        const tdDescripcion = document.createElement("td");
-        tdDescripcion.colSpan = 7;
-        tdDescripcion.className = "text-center";
-        tdDescripcion.style.fontWeight = "bold";
-        tdDescripcion.textContent = "Descripción: " + DescriCompetencia;
-        descripcion.appendChild(tdDescripcion);
-        contenedor.appendChild(descripcion);
+        // Asignamos al título data-id y data-id-tipo (para capturar en backend)
+        const filaTitulo = document.createElement("tr");
+        filaTitulo.setAttribute("data-id", idCompetencia);
+        filaTitulo.setAttribute("data-id-tipo", idTipoCompetencia);
+        filaTitulo.innerHTML = `
+            <th colspan="${totalColumnas}" class="text-center" style="background:#f8f9fa; font-weight:bold;">
+                Competencia: ${Competencia}
+            </th>
+        `;
+        contenedor.appendChild(filaTitulo);
 
-        // Niveles
-        const niveles = [...new Set(Datos.map(d => d.Nivel))];
+        // Fila de descripción
+        const filaDescripcion = document.createElement("tr");
+        filaDescripcion.innerHTML = `
+            <td colspan="${totalColumnas}" class="text-center" style="font-weight:bold;">
+                Descripción: ${DescriCompetencia}
+            </td>
+        `;
+        contenedor.appendChild(filaDescripcion);
 
-        // Encabezado
+        // Encabezado de niveles
         const encabezado = document.createElement("tr");
-        encabezado.innerHTML = `<th>Comportamientos</th>` +
-            niveles.map(n => `<th>${n}</th>`).join("") +
-            "";
-        //    `<th>Asignar</th><th>Observaciones</th>`;
+        encabezado.innerHTML = `<th>Comportamientos</th>` + niveles.map(n => `<th>${n}</th>`).join("");
         contenedor.appendChild(encabezado);
 
-        // Agrupar comportamientos
+        // Agrupamos comportamientos
         const comportamientoMap = new Map();
         Datos.forEach(item => {
             if (!comportamientoMap.has(item.Comportamiento)) {
@@ -84,60 +84,21 @@ function renderizarTablaAgrupada(data) {
             comportamientoMap.get(item.Comportamiento)[item.Nivel] = item.Descripcion;
         });
 
+        // Filas de comportamientos
         comportamientoMap.forEach((descripcionesPorNivel, comportamiento) => {
             const fila = document.createElement("tr");
-
-            const tdComport = document.createElement("td");
-            tdComport.innerHTML = `<strong>${comportamiento}</strong>`;
-            fila.appendChild(tdComport);
-
-            niveles.forEach(nivel => {
-                const td = document.createElement("td");
-                td.textContent = descripcionesPorNivel[nivel] || "";
-                fila.appendChild(td);
-            });
-            /*
-            // Columna Asignar
-            const tdAsignar = document.createElement("td");
-            tdAsignar.style.minWidth = "160px";
-
-            const select = document.createElement("select");
-            select.className = "form-select";
-            select.style.minWidth = "150px";
-
-            const optionDefault = document.createElement("option");
-            optionDefault.textContent = "Seleccione";
-            optionDefault.value = "";
-            select.appendChild(optionDefault);
-            niveles.forEach(nivel => {
-                const option = document.createElement("option");
-                option.value = nivel;
-                option.textContent = nivel;
-                select.appendChild(option);
-            });
-            tdAsignar.appendChild(select);
-            fila.appendChild(tdAsignar);
-
-            // Columna Observaciones
-            const tdObs = document.createElement("td");
-            const inputObs = document.createElement("input");
-            inputObs.type = "text";
-            inputObs.className = "form-control";
-            tdObs.appendChild(inputObs);
-            fila.appendChild(tdObs);
-                    */
+            fila.innerHTML = `<td><strong>${comportamiento}</strong></td>` +
+                niveles.map(nivel => `<td>${descripcionesPorNivel[nivel] || ""}</td>`).join("");
             contenedor.appendChild(fila);
         });
 
-        // Espaciado entre competencias
-        const espacio = document.createElement("tr");
-        const tdEspacio = document.createElement("td");
-        tdEspacio.colSpan = 7;
-        tdEspacio.innerHTML = "<hr/>";
-        espacio.appendChild(tdEspacio);
-        contenedor.appendChild(espacio);
+        // Fila separadora
+        const filaSeparador = document.createElement("tr");
+        filaSeparador.innerHTML = `<td colspan="${totalColumnas}"><hr/></td>`;
+        contenedor.appendChild(filaSeparador);
     });
 }
+
 
 //-----------COMPETENCIAS
 //agrega a la tabla las competencias que seleccionen
@@ -166,7 +127,7 @@ function renderizarTablaCompetenciaSelect(data) {
         return;
     }
 
-    // Agrupar por competencia
+    // Agrupamos por competencia
     const competenciasMap = new Map();
     data.forEach(item => {
         if (!competenciasMap.has(item.idCompetencia)) {
@@ -181,50 +142,44 @@ function renderizarTablaCompetenciaSelect(data) {
     });
 
     competenciasMap.forEach((competencia) => {
-        // Verificar si ya existe en la tabla
+        // vsliddamos si ya existe en la tabla
         if (contenedor.querySelector(`tr[data-id='${competencia.idCompetencia}']`)) {
             alert(`La competencia "${competencia.Competencia}" ya está agregada.`);
             return;
         }
 
+        // Obtener niveles únicos y calcular columnas dinámicas dependiendo de los niveles
         const niveles = [...new Set(competencia.Datos.map(d => d.Nivel))].sort();
-        const totalColumnas = 1 + niveles.length; // calculamos cuantas columnas
+        const totalColumnas = 1 + niveles.length; // Comportamientos + niveles
 
         // Fila del título con botón eliminar
         const filaTitulo = document.createElement("tr");
         filaTitulo.setAttribute("data-id", competencia.idCompetencia);
-        filaTitulo.setAttribute("data-id-tipo", competencia.Datos[0].idTipoCompetencia);//almacenamos el tipo de competencia tambien
-        const thTitulo = document.createElement("th");
-        thTitulo.colSpan = totalColumnas;
-        thTitulo.style.backgroundColor = "#f8f9fa";
-        thTitulo.style.textAlign = "center";
-        thTitulo.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-weight: bold; color: #0d6efd;">Competencia: ${competencia.Competencia}</span>
-                <button class="btn btn-danger btn-sm" onclick="eliminarCompetencia(${competencia.idCompetencia})">
-                    <i class="fas fa-trash-alt"></i> Eliminar
-                </button>
-            </div>
+        filaTitulo.setAttribute("data-id-tipo", competencia.Datos[0].idTipoCompetencia);
+        filaTitulo.innerHTML = `
+            <th colspan="${totalColumnas}" style="background-color:#f8f9fa; text-align:center;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-weight:bold; color:#0d6efd;">Competencia: ${competencia.Competencia}</span>
+                    <button class="btn btn-danger btn-sm btn-eliminar-competencia" data-id="${competencia.idCompetencia}">
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </button>
+                </div>
+            </th>
         `;
-        filaTitulo.appendChild(thTitulo);
         contenedor.appendChild(filaTitulo);
 
         // Fila de descripción
-        const descripcion = document.createElement("tr");
-        const tdDescripcion = document.createElement("td");
-        tdDescripcion.colSpan = totalColumnas;
-        tdDescripcion.className = "text-center";
-        tdDescripcion.style.fontWeight = "bold";
-        tdDescripcion.textContent = "Descripción: " + competencia.DescriCompetencia;
-        descripcion.appendChild(tdDescripcion);
-        contenedor.appendChild(descripcion);
+        const filaDescripcion = document.createElement("tr");
+        filaDescripcion.innerHTML = `
+            <td colspan="${totalColumnas}" class="text-center" style="font-weight:bold;">
+                Descripción: ${competencia.DescriCompetencia}
+            </td>
+        `;
+        contenedor.appendChild(filaDescripcion);
 
         // Encabezado de niveles
         const encabezado = document.createElement("tr");
-        encabezado.innerHTML = `<th>Comportamientos</th>` +
-            niveles.map(n => `<th>${n}</th>`).join("") +
-            "";
-        // + `<th>Asignar</th><th>Observaciones</th>`;
+        encabezado.innerHTML = `<th>Comportamientos</th>` + niveles.map(n => `<th>${n}</th>`).join("");
         contenedor.appendChild(encabezado);
 
         // Agrupar comportamientos
@@ -236,63 +191,18 @@ function renderizarTablaCompetenciaSelect(data) {
             comportamientoMap.get(item.Comportamiento)[item.Nivel] = item.Descripcion;
         });
 
-        // Crear filas para cada comportamiento
+        // Filas de comportamientos
         comportamientoMap.forEach((descripcionesPorNivel, comportamiento) => {
             const fila = document.createElement("tr");
-
-            // Columna Comportamiento
-            const tdComport = document.createElement("td");
-            tdComport.innerHTML = `<strong>${comportamiento}</strong>`;
-            fila.appendChild(tdComport);
-
-            // Columnas de niveles
-            niveles.forEach(nivel => {
-                const td = document.createElement("td");
-                td.textContent = descripcionesPorNivel[nivel] || "";
-                fila.appendChild(td);
-            });
-
-            /*
-            // Columna Asignar
-            const tdAsignar = document.createElement("td");
-            const select = document.createElement("select");
-            select.className = "form-select";
-            select.style.minWidth = "150px";
-
-            const optionDefault = document.createElement("option");
-            optionDefault.textContent = "Seleccione";
-            optionDefault.value = "";
-            select.appendChild(optionDefault);
-
-            niveles.forEach(nivel => {
-                const option = document.createElement("option");
-                option.value = nivel;
-                option.textContent = nivel;
-                select.appendChild(option);
-            });
-
-            tdAsignar.appendChild(select);
-            fila.appendChild(tdAsignar);
-
-            // Columna Observaciones
-            const tdObs = document.createElement("td");
-            const inputObs = document.createElement("input");
-            inputObs.type = "text";
-            inputObs.className = "form-control";
-            tdObs.appendChild(inputObs);
-            fila.appendChild(tdObs);
-            */
-
+            fila.innerHTML = `<td><strong>${comportamiento}</strong></td>` +
+                niveles.map(nivel => `<td>${descripcionesPorNivel[nivel] || ""}</td>`).join("");
             contenedor.appendChild(fila);
         });
 
-        // Fila de separación entre competencias
-        const espacio = document.createElement("tr");
-        const tdEspacio = document.createElement("td");
-        tdEspacio.colSpan = totalColumnas;
-        tdEspacio.innerHTML = "<hr/>";
-        espacio.appendChild(tdEspacio);
-        contenedor.appendChild(espacio);
+        // Fila de separación
+        const filaSeparador = document.createElement("tr");
+        filaSeparador.innerHTML = `<td colspan="${totalColumnas}"><hr/></td>`;
+        contenedor.appendChild(filaSeparador);
     });
 }
 
@@ -487,16 +397,21 @@ function actualizarResultadosGlobales() {
 //--------------- Envio de las tablas --------------
 function enviarEvaluacion() {
 
-    // Recolectar datos de ambas tablas
-    const objetivos = obtenerDatosTabla('#tablaObjetivos tbody tr');
+    // Recolectar datos de las tablas que pintamos
+    const objetivos = obtenerDatosTablaObjetivos('#tablaObjetivos tbody tr');
+    const competenciasTransversales = obtenerDatosTablaTransversales('#tbCompetenciasTransversales tr[data-id]');
     const competencias = obtenerDatosTablaCompetencia('#tbCompetenciasSelect tbody tr');
 
-    //Recolectar otraso datos
+    //Recolectamos lo otro
     const observaciones = document.getElementById('txtObservaciones').value;
     const cedFuncionario = document.getElementById('ceduFuncionario').innerText;
     const idConglo = document.getElementById('idConglo').innerText;
 
     // Valida que ambas tablas tengan datos ****************************
+    if (competenciasTransversales.length === 0) {
+        alert('No se detectaron las competencias transversales.');
+        return;
+    }
     if (objetivos.length === 0 && competencias.length === 0) {
         alert('Ambas tablas están vacías. Por favor agregue al menos un objetivo y una competencia.');
         return;
@@ -555,6 +470,7 @@ function enviarEvaluacion() {
     // Crear objeto con todos los datos
     const evaluacionData = {
         objetivos: objetivos,
+        competenciasTransversales: competenciasTransversales,
         competencias: competencias,
         observaciones: observaciones,
         cedFuncionario: cedFuncionario,
@@ -565,9 +481,7 @@ function enviarEvaluacion() {
     // Enviar al servidor
     enviarPeticionEvaluacion(evaluacionData);
 }
-
-// Función para extraer datos de las filas de la tabla
-function obtenerDatosTabla(selector) {
+function obtenerDatosTablaObjetivos(selector) {
     const filas = document.querySelectorAll(selector);
     return Array.from(filas).map(fila => {
         const celdas = fila.querySelectorAll('td');
@@ -581,16 +495,25 @@ function obtenerDatosTabla(selector) {
         };
     });
 }
-function obtenerDatosTablaCompetencia(selector) {
+function obtenerDatosTablaTransversales(selector) {
     const filas = document.querySelectorAll(selector);
     return Array.from(filas).map(fila => {
-        const celdas = fila.querySelectorAll('td');
         return {
             idCompetencia: fila.getAttribute('data-id') || null,
+            idTipoCompetencia: fila.getAttribute('data-id-tipo') || null
         };
     });
 }
-//fucion de la peticion
+function obtenerDatosTablaCompetencia(selector) {
+    const filas = document.querySelectorAll(`${selector}[data-id]`);
+    const idsUnicos = new Set();
+
+    return Array.from(filas)
+        .map(fila => fila.getAttribute('data-id'))
+        .filter(id => id && !idsUnicos.has(id) && idsUnicos.add(id))
+        .map(id => ({ idCompetencia: id }));
+}
+
 async function enviarPeticionEvaluacion(evaluacionData) {
     try {
         const formBody = `evaluacionData=${encodeURIComponent(JSON.stringify(evaluacionData))}`;

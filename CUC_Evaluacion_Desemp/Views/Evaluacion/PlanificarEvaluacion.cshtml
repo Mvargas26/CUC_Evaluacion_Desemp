@@ -163,14 +163,12 @@
     </div>
     <hr />
 
-    <!-- SECCIÓN para elegir Competencias y agregarlas a su propia tabla -->
+    <!-- SECCIÓN----------------- Tabla específica para Competencias Transversales -->
     <div class="mb-5">
         <h3>Competencias Transversales:</h3>
         <br />
-
     </div>
 
-    <!-- SECCIÓN----------------- Tabla específica para Competencias Transversales -->
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
             <thead class="thead-light">
@@ -178,8 +176,8 @@
                     <th colspan="5" class="text-center">Competencias Transversales</th>
                 </tr>
             </thead>
-            <tbody id="previewBody">
-                <!-- Aquí se llenará todo dinámicamente -->
+            <tbody id="tbCompetenciasTransversales">
+                <!-- Aquí llenamos todo dinámicamente -->
             </tbody>
         </table>
     </div>
@@ -320,7 +318,7 @@
             const competenciasData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.CompetenciasDelConglomerado));
 
             document.addEventListener("DOMContentLoaded", () => {
-                renderizarTablaAgrupada(transversalesData);
+                renderizarTablaTransversales(transversalesData);
             });
         </script>
     }
