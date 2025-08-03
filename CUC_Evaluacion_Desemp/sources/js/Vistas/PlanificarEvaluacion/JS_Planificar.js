@@ -8,6 +8,15 @@ document.querySelector('#tbCompetenciasSelect').addEventListener('click', functi
 
 document.getElementById("btnEnviarEvaluacion").addEventListener("click", enviarEvaluacion);
 
+// Elimina la fila de la tabla y actualiza el total
+document.querySelector("#tablaObjetivos tbody").addEventListener("click", function (e) {
+    if (e.target.classList.contains("btn-eliminar-objetivo") || e.target.closest(".btn-eliminar-objetivo")) {
+        const fila = e.target.closest("tr");
+        fila.remove();
+        actualizarResultadosGlobales();
+    }
+});
+
 //*****************************   FUNCIONES
 //***********************************************************************
 //-----------TRANSVERSALES
@@ -381,12 +390,10 @@ function agregarFilaObjetivos() {
     // Celda de Acciones
     const tdAcciones = document.createElement("td");
     const btnEliminar = document.createElement("button");
-    btnEliminar.classList.add("btn", "btn-sm", "btn-danger");
+    btnEliminar.classList.add("btn", "btn-sm", "btn-danger", "btn-eliminar-objetivo");
     btnEliminar.innerText = "Eliminar";
-    btnEliminar.onclick = function () {
-        tbody.removeChild(nuevaFila);
-    };
     tdAcciones.appendChild(btnEliminar);
+
 
     // Agregar celdas a la fila
     nuevaFila.appendChild(tdID);
@@ -410,7 +417,7 @@ function agregarFilaObjetivos() {
 
 //-----------TABLA DE SUMAS TOTALES
 function actualizarResultadosGlobales() {
-    // 1. Obtener tipos definidos en tablaResultados
+    // 1. Obtenmos los tipos
     const tiposDefinidos = {};
     document.querySelectorAll('#tablaResultados tbody tr').forEach(row => {
         const idTipoCell = row.querySelector('td:nth-child(4)');
@@ -424,50 +431,48 @@ function actualizarResultadosGlobales() {
                         .replace('%', '')
                         .trim() || '0'
                 ),
-                esCompetencia: false // Inicialmente no es competencia
+                esCompetencia: false 
             };
         }
     });
 
-    // 2. Identificmos solo los que están en tbCompetenciasSelect
+    // 2. Sacamos los tipos de competencias
     const tiposCompetencias = new Set();
     document.querySelectorAll('#tbCompetenciasSelect tbody tr[data-id-tipo]').forEach(row => {
         const idTipo = row.getAttribute('data-id-tipo');
         if (idTipo && tiposDefinidos[idTipo]) {
             tiposCompetencias.add(idTipo);
-            tiposDefinidos[idTipo].esCompetencia = true; // Marcamos como competencia
+            tiposDefinidos[idTipo].esCompetencia = true;
         }
     });
 
-    // 3. Calculamos sumas
     const sumasPorTipo = {};
     let sumaTotal = 0;
 
-    // Sumar objetivos (solo para tipos NO competencia)
+    // Sumamos los tipos objetivos nadamas
     document.querySelectorAll('#tablaObjetivos tbody tr').forEach(row => {
         const idTipo = row.querySelector('td:nth-child(3)')?.textContent.trim();
         const peso = parseFloat(row.querySelector('td:nth-child(4)')?.textContent.replace('%', '') || '0');
 
-        if (idTipo && !tiposCompetencias.has(idTipo)) { // Solo si NO es competencia
+        if (idTipo && !tiposCompetencias.has(idTipo)) {
             sumasPorTipo[idTipo] = (sumasPorTipo[idTipo] || 0) + peso;
         }
     });
 
-    // Asignar porcentaje deseado a competencias (si existen)
+    // Asignar porcentaje a competencias con solo que detecte 1
     tiposCompetencias.forEach(idTipo => {
         if (tiposDefinidos[idTipo]) {
             sumasPorTipo[idTipo] = tiposDefinidos[idTipo].porcentajeDeseado;
         }
     });
 
-    // 4. Actualizar vista
-    for (const [idTipo, sumaActual] of Object.entries(sumasPorTipo)) {
+    // 4. Actualizar vista para todos los tipos definidos
+    for (const [idTipo, def] of Object.entries(tiposDefinidos)) {
+        const sumaActual = sumasPorTipo[idTipo] || 0; // Si no hay datos es 0
+        def.input.value = sumaActual.toFixed(2);
+        const diferencia = Math.abs(sumaActual - def.porcentajeDeseado);
+        def.input.style.backgroundColor = diferencia > 1 ? '#e62929' : '';
         sumaTotal += sumaActual;
-        if (tiposDefinidos[idTipo]) {
-            tiposDefinidos[idTipo].input.value = sumaActual.toFixed(2);
-            const diferencia = Math.abs(sumaActual - tiposDefinidos[idTipo].porcentajeDeseado);
-            tiposDefinidos[idTipo].input.style.backgroundColor = diferencia > 1 ? '#e62929' : '';
-        }
     }
 
     // 5. Actualizar total general
@@ -477,6 +482,7 @@ function actualizarResultadosGlobales() {
         resultadoTotal.style.backgroundColor = Math.abs(sumaTotal - 100) > 1 ? '#e62929' : '';
     }
 }
+
 
 //--------------- Envio de las tablas --------------
 function enviarEvaluacion() {

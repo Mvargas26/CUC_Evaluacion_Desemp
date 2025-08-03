@@ -206,11 +206,6 @@
     <Content Include="sources\js\Vistas\ConsultarComportamientosYNiveles\filtrarPorTipoCompetencia.js" />
     <Content Include="sources\js\Vistas\ConsultarComportamientosYNiveles\ListarComportamientosYDescripcionesNegocios_JS.js" />
     <Content Include="sources\js\Vistas\CrearFuncionario\CrearFuncionarioJS.js" />
-    <Content Include="sources\js\Vistas\PlanificarEvaluacion\agregarCompetenciasdelCombo.js" />
-    <Content Include="sources\js\Vistas\PlanificarEvaluacion\agregarFilaObjetivos.js" />
-    <Content Include="sources\js\Vistas\PlanificarEvaluacion\cambioEnTablaCompetencias.js" />
-    <Content Include="sources\js\Vistas\PlanificarEvaluacion\enviarTablas.js" />
-    <Content Include="sources\js\Vistas\PlanificarEvaluacion\ListarTransversales.js" />
     <Content Include="sources\js\Vistas\PlanificarEvaluacion\JS_Planificar.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

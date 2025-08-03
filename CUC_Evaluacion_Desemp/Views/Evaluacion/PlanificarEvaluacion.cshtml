@@ -310,29 +310,6 @@
         </div>
     </div>
 
-    @*@section Scripts {
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-            <script src="~/sources/js/vistas/PlanificarEvaluacion/ListarTransversales.js"></script>
-            @using Newtonsoft.Json
-            <script>
-             const transversalesData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.transversales));
-             document.addEventListener("DOMContentLoaded", function () {
-                renderizarTablaAgrupada(transversalesData);
-            });
-            </script>
-            <script src="~/sources/js/vistas/PlanificarEvaluacion/agregarCompetenciasdelCombo.js"></script>
-            <script>
-            const competenciasData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.CompetenciasDelConglomerado));
-            document.addEventListener("DOMContentLoaded", function () {
-        });
-            </script>
-            <script src="~/sources/js/vistas/PlanificarEvaluacion/agregarFilaObjetivos.js"></script>
-            <script src="~/sources/js/vistas/PlanificarEvaluacion/enviarTablas.js"></script>
-            <script src="~/sources/js/vistas/PlanificarEvaluacion/cambioEnTablaCompetencias.js"></script>
-            <script src="~/sources/js/vistas/PlanificarEvaluacion/JS_Planificar.js"></script>
-
-        }*@
-
     @section Scripts {
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="~/sources/js/vistas/PlanificarEvaluacion/JS_Planificar.js"></script>
