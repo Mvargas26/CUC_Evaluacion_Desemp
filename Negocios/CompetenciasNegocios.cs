@@ -54,7 +54,42 @@ namespace Negocios
                 throw new Exception("Error al listar las competencias: " + ex.Message);
             }
         }
+        public List<CompetenciasModel> ListarCompetenciasSinComportamAsignados()
+        {
+            try
+            {
+                var parametros = new SqlParameter[]
+                {
+            new SqlParameter("@Accion", "NOASIGNADAS"),
+            new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+                };
 
+                DataTable dt = _accesoBD.EjecutarSPconDT("sp_CompetenciasCRUD", parametros);
+
+                string mensajeError = parametros.Last().Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(mensajeError))
+                {
+                    throw new Exception("Error SP: " + mensajeError);
+                }
+
+                return dt.AsEnumerable().Select(row => new CompetenciasModel
+                {
+                    IdCompetencia = Convert.ToInt32(row["idCompetencia"]),
+                    Competencia = row["Competencia"].ToString(),
+                    Descripcion = row["Descripcion"].ToString(),
+                    TipoCompetencia = new TiposCompetenciasModel
+                    {
+                        IdTipoCompetencia = Convert.ToInt32(row["idTipoCompetencia"]),
+                        Tipo = row["Tipo"].ToString(),
+                        Ambito = row["Ambito"].ToString()
+                    }
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al listar las competencias: " + ex.Message);
+            }
+        }
         public List<CompetenciasModel> ListarCompetenciasXTipo(int tipoCompetencia)
         {
             try
@@ -134,7 +169,6 @@ namespace Negocios
                 throw new Exception("Error al consultar la competencia: " + ex.Message);
             }
         }
-
 
         public bool CrearCompetencia(CompetenciasModel competencia)
         {

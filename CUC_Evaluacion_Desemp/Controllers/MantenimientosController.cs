@@ -834,7 +834,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
         {
             try
             {
-                var listaCompetencias = _servicioMantenimientos.Competencias.ListarCompetencias();
+                var listaCompetencias = _servicioMantenimientos.Competencias.ListarCompetenciasSinComportamAsignados();
 
                 return View(listaCompetencias);
             }
