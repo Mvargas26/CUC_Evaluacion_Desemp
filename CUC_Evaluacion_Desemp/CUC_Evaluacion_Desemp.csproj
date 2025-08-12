@@ -201,6 +201,7 @@
     <Content Include="sources\img\osoError.gif" />
     <Content Include="sources\js\accionOcultarCerrarMensajes.js" />
     <Content Include="sources\js\EventoSubMenu.js" />
+    <Content Include="sources\js\menuFlotante.js" />
     <Content Include="sources\js\scripts.js" />
     <Content Include="sources\js\Vistas\AsignarComportamientosYNiveles\asignarComportamientos.js" />
     <Content Include="sources\js\Vistas\ConsultarComportamientosYNiveles\filtrarPorTipoCompetencia.js" />

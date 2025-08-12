@@ -22,7 +22,7 @@
     }
 
     <div class="wrapper">
-    
+
         <nav class="sidebar">
             <div class="sidebar-header">
                 <h2>
@@ -32,52 +32,32 @@
                 </h2>
             </div>
             <ul class="sidebar-menu">
+                <!-- Menú principal (solo 3 opciones) -->
                 <li>
-                    <a href="#" class="toggle-submenu">
-                        Mantenimientos <i class="fa-solid fa-chevron-down"></i>
+                    <a href="#" class="main-menu-item" data-target="mantenimientos">
+                        Mantenimientos <i class="fa-solid fa-screwdriver"></i>
                     </a>
-                    <ul class="submenu">
-                        <li><a href="@Url.Action("ManteniDependencias", "Mantenimientos")">Dependencias</a></li>
-                        <li><a href="@Url.Action("ManteniRoles", "Mantenimientos")">Roles</a></li>
-                        <li><a href="@Url.Action("ManteniPuesto", "Mantenimientos")">Puestos</a></li>
-                        <li><a href="@Url.Action("ManteniArea", "Mantenimientos")">Areas</a></li>
-                        <li><a href="@Url.Action("ManteniCarreras", "Mantenimientos")">Carreras</a></li>
-                        <li><a href="@Url.Action("ManteniFuncionarios", "Mantenimientos")">Funcionarios</a></li>
-                        <li><a href="@Url.Action("ManteniConglomerados", "Mantenimientos")">Conglomerados</a></li>
-
-
-                        <li>
-                            <a href="#" class="toggle-submenu">
-                                Competencias <i class="fa-solid fa-chevron-down"></i>
-                            </a>
-                            <ul class="submenu">
-                                <li><a href="@Url.Action("ManteniTiposCompetencias", "Mantenimientos")">Tipos de Competencias</a></li>
-                                <li><a href="@Url.Action("ManteniComportamientos", "Mantenimientos")">Comportamientos</a></li>
-                                <li><a href="@Url.Action("ManteniCompetencias", "Mantenimientos")">Mantenimiento Competencias</a></li>
-                                <li><a href="@Url.Action("ConsultarComportamientosYNiveles", "Mantenimientos")">Ver comportamientos y niveles</a></li>
-                                <li><a href="@Url.Action("SelecCompetenciaParaAsignarComportamientos", "Mantenimientos")">Asignar Comportamientos y Niveles</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="@Url.Action("ManteniObjetivos", "Mantenimientos")">Objetivos</a></li>
-                    </ul>
                 </li>
                 <li>
-                    <a href="#" class="toggle-submenu">
-                        Evaluación <i class="fa-solid fa-chevron-down"></i>
+                    <a href="#" class="main-menu-item" data-target="evaluacion">
+                        Evaluación <i class="fa-solid fa-pen-to-square"></i>
                     </a>
-                    <ul class="submenu">
-                        <li><a href="@Url.Action("SeleccionarSubalterno", "Evaluacion")">Planificar Evaluación</a></li>
-                    </ul>
                 </li>
                 <li>
-                    <a href="#" class="toggle-submenu">
-                        Reportes <i class="fa-solid fa-chevron-down"></i>
+                    <a href="#" class="main-menu-item" data-target="reportes">
+                        Reportes <i class="fa-solid fa-flag"></i>
                     </a>
                 </li>
             </ul>
         </nav>
 
- 
+        <!-- Contenedor para el menú flotante -->
+        <div id="floating-menu-container" class="floating-menu-container">
+            <!-- El contenido se cargará dinámicamente mediante JavaScript -->
+        </div>
+
+
+
         <div class="main-content">
             <header class="topbar">
                 <h1>Sistema de Evaluación del Desempeño CUC</h1>
@@ -105,8 +85,67 @@
     </div>
 
     @RenderSection("Scripts", required: false)
+    <script defer src="~/sources/js/menuFlotante.js"></script>
     <script defer src="~/sources/js/scripts.js"></script>
-    <script defer src="~/sources/js/EventoSubMenu.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    @*********************************************************************************
+         ESTA PARTE DEBE ESTAR EN LA VISTA PARA QUE FUNCIONEN LAS RUTAS
+        *********************************************************************************@
+    <script>
+        window.menuData = {
+        mantenimientos: {
+            sections: [
+                {
+                    title: "General",
+                    items: [
+                        { text: "Dependencias", url: "@Url.Action("ManteniDependencias", "Mantenimientos")" },
+                        { text: "Roles", url: "@Url.Action("ManteniRoles", "Mantenimientos")" },
+                        { text: "Puestos", url: "@Url.Action("ManteniPuesto", "Mantenimientos")" },
+                        { text: "Areas", url: "@Url.Action("ManteniArea", "Mantenimientos")" },
+                        { text: "Carreras", url: "@Url.Action("ManteniCarreras", "Mantenimientos")" },
+                        { text: "Funcionarios", url: "@Url.Action("ManteniFuncionarios", "Mantenimientos")" },
+                        { text: "Conglomerados", url: "@Url.Action("ManteniConglomerados", "Mantenimientos")" },
+                        { text: "Objetivos", url: "@Url.Action("ManteniObjetivos", "Mantenimientos")" }
+                    ]
+                },
+                {
+                    title: "Competencias",
+                    items: [
+                        { text: "Tipos de Competencias", url: "@Url.Action("ManteniTiposCompetencias", "Mantenimientos")" },
+                        { text: "Comportamientos", url: "@Url.Action("ManteniComportamientos", "Mantenimientos")" },
+                        { text: "Mantenimiento Competencias", url: "@Url.Action("ManteniCompetencias", "Mantenimientos")" },
+                        { text: "Ver comportamientos y niveles", url: "@Url.Action("ConsultarComportamientosYNiveles", "Mantenimientos")" },
+                        { text: "Asignar Comportamientos y Niveles", url: "@Url.Action("SelecCompetenciaParaAsignarComportamientos", "Mantenimientos")" }
+                    ]
+                }
+            ]
+        },
+        evaluacion: {
+            sections: [
+                {
+                    title: "Evaluación",
+                    items: [
+                        { text: "Planificar Evaluación", url: "@Url.Action("SeleccionarSubalterno", "Evaluacion")" }
+                    ]
+                }
+            ]
+        },
+        reportes: {
+            sections: [
+                {
+                    title: "Reportes",
+                    items: [
+                        { text: "Planificar Evaluación", url: "@Url.Action("SeleccionarSubalterno", "Evaluacion")" }
+                    ]
+                }
+            ]
+        }
+    };
+    </script>
+
+
+
 </body>
 </html>
+
