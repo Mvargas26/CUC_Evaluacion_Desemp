@@ -6,6 +6,16 @@ document.querySelector('#tbCompetenciasSelect').addEventListener('click', functi
     }
 });
 
+//Elimina una competencia agregada desde el combo a la tabla
+document.querySelector("#tbCompetenciasSelect").addEventListener("click", function (e) {
+    if (e.target.classList.contains("btn-eliminar-competencia") || e.target.closest(".btn-eliminar-competencia")) {
+
+        const btn = e.target.closest(".btn-eliminar-competencia");
+        const idCompetencia = btn.getAttribute("data-id");
+        eliminarCompetencia(parseInt(idCompetencia));
+    }
+});//fin 
+
 document.getElementById("btnEnviarEvaluacion").addEventListener("click", enviarEvaluacion);
 
 // Elimina la fila de la tabla y actualiza el total
@@ -16,6 +26,8 @@ document.querySelector("#tablaObjetivos tbody").addEventListener("click", functi
         actualizarResultadosGlobales();
     }
 });
+
+
 
 //*****************************   FUNCIONES
 //***********************************************************************
@@ -227,9 +239,6 @@ function eliminarCompetencia(idCompetencia) {
                 filaActual = siguiente;
             }
         }
-
-        // Actualizar array de datos global
-        competenciasData = competenciasData.filter(item => item.idCompetencia !== idCompetencia);
 
         // Si ya no quedan competencias, mostrar mensaje vacío
         if (contenedor.querySelectorAll("tr").length === 0) {
