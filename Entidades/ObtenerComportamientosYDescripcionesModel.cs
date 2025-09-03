@@ -16,6 +16,7 @@ namespace Entidades
         public int idComport { get; set; }
         public string Comportamiento { get; set; }
         public string Nivel { get; set; }
+        public int idNivel { get; set; }
         public string Descripcion { get; set; }
     }//fin class
 }

@@ -48,6 +48,7 @@ namespace Negocios
                     Tipo = row["Tipo"].ToString(),
                     idComport = Convert.ToInt32(row["idComport"]),
                     Comportamiento = row["Comportamiento"].ToString(),
+                    idNivel = Convert.ToInt32(row["idNivel"]),
                     Nivel = row["Nivel"].ToString(),
                     Descripcion = row["Descripcion"].ToString()
                 });
@@ -84,6 +85,7 @@ namespace Negocios
                     Tipo = row["Tipo"].ToString(),
                     idComport = Convert.ToInt32(row["idComport"]),
                     Comportamiento = row["Comportamiento"].ToString(),
+                    idNivel = Convert.ToInt32(row["idNivel"]),
                     Nivel = row["Nivel"].ToString(),
                     Descripcion = row["DescripcionNivel"].ToString()
                 });

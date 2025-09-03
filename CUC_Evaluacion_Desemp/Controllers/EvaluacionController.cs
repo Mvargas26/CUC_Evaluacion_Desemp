@@ -198,10 +198,20 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     _servicioMantenimientos.EvaluacionXobjetivos.CrearEvaluacionXObjetivo(evaluacionXObjetivo);
                 }
 
-
-
                 //guardamos las competencias
+                foreach (var competencia in competenciasTransversales)
+                {
+                    var evaluacionXCompetencia = new EvaluacionXcompetenciaModel
+                    {
+                        IdEvaluacion = evaluacionGuardada.IdEvaluacion,
+                        IdCompetencia = Convert.ToInt32(competencia["id"]),
+                        ValorObtenido = Convert.ToDecimal(competencia["actual"]),
+                        Peso = Convert.ToDecimal(competencia["peso"]),
+                        Meta = competencia["meta"].ToString()
+                    };
 
+                    _servicioMantenimientos.EvaluacionXcompetencia.CrearEvaluacionXCompetencia(evaluacionXCompetencia);
+                }
 
 
 
