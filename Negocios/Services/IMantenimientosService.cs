@@ -18,6 +18,7 @@ namespace Negocios.Services
         EvaluacionesNegocio Evaluaciones { get; }
         EstadoEvaluacionNegocios EstadoEvaluacion { get; }
         EvaluacionXcompetenciaNegocios EvaluacionXcompetencia { get; }
+        EvaluacionXObjetivosNegocios EvaluacionXobjetivos { get; }
         FuncionarioXConglomeradoNegocios FuncionarioXConglomerado { get; }
         MetaXObjetivoNegocios MetaXObjetivo { get; }
         ObjetivoNegocios Objetivo { get; }

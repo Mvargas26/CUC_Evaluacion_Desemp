@@ -1,5 +1,7 @@
 ﻿using Entidades;
 using Negocios.Services;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -160,7 +162,46 @@ namespace CUC_Evaluacion_Desemp.Controllers
         {
             try
             {
-                var data = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(evaluacionData);
+                //Convertimos de string a Json lo que viene de la vista planificacion para tratarla
+                var dataEnJSon = JsonConvert.DeserializeObject<JObject>(evaluacionData);
+
+                var cedFuncionario = dataEnJSon["cedFuncionario"]?.ToString();
+                var idConglo = dataEnJSon["idConglo"]?.ToString();
+                var observaciones = dataEnJSon["observaciones"]?.ToString();
+
+                var objetivos = dataEnJSon["objetivos"];
+                var competenciasTransversales = dataEnJSon["competenciasTransversales"];
+                var competencias = dataEnJSon["competencias"];
+
+                //Crear un objeto tipo Evaluacion y Guardarlo
+                EvaluacionModel evaluacionGuardada = _servicioMantenimientos.Evaluaciones.CrearEvaluacion(new EvaluacionModel
+                {
+                    IdFuncionario = cedFuncionario.ToString(),
+                    Observaciones = observaciones.ToString(),
+                    FechaCreacion = DateTime.Now,
+                    EstadoEvaluacion = 1, // planificada
+                    IdConglomerado = Convert.ToInt32(idConglo)
+                });
+
+                // Guardamos los objetivos ya teniendo el id de la eva
+                foreach (var objetivo in objetivos)
+                {
+                    var evaluacionXObjetivo = new EvaluacionXObjetivoModel
+                    {
+                        IdEvaluacion = evaluacionGuardada.IdEvaluacion,
+                        IdObjetivo = Convert.ToInt32(objetivo["id"]),
+                        ValorObtenido = Convert.ToDecimal(objetivo["actual"]),
+                        Peso = Convert.ToDecimal(objetivo["peso"]),
+                        Meta = objetivo["meta"].ToString()
+                    };
+
+                    _servicioMantenimientos.EvaluacionXobjetivos.CrearEvaluacionXObjetivo(evaluacionXObjetivo);
+                }
+
+
+
+                //guardamos las competencias
+
 
 
 

@@ -533,12 +533,12 @@ async function enviarPeticionEvaluacion(evaluacionData) {
             body: formBody
         });
 
-        const data = await response.json();
-
-        if (!data.success) throw new Error(data.error);
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
 
         alert('Evaluación enviada correctamente');
-        window.location.href = data.redirectUrl || `${urlBase}Evaluacion/Index`;
+        window.location.href = `${urlBase}Home/Index`;
     } catch (error) {
         alert(`Error: ${error.message}`);
     }

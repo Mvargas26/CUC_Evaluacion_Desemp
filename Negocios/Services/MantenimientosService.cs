@@ -24,6 +24,7 @@ namespace Negocios.Services
         public EvaluacionesNegocio Evaluaciones { get; }
         public EstadoEvaluacionNegocios EstadoEvaluacion { get; }
         public EvaluacionXcompetenciaNegocios EvaluacionXcompetencia { get; }
+        public EvaluacionXObjetivosNegocios EvaluacionXobjetivos { get; }
         public FuncionarioXConglomeradoNegocios FuncionarioXConglomerado { get; }
         public MetaXObjetivoNegocios MetaXObjetivo { get; }
         public ObjetivoNegocios Objetivo { get; }
@@ -54,6 +55,7 @@ namespace Negocios.Services
             CompetenciasNegocios competencias,
             EstadoEvaluacionNegocios estadoEvaluacion,
             EvaluacionXcompetenciaNegocios evaluacionXcompetencia,
+            EvaluacionXObjetivosNegocios evaluacionXobjetivos,
             FuncionarioXConglomeradoNegocios funcionarioXConglomerado,
             MetaXObjetivoNegocios metaXObjetivo,
             ObjetivoNegocios objetivo,
@@ -82,6 +84,7 @@ namespace Negocios.Services
             Competencias = competencias;
             EstadoEvaluacion = estadoEvaluacion;
             EvaluacionXcompetencia = evaluacionXcompetencia;
+            EvaluacionXobjetivos = evaluacionXobjetivos;
             FuncionarioXConglomerado = funcionarioXConglomerado;
             MetaXObjetivo = metaXObjetivo;
             Objetivo = objetivo;
