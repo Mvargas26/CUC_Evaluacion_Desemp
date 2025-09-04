@@ -458,8 +458,10 @@ function enviarEvaluacion() {
 
     // Recolectar datos de las tablas que pintamos
     const objetivos = obtenerDatosTablaObjetivos('#tablaObjetivos tbody tr');
-    const competenciasTransversales = obtenerDatosTablaTransversales('#tbCompetenciasTransversales tr');
-    const competencias = obtenerDatosTablaCompetencia('#tbCompetenciasSelect tbody tr');
+    const competenciasTransversalesPlanas = obtenerDatosTablaTransversales('#tbCompetenciasTransversales tr');
+    const competenciasPlanas = obtenerDatosTablaCompetencia('#tbCompetenciasSelect tbody tr');
+    const competenciasTransversales = agruparCompetencias(competenciasTransversalesPlanas);
+    const competencias = agruparCompetencias(competenciasPlanas);
 
     //Recolectamos lo otro
     const observaciones = document.getElementById('txtObservaciones').value;
@@ -649,5 +651,28 @@ async function enviarPeticionEvaluacion(evaluacionData) {
     } catch (error) {
         alert(`Error: ${error.message}`);
     }
+}
+
+function agruparCompetencias(items) { //agrupa las competencias
+    const map = new Map();
+    for (const it of items) {
+        if (!map.has(it.idCompetencia)) {
+            map.set(it.idCompetencia, {
+                idCompetencia: String(it.idCompetencia),
+                idTipoCompetencia: String(it.idTipoCompetencia),
+                comportamientos: []
+            });
+        }
+        const comp = map.get(it.idCompetencia);
+        let compo = comp.comportamientos.find(c => c.idComportamiento === String(it.idComportamiento));
+        if (!compo) {
+            compo = { idComportamiento: String(it.idComportamiento), niveles: [] };
+            comp.comportamientos.push(compo);
+        }
+        if (!compo.niveles.some(n => n.idNivel === String(it.idNivel))) {
+            compo.niveles.push({ idNivel: String(it.idNivel) });
+        }
+    }
+    return Array.from(map.values());
 }
 

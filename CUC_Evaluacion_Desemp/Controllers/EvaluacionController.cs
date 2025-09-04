@@ -201,16 +201,57 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 //guardamos las competencias Transversales
                 foreach (var competencia in competenciasTransversales)
                 {
-                    var evaluacionXCompetencia = new EvaluacionXcompetenciaModel
-                    {
-                        IdEvaluacion = evaluacionGuardada.IdEvaluacion,
-                        IdCompetencia = Convert.ToInt32(competencia["id"]),
-                        ValorObtenido = Convert.ToDecimal(competencia["actual"]),
-                        IdCompotamiento = Convert.ToInt32(competencia["idComportamiento"]),
-                        IdNivel = Convert.ToInt32(competencia["idComportamiento"])
-                    };
+                    var idCompetencia = Convert.ToInt32(competencia["idCompetencia"]);
+                    var idTipoCompetencia = Convert.ToInt32(competencia["idTipoCompetencia"]);
 
-                    //_servicioMantenimientos.EvaluacionXcompetencia.CrearEvaluacionXCompetencia(evaluacionXCompetencia);
+                    foreach (var comportamiento in competencia["comportamientos"])
+                    {
+                        var idComportamiento = Convert.ToInt32(comportamiento["idComportamiento"]);
+
+                        foreach (var nivel in comportamiento["niveles"])
+                        {
+                            var idNivel = Convert.ToInt32(nivel["idNivel"]);
+
+                            var evaluacionXCompetencia = new EvaluacionXcompetenciaModel
+                            {
+                                IdEvaluacion = evaluacionGuardada.IdEvaluacion,
+                                IdCompetencia = idCompetencia,
+                                IdCompotamiento = idComportamiento,
+                                IdNivel = idNivel,
+                                ValorObtenido = 0 // si después necesitas ponerle nota real, aquí la cargas
+                            };
+
+                            _servicioMantenimientos.EvaluacionXcompetencia.CrearEvaluacionXCompetencia(evaluacionXCompetencia);
+                        }
+                    }
+                }
+
+                //guardamos las competencias Normales asignadas del combo
+                foreach (var competencia in competencias)
+                {
+                    var idCompetencia = Convert.ToInt32(competencia["idCompetencia"]);
+                    var idTipoCompetencia = Convert.ToInt32(competencia["idTipoCompetencia"]);
+
+                    foreach (var comportamiento in competencia["comportamientos"])
+                    {
+                        var idComportamiento = Convert.ToInt32(comportamiento["idComportamiento"]);
+
+                        foreach (var nivel in comportamiento["niveles"])
+                        {
+                            var idNivel = Convert.ToInt32(nivel["idNivel"]);
+
+                            var evaluacionXCompetencia = new EvaluacionXcompetenciaModel
+                            {
+                                IdEvaluacion = evaluacionGuardada.IdEvaluacion,
+                                IdCompetencia = idCompetencia,
+                                IdCompotamiento = idComportamiento,
+                                IdNivel = idNivel,
+                                ValorObtenido = 0 // si después necesitas ponerle nota real, aquí la cargas
+                            };
+
+                            _servicioMantenimientos.EvaluacionXcompetencia.CrearEvaluacionXCompetencia(evaluacionXCompetencia);
+                        }
+                    }
                 }
 
 
