@@ -188,6 +188,14 @@ function renderizarTablaCompetenciaSelect(data) {
         const niveles = [...new Set(competencia.Datos.map(d => d.Nivel))].sort();
         const totalColumnas = 1 + niveles.length; // Comportamientos + niveles
 
+        //Creamos mapeo de niveles con sus IDs
+        const nivelesConIds = new Map();
+        competencia.Datos.forEach(item => {
+            if (!nivelesConIds.has(item.Nivel)) {
+                nivelesConIds.set(item.Nivel, item.idNivel);
+            }
+        });
+
         // Fila del título con botón eliminar
         const filaTitulo = document.createElement("tr");
         filaTitulo.setAttribute("data-id", competencia.idCompetencia);
@@ -215,23 +223,41 @@ function renderizarTablaCompetenciaSelect(data) {
 
         // Encabezado de niveles
         const encabezado = document.createElement("tr");
-        encabezado.innerHTML = `<th>Comportamientos</th>` + niveles.map(n => `<th>${n}</th>`).join("");
+        encabezado.innerHTML = `<th>Comportamientos</th>` +
+            niveles.map(n => `<th data-nivel-id="${nivelesConIds.get(n)}">${n}</th>`).join("");
         contenedor.appendChild(encabezado);
 
         // Agrupar comportamientos
         const comportamientoMap = new Map();
         competencia.Datos.forEach(item => {
             if (!comportamientoMap.has(item.Comportamiento)) {
-                comportamientoMap.set(item.Comportamiento, {});
+                //Guardamos también el ID del comportamiento
+                comportamientoMap.set(item.Comportamiento, {
+                    idComportamiento: item.idComport, // Usando idComport como mencionaste
+                    descripcionesPorNivel: {}
+                });
             }
-            comportamientoMap.get(item.Comportamiento)[item.Nivel] = item.Descripcion;
+            comportamientoMap.get(item.Comportamiento).descripcionesPorNivel[item.Nivel] = {
+                descripcion: item.Descripcion,
+                idNivel: item.idNivel
+            };
         });
 
         // Filas de comportamientos
-        comportamientoMap.forEach((descripcionesPorNivel, comportamiento) => {
+        comportamientoMap.forEach(({ idComportamiento, descripcionesPorNivel }, comportamiento) => {
             const fila = document.createElement("tr");
+            //Guardamos el ID del comportamiento en la fila
+            fila.setAttribute("data-comportamiento-id", idComportamiento);
+
             fila.innerHTML = `<td><strong>${comportamiento}</strong></td>` +
-                niveles.map(nivel => `<td>${descripcionesPorNivel[nivel] || ""}</td>`).join("");
+                niveles.map(nivel => {
+                    const nivelData = descripcionesPorNivel[nivel];
+                    const descripcion = nivelData?.descripcion || "";
+                    const idNivel = nivelData?.idNivel || nivelesConIds.get(nivel);
+
+                    //Cada celda tiene los IDs necesarios
+                    return `<td data-comportamiento-id="${idComportamiento}" data-nivel-id="${idNivel}">${descripcion}</td>`;
+                }).join("");
             contenedor.appendChild(fila);
         });
 
@@ -565,13 +591,43 @@ function obtenerDatosTablaTransversales(selector) {
     return datos;
 }
 function obtenerDatosTablaCompetencia(selector) {
-    const filas = document.querySelectorAll(`${selector}[data-id]`);
-    const idsUnicos = new Set();
+    const filas = document.querySelectorAll(selector);
+    const datos = [];
 
-    return Array.from(filas)
-        .map(fila => fila.getAttribute('data-id'))
-        .filter(id => id && !idsUnicos.has(id) && idsUnicos.add(id))
-        .map(id => ({ idCompetencia: id }));
+    let competenciaActual = null;
+    let tipoCompetenciaActual = null;
+
+    Array.from(filas).forEach(fila => {
+        // Capturamos IDs de competencia cuando encontramos una fila de título
+        if (fila.hasAttribute('data-id')) {
+            competenciaActual = fila.getAttribute('data-id');
+            tipoCompetenciaActual = fila.getAttribute('data-id-tipo');
+        }
+
+        // Capturamos IDs de comportamiento y nivel de las filas de datos
+        if (fila.hasAttribute('data-comportamiento-id')) {
+            const idComportamiento = fila.getAttribute('data-comportamiento-id');
+
+            // Buscamos todas las celdas con datos de nivel en esta fila
+            const celdasNivel = fila.querySelectorAll('td[data-nivel-id]');
+
+            celdasNivel.forEach(celda => {
+                const idNivel = celda.getAttribute('data-nivel-id');
+
+                // Solo agregamos si tenemos todos los datos válidos
+                if (idComportamiento && idComportamiento !== 'undefined' && idNivel) {
+                    datos.push({
+                        idCompetencia: competenciaActual,
+                        idTipoCompetencia: tipoCompetenciaActual,
+                        idComportamiento: idComportamiento,
+                        idNivel: idNivel
+                    });
+                }
+            });
+        }
+    });
+
+    return datos;
 }
 
 async function enviarPeticionEvaluacion(evaluacionData) {

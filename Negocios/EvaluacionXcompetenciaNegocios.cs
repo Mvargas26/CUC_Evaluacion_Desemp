@@ -27,8 +27,8 @@ namespace Negocios
             new SqlParameter("@idEvaluacion", nueva.IdEvaluacion),
             new SqlParameter("@idCompetencia", nueva.IdCompetencia),
             new SqlParameter("@valorObtenido", nueva.ValorObtenido),
-            new SqlParameter("@peso", nueva.Peso),
-            new SqlParameter("@meta", nueva.Meta ?? string.Empty)
+            new SqlParameter("@idComportamiento", nueva.IdCompotamiento),
+            new SqlParameter("@idNivel", nueva.IdNivel)
             };
 
             _accesoBD.EjecutarSPconDT("sp_EvaluacionPorCompetencia_CRUD", parametros);
