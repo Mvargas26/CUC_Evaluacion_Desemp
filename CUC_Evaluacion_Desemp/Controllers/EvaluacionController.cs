@@ -267,8 +267,23 @@ namespace CUC_Evaluacion_Desemp.Controllers
         }
         #endregion
 
-        #region EvaFuncionario
+        #region EvaluarFuncionario
+        public ActionResult SeleccionarSubalternoParaEvaluar()
+        {
+            try
+            {
+                var listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosConEvaluacionPorJefe("44444444");
 
+                return View(listaSubAlternos);
+
+
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener la lista.";
+                return View("Error");
+            }
+        }//fin
 
 
         #endregion

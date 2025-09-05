@@ -247,6 +247,7 @@
     <Content Include="Views\Mantenimientos\ManteniComportamientos.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniConglomerados.cshtml" />
     <Content Include="Views\Evaluacion\PlanificarEvaluacion.cshtml" />
+    <Content Include="Views\Evaluacion\SeleccionarSubalternoParaEvaluar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

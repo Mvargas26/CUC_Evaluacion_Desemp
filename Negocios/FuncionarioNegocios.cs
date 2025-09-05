@@ -241,10 +241,18 @@ namespace Negocios
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@cedJefe", cedJefatura)
+                new SqlParameter("@cedJefe", cedJefatura),
+                new SqlParameter("@operacion", "listarSubalternos"),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
             };
 
-            DataTable dt = _accesoBD.EjecutarSPconDT("ListarSubAlternosPorJefe", parametros);
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_ListarSubAlternosPorJefe", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError) && mensajeError != "OK")
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
 
             var lista = new List<FuncionarioModel>();
             foreach (DataRow row in dt.Rows)
@@ -255,9 +263,9 @@ namespace Negocios
                     Nombre = row["nombre"].ToString(),
                     Apellido1 = row["apellido1"].ToString(),
                     Apellido2 = row["apellido2"].ToString(),
-                    IdRol = Convert.ToInt32(row["idRol"].ToString()),
-                    IdPuesto = Convert.ToInt32(row["idPuesto"].ToString()),
-                    IdEstadoFuncionario = Convert.ToInt32(row["idEstadoFuncionario"].ToString()),
+                    IdRol = Convert.ToInt32(row["idRol"]),
+                    IdPuesto = Convert.ToInt32(row["idPuesto"]),
+                    IdEstadoFuncionario = Convert.ToInt32(row["idEstadoFuncionario"]),
                     Dependencia = row["Dependencia"].ToString(),
                     CedJefeInmediato = row["cedJefeInmediato"].ToString()
                 });
@@ -265,7 +273,6 @@ namespace Negocios
 
             return lista;
         }
-
 
         public List<ConglomeradoModel> ConglomeradosPorFunc(string cedFuncionario)
         {
@@ -291,6 +298,42 @@ namespace Negocios
             return lista;
         }
 
-    }
+        public List<FuncionarioModel> ListarSubAlternosConEvaluacionPorJefe(string cedJefatura)
+        {
+            var parametros = new SqlParameter[]
+            {
+                new SqlParameter("@cedJefe", cedJefatura),
+                new SqlParameter("@operacion", "listarSubalternosConEvaluacion"),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
+            };
+
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_ListarSubAlternosPorJefe", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError) && mensajeError != "OK")
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
+
+            var lista = new List<FuncionarioModel>();
+            foreach (DataRow row in dt.Rows)
+            {
+                lista.Add(new FuncionarioModel
+                {
+                    Cedula = row["cedula"].ToString(),
+                    Nombre = row["nombre"].ToString(),
+                    Apellido1 = row["apellido1"].ToString(),
+                    Apellido2 = row["apellido2"].ToString(),
+                    IdRol = Convert.ToInt32(row["idRol"]),
+                    IdPuesto = Convert.ToInt32(row["idPuesto"]),
+                    IdEstadoFuncionario = Convert.ToInt32(row["idEstadoFuncionario"]),
+                    Dependencia = row["Dependencia"].ToString(),
+                    CedJefeInmediato = row["cedJefeInmediato"].ToString()
+                });
+            }
+
+            return lista;
+        }
+    }//fin class
 
 }//fin space
