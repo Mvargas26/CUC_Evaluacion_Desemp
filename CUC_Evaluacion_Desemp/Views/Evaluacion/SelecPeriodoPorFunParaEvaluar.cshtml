@@ -1,0 +1,42 @@
+﻿@model List<Entidades.PeriodosModel>
+@{
+    ViewBag.Title = "Seleccionar Período";
+    string cedulaSeleccionada = ViewBag.cedulaSeleccionada;
+    string idConglomerado = ViewBag.idConglomerado;
+}
+
+<h2>Seleccionar Período</h2>
+
+@if (TempData["MensajeError"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["MensajeError"]
+    </div>
+}
+
+@using (Html.BeginForm("EvaluarSubAlterno", "Evaluacion", FormMethod.Post))
+{
+    @Html.Hidden("cedulaSeleccionada", cedulaSeleccionada)
+    @Html.Hidden("idConglomerado", idConglomerado)
+
+    <div class="form-group">
+        <label for="idPeriodo">Seleccione un período:</label>
+        <br />
+        <br />
+        <select class="form-control" id="idPeriodo" name="idPeriodo" required>
+            <option value="">-- Seleccione --</option>
+            @foreach (var periodo in Model)
+            {
+                <option value="@periodo.idPeriodo">@periodo.Nombre (@periodo.FechaInicio.ToString("dd/MM/yyyy") - @periodo.FechaFin.ToString("dd/MM/yyyy"))</option>
+            }
+        </select>
+    </div>
+    <br />
+    <br />
+    <button type="submit" class="btn btn-primary">Continuar</button>
+    <a href="@Url.Action("SeleccionarSubalternoParaEvaluar")" class="btn btn-secondary">Cancelar</a>
+}
+<script defer src="~/sources/js/accionOcultarCerrarMensajes.js"></script>
+
+
+

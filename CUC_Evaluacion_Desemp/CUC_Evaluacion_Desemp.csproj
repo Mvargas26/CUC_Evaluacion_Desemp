@@ -248,6 +248,9 @@
     <Content Include="Views\Mantenimientos\ManteniConglomerados.cshtml" />
     <Content Include="Views\Evaluacion\PlanificarEvaluacion.cshtml" />
     <Content Include="Views\Evaluacion\SeleccionarSubalternoParaEvaluar.cshtml" />
+    <Content Include="Views\Evaluacion\ConglomeradosPorFuncAParaEvaluar.cshtml" />
+    <Content Include="Views\Evaluacion\SelecPeriodoPorFunParaEvaluar.cshtml" />
+    <Content Include="Views\Evaluacion\EvaluarSubAlterno.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
