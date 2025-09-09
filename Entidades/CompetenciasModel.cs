@@ -15,5 +15,6 @@ namespace Entidades
         public string Descripcion { get; set; }
         public int IdTipoCompetencia { get; set; }
         public TiposCompetenciasModel TipoCompetencia { get; set; }
+        public List<ComportamientoModel> Comportamientos { get; set; } = new List<ComportamientoModel>();
     }
 }

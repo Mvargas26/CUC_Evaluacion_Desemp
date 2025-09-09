@@ -207,6 +207,7 @@
     <Content Include="sources\js\Vistas\ConsultarComportamientosYNiveles\filtrarPorTipoCompetencia.js" />
     <Content Include="sources\js\Vistas\ConsultarComportamientosYNiveles\ListarComportamientosYDescripcionesNegocios_JS.js" />
     <Content Include="sources\js\Vistas\CrearFuncionario\CrearFuncionarioJS.js" />
+    <Content Include="sources\js\Vistas\EvaluarSubAlterno\JS_EvaluarSubAlterno.js" />
     <Content Include="sources\js\Vistas\PlanificarEvaluacion\JS_Planificar.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

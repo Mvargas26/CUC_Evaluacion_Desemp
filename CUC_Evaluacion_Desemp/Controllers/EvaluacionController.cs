@@ -216,7 +216,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                             {
                                 IdEvaluacion = evaluacionGuardada.IdEvaluacion,
                                 IdCompetencia = idCompetencia,
-                                IdCompotamiento = idComportamiento,
+                                IdComportamiento = idComportamiento,
                                 IdNivel = idNivel,
                                 ValorObtenido = 0 // si después necesitas ponerle nota real, aquí la cargas
                             };
@@ -244,7 +244,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                             {
                                 IdEvaluacion = evaluacionGuardada.IdEvaluacion,
                                 IdCompetencia = idCompetencia,
-                                IdCompotamiento = idComportamiento,
+                                IdComportamiento = idComportamiento,
                                 IdNivel = idNivel,
                                 ValorObtenido = 0 // si después necesitas ponerle nota real, aquí la cargas
                             };
@@ -365,32 +365,106 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     return RedirectToAction("SeleccionarSubalterno");
                 }
 
-                //obtenemos el funcionario
                 var subalterno = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(cedulaSeleccionada);
-                //obtenemos los pesos de su conglomerado
                 var PesosConglomerados = _servicioMantenimientos.Conglomerados.ConsultarPesosXConglomerado(idConglomerado);
-                // Obtenemos tipos de Objetivos
                 ViewData["ListaTiposObjetivos"] = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
-                //Obtenemos tipos de competencias
                 ViewData["ListaTiposCompetencias"] = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
-                //Obtenemos la lista de conglomerados
                 ViewData["ListaConglomerados"] = _servicioMantenimientos.Conglomerados.ListarConglomerados();
-                //obtenemos los objetivos y competencias relacionadas a este congloemrado
-                var (listaObjetivos, listaCompetencias) = _servicioMantenimientos.Evaluaciones.ListarObjYCompetenciasXConglomerado(idConglomerado);
 
-                //Obtenemos las competencias, comportamientos y descrp Transversales id 2500
-                var transversales = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegocios(2500, "PorTipo");
+                var ultimaEvaluacionFuncionario = _servicioMantenimientos.Evaluaciones.ConsultarEvaluacionComoFuncionario(cedulaSeleccionada, idConglomerado);
 
-                var CompetenciasDelConglomerado = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegociosXCOnglo(idConglomerado);
-                var tiposdeObjetivos = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
-                //pasamos todo a la vista
+                //Validamos que tenga una Evaluacion
+                if (ultimaEvaluacionFuncionario == null)
+                {
+                    TempData["AlertMessage"] = "No hay una evaluación para usted en este conglomerado.Por favor contacte a su Jefatura para planificarla.";
+                    return RedirectToAction("Index", "Home");
+                }
+
+                var listaObjetivos = _servicioMantenimientos.Evaluaciones.Listar_objetivosXEvaluacion(ultimaEvaluacionFuncionario.IdEvaluacion);
+
+
+                // Traemos las competencias, comportamientos y niveles relacionados a la evaluacion
+                var CompetenciasPlanificadas = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegocios(ultimaEvaluacionFuncionario.IdEvaluacion, "PorEvaluacion");
+
+                //Separamos las transversales de las otras (con LinQ)
+                var Transversales = CompetenciasPlanificadas
+                    .Where(c => Convert.ToInt32(c.idTipoCompetencia) == 2500)
+                    .ToList();
+
+                var Competencias = CompetenciasPlanificadas
+                    .Where(c => Convert.ToInt32(c.idTipoCompetencia) != 2500)
+                    .ToList();
+
+                //agrupamos por competencia para pintar la tabla como se hixo en el js_planificar
+                var transversalesAgrupadas = Transversales
+                    .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia, x.idTipoCompetencia, x.Tipo })
+                    .Select(g => new CompetenciasModel
+                    {
+                        IdCompetencia = g.Key.idCompetencia,
+                        Competencia = g.Key.Competencia,
+                        Descripcion = g.Key.DescriCompetencia,
+                        IdTipoCompetencia = g.Key.idTipoCompetencia,
+                        TipoCompetencia = new TiposCompetenciasModel { IdTipoCompetencia = g.Key.idTipoCompetencia, Tipo = g.Key.Tipo },
+                        Comportamientos = g
+                            .GroupBy(k => new { k.idComport, k.Comportamiento })
+                            .Select(cg => new ComportamientoModel
+                            {
+                                idComport = cg.Key.idComport,
+                                Nombre = cg.Key.Comportamiento,
+                                Niveles = cg
+                                    .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion })
+                                    .Select(ng => new NivelComportamientoModel
+                                    {
+                                        idNivel = ng.Key.idNivel,
+                                        nombre = ng.Key.Nivel,
+                                        descripcion = ng.Key.Descripcion,
+                                        valor = Convert.ToInt32(cg.Where(z => z.idNivel == ng.Key.idNivel).Select(z => z.valorObtenido).FirstOrDefault() ?? 0)
+                                    }).ToList()
+                            }).ToList()
+                    }).ToList();
+
+                //Agrupamos las que no son trasnversales
+                var CompetenciasAgrupadas = Competencias
+                        .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia, x.idTipoCompetencia, x.Tipo })
+                        .Select(g => new Entidades.CompetenciasModel
+                        {
+                            IdCompetencia = g.Key.idCompetencia,
+                            Competencia = g.Key.Competencia,
+                            Descripcion = g.Key.DescriCompetencia,
+                            IdTipoCompetencia = g.Key.idTipoCompetencia,
+                            TipoCompetencia = new Entidades.TiposCompetenciasModel { IdTipoCompetencia = g.Key.idTipoCompetencia, Tipo = g.Key.Tipo },
+                            Comportamientos = g
+                                .GroupBy(k => new { k.idComport, k.Comportamiento })
+                                .Select(cg => new Entidades.ComportamientoModel
+                                {
+                                    idComport = cg.Key.idComport,
+                                    Nombre = cg.Key.Comportamiento,
+                                    Niveles = cg
+                                        .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion })
+                                        .Select(ng => new Entidades.NivelComportamientoModel
+                                        {
+                                            idNivel = ng.Key.idNivel,
+                                            nombre = ng.Key.Nivel,
+                                            descripcion = ng.Key.Descripcion,
+                                            valor = Convert.ToInt32(cg.Where(z => z.idNivel == ng.Key.idNivel).Select(z => z.valorObtenido).FirstOrDefault() ?? 0)
+                                        }).ToList()
+                                }).ToList()
+                        }).ToList();
+
+
+                //var CompetenciasDelConglomerado = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegociosXCOnglo(idConglomerado);
+                //var tiposdeObjetivos = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
+
+                ////pasamos todo a la vista
                 ViewBag.ListaObjetivos = listaObjetivos;
-                ViewBag.ListaCompetencias = listaCompetencias;
+                ViewBag.Transversales = transversalesAgrupadas;
+                ViewBag.CompetenciasAgrupadas = CompetenciasAgrupadas;
                 ViewBag.PesosConglomerados = PesosConglomerados;
                 ViewBag.IdConglomerado = idConglomerado;
-                ViewBag.transversales = transversales;
-                ViewBag.CompetenciasDelConglomerado = CompetenciasDelConglomerado;
-                ViewBag.tiposdeObjetivos = tiposdeObjetivos;
+
+                //ViewBag.transversales = transversales;
+                //ViewBag.CompetenciasDelConglomerado = CompetenciasDelConglomerado;
+                //ViewBag.tiposdeObjetivos = tiposdeObjetivos;
 
 
                 return View(subalterno);

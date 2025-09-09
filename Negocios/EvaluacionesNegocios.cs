@@ -239,8 +239,8 @@ namespace Negocios
                         IdEvaluacion = Convert.ToInt32(row["idEvaluacion"]),
                         IdCompetencia = Convert.ToInt32(row["idCompetencia"]),
                         ValorObtenido = Convert.ToDecimal(row["valorObtenido"]),
-                        Peso = Convert.ToDecimal(row["peso"]),
-                        Meta = row["meta"].ToString(),
+                        IdComportamiento = Convert.ToInt32(row["idComport"]),
+                        IdNivel = Convert.ToInt32(row["idNivel"]),
                         NombreCompetencia = row["NombreCompetencia"].ToString(),
                         TipoCompetencia = row["TipoCompetencia"].ToString()
                     });
@@ -267,6 +267,38 @@ namespace Negocios
 
             return (listaObjetivos, listaCompetencias);
         }
-    
+
+        public List<EvaluacionXObjetivoModel> Listar_objetivosXEvaluacion(int idEvaluacion)
+        {
+            var parametros = new SqlParameter[]
+            {
+            new SqlParameter("@idEvaluacion", idEvaluacion)
+            };
+
+            DataSet ds = _accesoBD.EjecutarSPconDS("sp_objetivosYCompetenciasXEvaluacion", parametros);
+
+            var listaObjetivos = new List<EvaluacionXObjetivoModel>();
+            var listaCompetencias = new List<EvaluacionXcompetenciaModel>();
+
+            if (ds.Tables.Count > 1 && ds.Tables[1].Rows.Count > 0)
+            {
+                foreach (DataRow row in ds.Tables[1].Rows)
+                {
+                    listaObjetivos.Add(new EvaluacionXObjetivoModel
+                    {
+                        IdEvaxObj = Convert.ToInt32(row["IdEvaxObj"]),
+                        IdEvaluacion = Convert.ToInt32(row["idEvaluacion"]),
+                        IdObjetivo = Convert.ToInt32(row["idObjetivo"]),
+                        ValorObtenido = Convert.ToDecimal(row["valorObtenido"]),
+                        Peso = Convert.ToDecimal(row["peso"]),
+                        Meta = row["meta"].ToString(),
+                        NombreObjetivo = row["NombreObjetivo"].ToString(),
+                        TipoObjetivo = row["TipoObjetivo"].ToString()
+                    });
+                }
+            }
+
+            return (listaObjetivos);
+        }
     }//fin class
 }//fn space

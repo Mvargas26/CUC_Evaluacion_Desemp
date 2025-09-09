@@ -27,7 +27,7 @@ namespace Negocios
             new SqlParameter("@idEvaluacion", nueva.IdEvaluacion),
             new SqlParameter("@idCompetencia", nueva.IdCompetencia),
             new SqlParameter("@valorObtenido", nueva.ValorObtenido),
-            new SqlParameter("@idComportamiento", nueva.IdCompotamiento),
+            new SqlParameter("@idComportamiento", nueva.IdComportamiento),
             new SqlParameter("@idNivel", nueva.IdNivel)
             };
 

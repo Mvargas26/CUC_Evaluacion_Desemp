@@ -18,7 +18,7 @@ namespace Entidades
         public string Meta { get; set; }
         public string NombreCompetencia { get; set; }
         public string TipoCompetencia { get; set; }
-        public int IdCompotamiento { get; set; }
+        public int IdComportamiento { get; set; }
         public int IdNivel { get; set; }
 
     }//fn class

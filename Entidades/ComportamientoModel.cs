@@ -10,6 +10,8 @@ namespace Entidades
     {
         public int idComport { get; set; }
         public string Nombre { get; set; }
+
+        public List<NivelComportamientoModel> Niveles { get; set; } = new List<NivelComportamientoModel>();
     }
 
 }
