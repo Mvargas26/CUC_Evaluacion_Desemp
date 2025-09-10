@@ -1,130 +1,107 @@
-﻿$(document).ready(function () {
-    // Variables para mantener el estado
-    let campoActualEdicion = null;
-    let pesoObjetivo = 0;
-    let datosOriginales = null;
+﻿//*******************************************************************************************************************************
+//***********************************  Funcion Principal                    *****************************************************
+//*******************************************************************************************************************************
 
-    // Función para cerrar el modal y resetear
-    const cerrarModal = () => {
-        $('#editarActualModal').modal('hide');
-        resetModal();
-    };
+$(document).ready(function () {
+    inicializarEventos();
+});
 
-    // Función para resetear el estado del modal
-    const resetModal = () => {
-        $('#modalValorActual').val('');
-        $('#valorError').addClass('d-none');
-        campoActualEdicion = null;
-        pesoObjetivo = 0;
-        datosOriginales = null;
-    };
+function inicializarEventos() {
+    functionModalObjetivos();
+}
 
-    // Función para validar el valor ingresado
-    const validarValor = (valor) => {
-        const numValor = parseFloat(valor);
-        return !isNaN(numValor) && numValor >= 1 && numValor <= pesoObjetivo;
-    };
+//*******************************************************************************************************************************
+//***********************************  Seccion Objetivos                    *****************************************************
+function functionModalObjetivos() {
+    // Evento para abrir el modal con los datos del botón
+    $(document).on("click", ".btn-editar-actual", function () {
+        let id = $(this).data("id");
+        let tipo = $(this).data("tipo");
+        let nombre = $(this).data("nombre");
+        let peso = $(this).data("peso");
+        let actual = $(this).data("actual");
+        let meta = $(this).data("meta");
 
-    // Configurar el modal para evitar cierre accidental
-    $('#editarActualModal').modal({
-        backdrop: 'static',
-        keyboard: false,
-        show: false
+        $("#modalTipoObjetivo").text(tipo);
+        $("#modalNombreObjetivo").text(nombre);
+        $("#modalPesoObjetivo").text(peso + "%");
+        $("#modalMetaObjetivo").text(meta);
+        $("#modalValorActual").val(actual);
+        $("#maxPeso").text(peso);
+
+        // Guardar el ID del objetivo en el botón confirmar
+        $("#modalBtnConfirmar").data("id", id);
+
+        $("#editarActualModal").modal("show");
     });
 
-    // Manejador para abrir el modal
-    $(document).on('click', '.btn-editar-actual', function () {
-        const button = $(this);
-        datosOriginales = {
-            tipo: button.data('tipo'),
-            nombre: button.data('nombre'),
-            peso: button.data('peso'),
-            meta: button.data('meta'),
-            actual: button.data('actual'),
-            id: button.data('id')
-        };
+    // Evento para confirmar el cambio
+    $("#modalBtnConfirmar").off("click").on("click", function () {
+        let id = $(this).data("id");
+        let nuevoValor = parseInt($("#modalValorActual").val());
+        let max = parseInt($("#maxPeso").text());
 
-        // Llenar datos en el modal
-        $('#modalTipoObjetivo').text(datosOriginales.tipo);
-        $('#modalNombreObjetivo').text(datosOriginales.nombre);
-        $('#modalPesoObjetivo').text(`${datosOriginales.peso}%`);
-        $('#modalMetaObjetivo').text(datosOriginales.meta);
-        $('#modalValorActual').val(datosOriginales.actual);
-        $('#maxPeso').text(datosOriginales.peso);
-
-        // Configurar validación inicial
-        pesoObjetivo = parseFloat(datosOriginales.peso);
-        campoActualEdicion = button.closest('tr').find('td:nth-child(5)');
-
-        // Mostrar modal
-        $('#editarActualModal').modal('show');
-    });
-
-    // Validación en tiempo real
-    $('#modalValorActual').on('input', function () {
-        const valor = $(this).val();
-        const errorElement = $('#valorError');
-
-        if (validarValor(valor)) {
-            errorElement.addClass('d-none');
-        } else {
-            errorElement.removeClass('d-none');
-            errorElement.text(`El valor debe estar entre 1 y ${pesoObjetivo}%`);
-        }
-    });
-
-    // Manejador para confirmar cambios
-    $('#modalBtnConfirmar').click(function () {
-        const nuevoValor = $('#modalValorActual').val();
-        const errorElement = $('#valorError');
-
-        if (!validarValor(nuevoValor)) {
-            errorElement.text(`El valor debe estar entre 1 y ${pesoObjetivo}%`).removeClass('d-none');
+        if (isNaN(nuevoValor) || nuevoValor < 1 || nuevoValor > max) {
+            $("#valorError").removeClass("d-none");
             return;
         }
 
-        // Actualizar visualmente en la tabla
-        if (campoActualEdicion) {
-            campoActualEdicion.text(`${nuevoValor}%`);
-            campoActualEdicion.data('actual', nuevoValor); // Guardar dato para posterior envío
+        $("#valorError").addClass("d-none");
+
+        // Buscar la fila correspondiente en la tabla y actualizar valor
+        let fila = $("#tbObjetivosAsignados").find(`button[data-id='${id}']`).closest("tr");
+        fila.find("td:eq(4)").html(nuevoValor + "<span>%</span>");
+
+        // Actualizar también el atributo data del botón
+        fila.find(".btn-editar-actual").data("actual", nuevoValor);
+
+        //llamamos la funcion que actualiza la tb resultados
+        actualizarObjetivosEnTbResultados();
+
+        let modal = bootstrap.Modal.getInstance(document.getElementById("editarActualModal"));
+        modal.hide();
+    });
+}
+
+// Función para cerrar el modal desde el botón de cerrar
+function cerrarModal() {
+    let modal = bootstrap.Modal.getInstance(document.getElementById("editarActualModal"));
+    modal.hide();
+    $("#valorError").addClass("d-none");
+    document.activeElement.blur();
+}
+//*******************************************************************************************************************************
+//***********************************  Seccion Tabla Resultados             *****************************************************
+function actualizarObjetivosEnTbResultados() {
+    let acumulados = {};
+
+    // Recorremos la tabla de objetivos asignados
+    $("#tbObjetivosAsignados tbody tr").each(function () {
+        let tipo = $(this).find(".btn-editar-actual").data("tipo");
+        let actualTxt = $(this).find("td:eq(4)").text().replace("%", "").trim();
+        let actual = parseInt(actualTxt) || 0;
+
+        if (!acumulados[tipo]) {
+            acumulados[tipo] = 0;
         }
-
-        //llamamos la funcion de suma automatica
-        actualizarSumasObjetivos();
-
-        cerrarModal();
+        acumulados[tipo] += actual;
     });
 
-    // Manejadores para cerrar el modal
-    $('.modal-header .close, .modal-footer .btn-secondary').on('click', cerrarModal);
+    // Recorremos la tabla de resultados y actualiza los inputs
+    $("#tablaResultados tbody tr").each(function () {
+        let tipoTexto = $(this).find("td:first").text().trim();
+        let input = $(this).find(".input-calificacion");
 
-    // Prevenir cierre del modal al hacer clic fuera
-    $('#editarActualModal').on('click.dismiss.bs.modal', function (e) {
-        if (e.target === this) {
-            e.preventDefault();
-            e.stopPropagation();
+        if (acumulados[tipoTexto] !== undefined) {
+            input.val(acumulados[tipoTexto]);
         }
     });
 
-    function actualizarSumasObjetivos() {
-        // Resetear valores previos
-        window.sumasGlobales.objetivos = {};
-
-        // Procesar tabla de Objetivos
-        document.querySelectorAll('#tbObjetivosAsignados tbody tr').forEach(row => {
-            const tipoCell = row.querySelector('td:nth-child(1)'); // Columna Tipo
-            const valorCell = row.querySelector('td:nth-child(5)'); // Columna Actual
-
-            if (tipoCell && valorCell) {
-                const tipo = tipoCell.textContent.trim();
-                const valor = parseFloat(valorCell.textContent.replace('%', '')) || 0;
-
-                window.sumasGlobales.objetivos[tipo] =
-                    (window.sumasGlobales.objetivos[tipo] || 0) + valor;
-            }
-        });
-
-        actualizarTablaResultados();
-    }
-
-});
+    // Calculamos el total final
+    let total = 0;
+    $("#tablaResultados .input-calificacion").each(function () {
+        let val = parseInt($(this).val()) || 0;
+        total += val;
+    });
+    $("#resultado-total").val(total);
+}//fin 

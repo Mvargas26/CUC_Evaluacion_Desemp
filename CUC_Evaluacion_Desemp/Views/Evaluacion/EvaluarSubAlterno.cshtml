@@ -145,6 +145,7 @@
             </tbody>
         </table>
     </div>
+    <hr />
     <!-- ***********************************************************SECCIÓN COMPETENCIAS TRANSVERSALES -->
     <div class="mb-5">
         <h3>Competencias Transversales</h3>
@@ -217,6 +218,7 @@
             </tbody>
         </table>
     </div>
+    <hr />
     <!-- ***********************************************************SECCIÓN COMPETENCIAS QUE NO SON  TRANSVERSALES -->
     <div class="mb-5">
         <h3>Competencias</h3>
@@ -290,6 +292,61 @@
             </tbody>
         </table>
     </div>
+    <!-- ********************************************************* Resumen Final -->
+    <div class="d-flex justify-content-center">
+        <div class="p-4" style="background-color: #f8d7da; max-width: 600px;">
+            <h5 class="text-center">Resumen para: @Model.Nombre @Model.Apellido1 @Model.Apellido2</h5>
+            <table id="tablaResultados" class="table table-borderless align-middle">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Porcentaje</th>
+                        <th style="width: 100px;">Valor</th>
+                        <th class="d-none">id tipo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.PesosConglomerados)
+                    {
+                        var nombreTipo = listaTiposObjetivos?.FirstOrDefault(t => t.IdTipoObjetivo == item?.IdTipoObjetivo)?.Tipo;
+                        var nombreTipoCompet = listaTiposCompetencias?.FirstOrDefault(t => t.IdTipoCompetencia == item?.IdTipoCompetencia)?.Tipo;
+                        var nombreFinal = nombreTipo ?? nombreTipoCompet ?? "Desconocido";
+
+                        var idTipoObjetivo = item?.IdTipoObjetivo ?? 0;
+                        var idTipoCompetencia = item?.IdTipoCompetencia ?? 0;
+                        var idTipo = idTipoObjetivo != 0 ? idTipoObjetivo : idTipoCompetencia;
+                        var tipo = idTipoObjetivo != 0 ? "Objetivo" : "Competencia";
+
+                        <tr>
+                            <td><strong>@nombreFinal</strong></td>
+                            <td><strong>@(item?.Porcentaje.ToString("0") ?? "0")%</strong></td>
+                            <td style="width: 100px;">
+                                <input type="number" class="form-control input-calificacion"
+                                       placeholder="@(item?.Porcentaje.ToString("0") ?? "0")%" readonly />
+                            </td>
+                            <td class="d-none" data-tipo-id="@idTipo" data-tipo-categoria="@tipo">
+                                @idTipo
+                            </td>
+                        </tr>
+                    }
+
+                    <tr>
+                        <td><strong>Resultado:</strong></td>
+                        <td><strong> 100%</strong></td>
+                        <td style="width: 100px;">
+                            <input type="number" class="form-control" id="resultado-total" readonly />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- ******************************************************* btn Guardar Avance -->
+    <div class="d-flex justify-content-center">
+        <div class="text-center">
+            <button id="btnGuardarAvance" class="btn btn-success mt-3">Guardar Avance <i class="fa-solid fa-floppy-disk"></i></button>
+        </div>
+    </div>
 
 
 
@@ -316,14 +373,12 @@
     </div>
 
     <!-- Modal EditarActual Objetivos -->
-    <div class="modal fade" id="editarActualModal" tabindex="-1" data-backdrop="static" data-keyboard="false">
+    <div class="modal fade" id="editarActualModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-warning">
                     <h5 class="modal-title">Editar Valor Actual</h5>
-                    <button type="button" class="close" onclick="cerrarModal()">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" onclick="cerrarModal()" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -355,6 +410,7 @@
             </div>
         </div>
     </div>
+
 
     @section Scripts {
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

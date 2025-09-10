@@ -451,21 +451,12 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                 }).ToList()
                         }).ToList();
 
-
-                //var CompetenciasDelConglomerado = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegociosXCOnglo(idConglomerado);
-                //var tiposdeObjetivos = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
-
                 ////pasamos todo a la vista
                 ViewBag.ListaObjetivos = listaObjetivos;
                 ViewBag.Transversales = transversalesAgrupadas;
                 ViewBag.CompetenciasAgrupadas = CompetenciasAgrupadas;
                 ViewBag.PesosConglomerados = PesosConglomerados;
                 ViewBag.IdConglomerado = idConglomerado;
-
-                //ViewBag.transversales = transversales;
-                //ViewBag.CompetenciasDelConglomerado = CompetenciasDelConglomerado;
-                //ViewBag.tiposdeObjetivos = tiposdeObjetivos;
-
 
                 return View(subalterno);
 
