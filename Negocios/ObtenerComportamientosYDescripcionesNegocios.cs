@@ -52,6 +52,7 @@ namespace Negocios
                     Comportamiento = row["Comportamiento"].ToString(),
                     idNivel = Convert.ToInt32(row["idNivel"]),
                     Nivel = row["Nivel"].ToString(),
+                    valorNivel = Convert.ToInt32(row["valorNivel"]),
                     Descripcion = row["Descripcion"].ToString(),
                     valorObtenido = tieneValor && row["valorObtenido"] != DBNull.Value
                             ? Convert.ToDecimal(row["valorObtenido"])
@@ -92,6 +93,7 @@ namespace Negocios
                     Comportamiento = row["Comportamiento"].ToString(),
                     idNivel = Convert.ToInt32(row["idNivel"]),
                     Nivel = row["Nivel"].ToString(),
+                    valorNivel = Convert.ToInt32(row["valorNivel"]),
                     Descripcion = row["DescripcionNivel"].ToString()
                 });
             }

@@ -395,7 +395,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     .Where(c => Convert.ToInt32(c.idTipoCompetencia) != 2500)
                     .ToList();
 
-                //agrupamos por competencia para pintar la tabla como se hixo en el js_planificar
+                //agrupamos por competencia para pintar la tabla como se hizo en el js_planificar
                 var transversalesAgrupadas = Transversales
                     .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia, x.idTipoCompetencia, x.Tipo })
                     .Select(g => new CompetenciasModel
@@ -412,13 +412,13 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                 idComport = cg.Key.idComport,
                                 Nombre = cg.Key.Comportamiento,
                                 Niveles = cg
-                                    .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion })
+                                    .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel })
                                     .Select(ng => new NivelComportamientoModel
                                     {
                                         idNivel = ng.Key.idNivel,
                                         nombre = ng.Key.Nivel,
                                         descripcion = ng.Key.Descripcion,
-                                        valor = Convert.ToInt32(cg.Where(z => z.idNivel == ng.Key.idNivel).Select(z => z.valorObtenido).FirstOrDefault() ?? 0)
+                                        valor = ng.Key.valorNivel
                                     }).ToList()
                             }).ToList()
                     }).ToList();
@@ -440,16 +440,41 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                     idComport = cg.Key.idComport,
                                     Nombre = cg.Key.Comportamiento,
                                     Niveles = cg
-                                        .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion })
+                                        .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel })
                                         .Select(ng => new Entidades.NivelComportamientoModel
                                         {
                                             idNivel = ng.Key.idNivel,
                                             nombre = ng.Key.Nivel,
                                             descripcion = ng.Key.Descripcion,
-                                            valor = Convert.ToInt32(cg.Where(z => z.idNivel == ng.Key.idNivel).Select(z => z.valorObtenido).FirstOrDefault() ?? 0)
+                                            valor = ng.Key.valorNivel
                                         }).ToList()
                                 }).ToList()
                         }).ToList();
+
+                //*********************************************************************
+                // Aqui vamos al calcular el maximo de puntos para las competencias (valor de nivel maximo * cant de comprtamientos)
+                //ejemplo : 5 comportamientos a nivel intermedio que vale 2 seria = 10
+
+                //traemos la lista de niveles
+                var listaNiveles = _servicioMantenimientos.NivelesComportamientos.ListarNivelesComportamientos();
+                var valorPorNivel = listaNiveles.ToDictionary(n => n.idNivel, n => n.valor);
+
+                int Val(int idNivel) => valorPorNivel.TryGetValue(idNivel, out var v) ? v : 0;
+
+                //sacamos el valor de nivel mas alto agrupando por Comportamiento
+                var maxPorTransversal = (Transversales ?? Enumerable.Empty<ObtenerComportamientosYDescripcionesModel>())
+                    .GroupBy(x => x.idComport)
+                    .Select(g => Val(g.Max(e => e.idNivel)));
+
+                var maxPorCompetencia = (Competencias ?? Enumerable.Empty<ObtenerComportamientosYDescripcionesModel>())
+                    .GroupBy(x => x.idComport)
+                    .Select(g => Val(g.Max(e => e.idNivel)));
+
+                int MaximoPuntosCompetencias = maxPorTransversal.Sum() + maxPorCompetencia.Sum();
+
+
+
+
 
                 ////pasamos todo a la vista
                 ViewBag.ListaObjetivos = listaObjetivos;
@@ -457,6 +482,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 ViewBag.CompetenciasAgrupadas = CompetenciasAgrupadas;
                 ViewBag.PesosConglomerados = PesosConglomerados;
                 ViewBag.IdConglomerado = idConglomerado;
+                ViewBag.MaximoPuntosCompetencias = MaximoPuntosCompetencias;
 
                 return View(subalterno);
 

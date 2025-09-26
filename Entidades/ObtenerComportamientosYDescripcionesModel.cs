@@ -17,6 +17,7 @@ namespace Entidades
         public string Comportamiento { get; set; }
         public string Nivel { get; set; }
         public int idNivel { get; set; }
+        public int valorNivel { get; set; }
         public string Descripcion { get; set; }
         public decimal? valorObtenido { get; set; }
 

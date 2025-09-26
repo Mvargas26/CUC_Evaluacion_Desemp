@@ -6,6 +6,8 @@ $(document).ready(function () {
     inicializarEventos();
 });
 
+
+
 function inicializarEventos() {
     functionModalObjetivos();
 }
@@ -104,4 +106,48 @@ function actualizarObjetivosEnTbResultados() {
         total += val;
     });
     $("#resultado-total").val(total);
-}//fin 
+}//fin
+
+function actualizarCompetenciasEnTbResultados() {
+    let total = 0;
+
+    $('#tbTransversalesEval select.select-nivel-obtenido, #tbCompetenciasEval select.select-nivel-obtenido').each(function () {
+        const v = parseFloat($(this).val() || '0');
+        if (!isNaN(v)) total += v;
+    });
+
+    const max = Number($('#MaximoPuntosCompetencias').val() || 0);
+    const porcLogro = max > 0 ? (total * 100) / max : 0;
+
+    let $filaComp = $('#tablaResultados tbody tr').has('td[data-tipo-categoria="Competencia"]').first();
+    if (!$filaComp.length) {
+        $filaComp = $('#tablaResultados tbody tr').filter(function () {
+            const txt = $(this).find('td:first').text().trim().toLowerCase();
+            return txt.includes('competencia');
+        }).first();
+    }
+
+    if ($filaComp.length) {
+        const porcTxt = $filaComp.find('td').eq(1).text();
+        const porcCategoria = parseFloat(porcTxt.replace('%', '').replace(',', '.').trim()) || 0;
+        const ponderado = (porcLogro * porcCategoria) / 100;
+        $filaComp.find('.input-calificacion').val(ponderado.toFixed(2));
+    }
+
+    let totalGeneral = 0;
+    $('#tablaResultados .input-calificacion').each(function () {
+        const v = parseFloat($(this).val() || '0');
+        if (!isNaN(v)) totalGeneral += v;
+    });
+    $('#resultado-total').val(totalGeneral.toFixed(2));
+
+    return { total, porcLogro, totalGeneral };
+}
+
+// Disparo al cambiar los combos de competencias/transversales
+$(document).on('change', '#tbTransversalesEval select.select-nivel-obtenido, #tbCompetenciasEval select.select-nivel-obtenido', function () {
+    actualizarCompetenciasEnTbResultados();
+});
+
+
+

@@ -25,6 +25,8 @@
     var CompetenciasAgrupadas = (List<Entidades.CompetenciasModel>)ViewBag.CompetenciasAgrupadas;
 }
 
+<input type="hidden" id="MaximoPuntosCompetencias" value="@ViewBag.MaximoPuntosCompetencias" />
+
 <div class="container mt-4 mb-5">
     <!-- Encabezado principal -->
     <h2 class="mb-2 text-center">Gestión Institucional de Recursos Humanos</h2>
@@ -155,7 +157,7 @@
                 {
                     var niveles = comp.Comportamientos
                         .SelectMany(c => c.Niveles)
-                        .GroupBy(n => new { n.idNivel, n.nombre })
+                        .GroupBy(n => new { n.idNivel, n.nombre, n.valor })
                         .OrderBy(g => g.Key.idNivel)
                         .Select(g => g.Key)
                         .ToList();
@@ -196,16 +198,14 @@
                                 </td>
                             }
                             <td style="width:180px;">
-                                <select class="form-select form-select-sm select-nivel-obtenido"
+                                <select class="form-select form-select-sm select-nivel-obtenido w-100"
                                         data-idcompetencia="@comp.IdCompetencia"
                                         data-idcomportamiento="@compo.idComport">
                                     <option value="" selected disabled>Seleccione...</option>
                                     @foreach (var n in niveles)
                                     {
-                                        var nivelMatch = compo.Niveles.FirstOrDefault(x => x.idNivel == n.idNivel);
-                                        var val = nivelMatch?.valor ?? 0;
                                         var isSelected = (n.idNivel == selectedNivelId) ? "selected" : "";
-                                        <option value="@val" data-idnivel="@n.idNivel" @Html.Raw(isSelected)>@n.nombre</option>
+                                        <option value="@n.valor" data-idnivel="@n.idNivel" @Html.Raw(isSelected)>@n.nombre</option>
                                     }
                                 </select>
                             </td>
