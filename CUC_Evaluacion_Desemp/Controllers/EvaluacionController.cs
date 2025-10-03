@@ -426,32 +426,33 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 //Agrupamos las que no son trasnversales
                 var CompetenciasAgrupadas = Competencias
-                        .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia, x.idTipoCompetencia, x.Tipo })
-                        .Select(g => new Entidades.CompetenciasModel
-                        {
-                            IdCompetencia = g.Key.idCompetencia,
-                            Competencia = g.Key.Competencia,
-                            Descripcion = g.Key.DescriCompetencia,
-                            IdTipoCompetencia = g.Key.idTipoCompetencia,
-                            TipoCompetencia = new Entidades.TiposCompetenciasModel { IdTipoCompetencia = g.Key.idTipoCompetencia, Tipo = g.Key.Tipo },
-                            Comportamientos = g
-                                .GroupBy(k => new { k.idComport, k.Comportamiento })
-                                .Select(cg => new Entidades.ComportamientoModel
-                                {
-                                    idComport = cg.Key.idComport,
-                                    Nombre = cg.Key.Comportamiento,
-                                    Niveles = cg
-                                        .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel })
-                                        .Select(ng => new Entidades.NivelComportamientoModel
-                                        {
-                                            idNivel = ng.Key.idNivel,
-                                            nombre = ng.Key.Nivel,
-                                            descripcion = ng.Key.Descripcion,
-                                            valor = ng.Key.valorNivel,
-                                            idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
-                                        }).ToList()
-                                }).ToList()
-                        }).ToList();
+                 .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia, x.idTipoCompetencia, x.Tipo })
+                 .Select(g => new Entidades.CompetenciasModel
+                 {
+                     IdCompetencia = g.Key.idCompetencia,
+                     Competencia = g.Key.Competencia,
+                     Descripcion = g.Key.DescriCompetencia,
+                     IdTipoCompetencia = g.Key.idTipoCompetencia,
+                     TipoCompetencia = new Entidades.TiposCompetenciasModel { IdTipoCompetencia = g.Key.idTipoCompetencia, Tipo = g.Key.Tipo },
+                     Comportamientos = g
+                         .GroupBy(k => new { k.idComport, k.Comportamiento })
+                         .Select(cg => new Entidades.ComportamientoModel
+                         {
+                             idComport = cg.Key.idComport,
+                             Nombre = cg.Key.Comportamiento,
+                             Niveles = cg
+                                 .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel })
+                                 .Select(ng => new Entidades.NivelComportamientoModel
+                                 {
+                                     idNivel = ng.Key.idNivel,
+                                     nombre = ng.Key.Nivel,
+                                     descripcion = ng.Key.Descripcion,
+                                     valor = ng.Key.valorNivel,
+                                     idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
+                                 }).ToList()
+                         }).ToList()
+                 }).ToList();
+
 
                 //*********************************************************************
                 // Aqui vamos al calcular el maximo de puntos para las competencias (valor de nivel maximo * cant de comprtamientos)
@@ -570,7 +571,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                         }
                     }
                 }
-
+                //Actualizamos el nivel asignado de las competencias
                 foreach (var competencia in competencias)
                 {
                     var idCompetencia = Convert.ToInt32(competencia["idCompetencia"]);
@@ -593,7 +594,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                 ValorObtenido = valor
                             };
                                 _servicioMantenimientos.EvaluacionXcompetencia.ActualizarEvaluacionXCompetencia(registro);
-
                         }
                     }
                 }

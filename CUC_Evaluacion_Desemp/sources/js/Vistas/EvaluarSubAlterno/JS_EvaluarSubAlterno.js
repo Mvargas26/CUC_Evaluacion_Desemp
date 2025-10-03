@@ -154,7 +154,7 @@ function enviarEvaluacion() {
     // Recolectar datos de las tablas que pintamos
     const objetivos = obtenerDatosTablaObjetivos('#tbObjetivosAsignados tbody tr');
     const competenciasTransversalesPlanas = obtenerDatosTablaTransversales('#tbTransversalesEval tr');
-    const competenciasPlanas = obtenerDatosTablaCompetencia('#tbTransversalesEval tr');
+    const competenciasPlanas = obtenerDatosTablaCompetencia('#tbCompetenciasEval tbody tr');
     const competenciasTransversales = agruparCompetencias(competenciasTransversalesPlanas);
     const competencias = agruparCompetencias(competenciasPlanas);
 
