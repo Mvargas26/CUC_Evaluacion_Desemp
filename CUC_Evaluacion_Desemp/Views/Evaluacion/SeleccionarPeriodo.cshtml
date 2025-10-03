@@ -24,8 +24,8 @@
         <label for="idPeriodo">Seleccione un período:</label>
         <br />
         <br />
-        <select class="form-control" id="idPeriodo" name="idPeriodo" required>
-            <option value="">-- Seleccione --</option>
+        <select class="form-control form-select" id="idPeriodo" name="idPeriodo" required>
+            <option value="" selected disabled>Seleccione...</option>
             @foreach (var periodo in Model)
             {
                 <option value="@periodo.idPeriodo">@periodo.Nombre (@periodo.FechaInicio.ToString("dd/MM/yyyy") - @periodo.FechaFin.ToString("dd/MM/yyyy"))</option>

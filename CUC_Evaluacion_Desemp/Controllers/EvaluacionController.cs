@@ -90,6 +90,12 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 string cedulaSeleccionada = coleccion["cedulaSeleccionada"];
                 string idConglomerado = coleccion["idConglomerado"];
 
+                if (string.IsNullOrEmpty(idConglomerado))
+                {
+                    TempData["MensajeError"] = "Debe seleccionar un Conglomerado.";
+                    return RedirectToAction("ConglomeradosPorFunc", new { cedulaSeleccionada = cedulaSeleccionada });
+                }
+
                 ViewBag.cedulaSeleccionada = cedulaSeleccionada;
                 ViewBag.idConglomerado = idConglomerado;
 
@@ -339,6 +345,12 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 ViewBag.cedulaSeleccionada = cedulaSeleccionada;
                 ViewBag.idConglomerado = idConglomerado;
+
+                if (string.IsNullOrEmpty(idConglomerado))
+                {
+                    TempData["MensajeError"] = "Debe seleccionar un Conglomerado.";
+                    return RedirectToAction("ConglomeradosPorFuncAParaEvaluar", new { cedulaSeleccionada = cedulaSeleccionada });
+                }
 
                 var periodos = _servicioMantenimientos.Periodos.ListarPeriodosAnioActual();
                 return View(periodos);

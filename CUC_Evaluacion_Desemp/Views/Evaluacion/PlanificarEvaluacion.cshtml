@@ -123,202 +123,203 @@
             </div>
         </div>
         <br />
+        <div class="row g-3 mb-2">
+            <div class="col-12">
+                <label for="inputMetaObj" class="form-label">Meta del Objetivo:</label>
+                <textarea id="inputMetaObj" class="form-control" rows="3" required></textarea>
+            </div>
+        </div>
+
         <div class="row g-3 align-items-center">
-            <div class="col-auto">
-                <label for="inputMetaObj" class="col-form-label">Meta del Objetivo:</label>
-            </div>
-            <div class="col-auto">
-                <input type="text" id="inputMetaObj" class="form-control" required />
-            </div>
             <div class="col-auto">
                 <label for="inputPesoObj" class="col-form-label">Peso de la meta:</label>
             </div>
             <div class="col-auto">
-                <input type="number" id="inputPesoObj" class="form-control" min="1" step="1" required />
+                <input type="number" id="inputPesoObj" class="form-control" min="0" step="1" required />
             </div>
             <div class="col-auto">
                 <button type="button" class="btn btn-success" onclick="agregarFilaObjetivos()">Agregar fila</button>
             </div>
         </div>
-    </div>
 
-    <!-- Tabla específica para Objetivos -->
-    <div class="mb-5">
-        <table id="tablaObjetivos" class="table table-bordered mt-3">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Objetivo</th>
-                    <th>Tipo</th>
-                    <th>Peso</th>
-                    <th>Meta</th>
-                    <th>Actual</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Inicia vacía -->
-            </tbody>
-        </table>
-    </div>
-    <hr />
 
-    <!-- SECCIÓN----------------- Tabla específica para Competencias Transversales -->
-    <div class="mb-5">
-        <h3>Competencias Transversales:</h3>
-        <br />
-    </div>
-
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead class="thead-light">
-                <tr>
-                    <th colspan="5" class="text-center">Competencias Transversales</th>
-                </tr>
-            </thead>
-            <tbody id="tbCompetenciasTransversales">
-                <!-- Aquí llenamos todo dinámicamente -->
-            </tbody>
-        </table>
-    </div>
-
-    <!-- SECCIÓN para elegir Competencias y agregarlos a la tabla -->
-    <div class="mb-5">
-        <h3>Elegir Competencias relacionadas a este conglomerado:</h3>
-        <div class="row g-3 align-items-center">
-            <div class="col-auto">
-                <label for="CompetenciaElejida" class="col-form-label">Elija una competencia:</label>
-            </div>
-            <div class="col-auto">
-                <!-- Combobox con datos dinámicos para elejir competencia -->
-                <select id="CompetenciaElejida" class="form-select">
-                    <option value="" selected disabled>Seleccione...</option>
-                    @foreach (var competencia in (ViewBag.CompetenciasDelConglomerado as List<Entidades.ObtenerComportamientosYDescripcionesModel>)
-                                                      .Select(c => c.Competencia)
-                                                      .Distinct()) //aqui devolvemos una ves cada competencia
-                    {
-                        <option value="@competencia">
-                            @competencia
-                        </option>
-                    }
-                </select>
-            </div>
-        </div>
-        <br />
-        <div class="row g-3 align-items-center">
-            <div class="col-auto">
-                <button type="button" class="btn btn-success" onclick="agregarCompetenciaSelect(); actualizarResultadosGlobales();">Agregar Competencia</button>
-            </div>
-        </div>
-        <!-- Tabla con los datos de la competencia elejidos -->
-        <div class="table-responsive mt-3">
-            <table id="tbCompetenciasSelect" class="table table-bordered table-hover">
-                <thead class="thead-light">
+        <!-- Tabla específica para Objetivos -->
+        <div class="mb-5">
+            <table id="tablaObjetivos" class="table table-bordered mt-3">
+                <thead>
                     <tr>
-                        <th colspan="5" class="text-center">Competencias Seleccionadas</th>
+                        <th>ID</th>
+                        <th>Objetivo</th>
+                        <th>Tipo</th>
+                        <th>Peso</th>
+                        <th>Meta</th>
+                        <th>Actual</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Aquí JS insertará dinámicamente las filas -->
+                    <!-- Inicia vacía -->
                 </tbody>
             </table>
         </div>
         <hr />
-        @*      input Observaciones *@
-        <div class="mb-5">
-            <h3>Observaciones:</h3>
-            <div class="col-auto">
-                <input type="text" id="txtObservaciones" class="form-control"
-                       placeholder="Ingrese sus observaciones aqui."
-                       value="Sin Observaciones." />
-            </div>
-        </div>
-        <hr />
 
-        <!-- Resumen Final centrado y alineado -->
-        <div class="d-flex justify-content-center">
-            <div class="p-4" style="background-color: #f8d7da; max-width: 600px;">
-                <h5 class="text-center">Resumen para: @Model.Nombre @Model.Apellido1</h5>
-                <table id="tablaResultados" class="table table-borderless align-middle">
-                    <thead>
+        <!-- SECCIÓN----------------- Tabla específica para Competencias Transversales -->
+        <div class="mb-5">
+            <h3>Competencias Transversales:</h3>
+            <br />
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th colspan="5" class="text-center">Competencias Transversales</th>
+                    </tr>
+                </thead>
+                <tbody id="tbCompetenciasTransversales">
+                    <!-- Aquí llenamos todo dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SECCIÓN para elegir Competencias y agregarlos a la tabla -->
+        <div class="mb-5">
+            <h3>Elegir Competencias relacionadas a este conglomerado:</h3>
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <label for="CompetenciaElejida" class="col-form-label">Elija una competencia:</label>
+                </div>
+                <div class="col-auto">
+                    <!-- Combobox con datos dinámicos para elejir competencia -->
+                    <select id="CompetenciaElejida" class="form-select">
+                        <option value="" selected disabled>Seleccione...</option>
+                        @foreach (var competencia in (ViewBag.CompetenciasDelConglomerado as List<Entidades.ObtenerComportamientosYDescripcionesModel>)
+                                                          .Select(c => c.Competencia)
+                                                          .Distinct()) //aqui devolvemos una ves cada competencia
+                        {
+                            <option value="@competencia">
+                                @competencia
+                            </option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <br />
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-success" onclick="agregarCompetenciaSelect(); actualizarResultadosGlobales();">Agregar Competencia</button>
+                </div>
+            </div>
+            <!-- Tabla con los datos de la competencia elejidos -->
+            <div class="table-responsive mt-3">
+                <table id="tbCompetenciasSelect" class="table table-bordered table-hover">
+                    <thead class="thead-light">
                         <tr>
-                            <th>Tipo</th>
-                            <th>Porcentaje</th>
-                            <th style="width: 100px;">Valor</th>
-                            <th class="d-none">id tipo</th>
+                            <th colspan="5" class="text-center">Competencias Seleccionadas</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in ViewBag.PesosConglomerados)
-                        {
-                            var nombreTipo = listaTiposObjetivos?.FirstOrDefault(t => t.IdTipoObjetivo == item?.IdTipoObjetivo)?.Tipo;
-                            var nombreTipoCompet = listaTiposCompetencias?.FirstOrDefault(t => t.IdTipoCompetencia == item?.IdTipoCompetencia)?.Tipo;
-                            var nombreFinal = nombreTipo ?? nombreTipoCompet ?? "Desconocido";
-
-                            var idTipoObjetivo = item?.IdTipoObjetivo ?? 0;
-                            var idTipoCompetencia = item?.IdTipoCompetencia ?? 0;
-                            var idTipo = idTipoObjetivo != 0 ? idTipoObjetivo : idTipoCompetencia;
-                            var tipo = idTipoObjetivo != 0 ? "Objetivo" : "Competencia";
-
-                            <tr>
-                                <td><strong>@nombreFinal</strong></td>
-                                <td><strong>@(item?.Porcentaje.ToString("0") ?? "0")%</strong></td>
-                                <td style="width: 100px;">
-                                    <input type="number" class="form-control input-calificacion"
-                                           placeholder="@(item?.Porcentaje.ToString("0") ?? "0")%" readonly />
-                                </td>
-                                <td class="d-none" data-tipo-id="@idTipo" data-tipo-categoria="@tipo">
-                                    @idTipo
-                                </td>
-                            </tr>
-                        }
-
-                        <tr>
-                            <td><strong>Resultado:</strong></td>
-                            <td><strong> 100%</strong></td>
-                            <td style="width: 100px;">
-                                <input type="number" class="form-control" id="resultado-total" readonly />
-                            </td>
-                        </tr>
+                        <!-- Aquí JS insertará dinámicamente las filas -->
                     </tbody>
                 </table>
-                <div class="text-center">
-                    <button id="btnEnviarEvaluacion" class="btn btn-success mt-3">Planificar Evaluación</button>
+            </div>
+            <hr />
+            @*      input Observaciones *@
+            <div class="mb-5">
+                <h3>Observaciones:</h3>
+                <div class="col-auto">
+                    <input type="text" id="txtObservaciones" class="form-control"
+                           placeholder="Ingrese sus observaciones aqui."
+                           value="Sin Observaciones." />
+                </div>
+            </div>
+            <hr />
+
+            <!-- Resumen Final centrado y alineado -->
+            <div class="d-flex justify-content-center">
+                <div class="p-4" style="background-color: #f8d7da; max-width: 600px;">
+                    <h5 class="text-center">Resumen para: @Model.Nombre @Model.Apellido1</h5>
+                    <table id="tablaResultados" class="table table-borderless align-middle">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Porcentaje</th>
+                                <th style="width: 100px;">Valor</th>
+                                <th class="d-none">id tipo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in ViewBag.PesosConglomerados)
+                            {
+                                var nombreTipo = listaTiposObjetivos?.FirstOrDefault(t => t.IdTipoObjetivo == item?.IdTipoObjetivo)?.Tipo;
+                                var nombreTipoCompet = listaTiposCompetencias?.FirstOrDefault(t => t.IdTipoCompetencia == item?.IdTipoCompetencia)?.Tipo;
+                                var nombreFinal = nombreTipo ?? nombreTipoCompet ?? "Desconocido";
+
+                                var idTipoObjetivo = item?.IdTipoObjetivo ?? 0;
+                                var idTipoCompetencia = item?.IdTipoCompetencia ?? 0;
+                                var idTipo = idTipoObjetivo != 0 ? idTipoObjetivo : idTipoCompetencia;
+                                var tipo = idTipoObjetivo != 0 ? "Objetivo" : "Competencia";
+
+                                <tr>
+                                    <td><strong>@nombreFinal</strong></td>
+                                    <td><strong>@(item?.Porcentaje.ToString("0") ?? "0")%</strong></td>
+                                    <td style="width: 100px;">
+                                        <input type="number" class="form-control input-calificacion"
+                                               placeholder="@(item?.Porcentaje.ToString("0") ?? "0")%" readonly />
+                                    </td>
+                                    <td class="d-none" data-tipo-id="@idTipo" data-tipo-categoria="@tipo">
+                                        @idTipo
+                                    </td>
+                                </tr>
+                            }
+
+                            <tr>
+                                <td><strong>Resultado:</strong></td>
+                                <td><strong> 100%</strong></td>
+                                <td style="width: 100px;">
+                                    <input type="number" class="form-control" id="resultado-total" readonly />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center">
+                        <button id="btnEnviarEvaluacion" class="btn btn-success mt-3">Planificar Evaluación</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modal de confirmación -->
-    <div class="modal fade" id="confirmacionModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title">Confirmación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <p id="mensajeConfirmacion">¿Está seguro de realizar esta acción?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                    <button type="button" class="btn btn-danger" id="btnEliminar">Sí</button>
+        <!-- Modal de confirmación -->
+        <div class="modal fade" id="confirmacionModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title">Confirmación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="mensajeConfirmacion">¿Está seguro de realizar esta acción?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                        <button type="button" class="btn btn-danger" id="btnEliminar">Sí</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    @section Scripts {
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="~/sources/js/vistas/PlanificarEvaluacion/JS_Planificar.js"></script>
-        @using Newtonsoft.Json
+        @section Scripts {
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="~/sources/js/vistas/PlanificarEvaluacion/JS_Planificar.js"></script>
+            @using Newtonsoft.Json
 
-        <script>
+            <script>
             const transversalesData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.transversales));
             const competenciasData = @Html.Raw(JsonConvert.SerializeObject(ViewBag.CompetenciasDelConglomerado));
 
             document.addEventListener("DOMContentLoaded", () => {
                 renderizarTablaTransversales(transversalesData);
             });
-        </script>
-    }
+            </script>
+        }
