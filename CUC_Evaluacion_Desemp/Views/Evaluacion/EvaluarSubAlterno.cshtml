@@ -179,7 +179,7 @@
                         <th>Comportamientos</th>
                         @foreach (var n in niveles)
                         {
-                            <th data-nivel-id="@n.idNivel">@n.nombre</th>
+                            <th data-nivel-id="@n.idNivel">@n.nombre = @n.valor</th>
                         }
                         <th>Asignar nivel</th>
                     </tr>
@@ -312,10 +312,11 @@
     <hr />
     <div class="mb-5">
         <h3>Observaciones:</h3>
-        <div class="col-auto">
-            <input type="text" id="txtObservaciones" class="form-control"
-                   placeholder="Ingrese sus observaciones aqui."
-                   value="@ultimaEvaluacionFuncionario.Observaciones" />
+        <div class="col-12">
+            <textarea id="txtObservaciones"
+                      class="form-control"
+                      placeholder="Ingrese sus observaciones aquí."
+                      rows="4">@ultimaEvaluacionFuncionario.Observaciones</textarea>
         </div>
     </div>
     <hr />

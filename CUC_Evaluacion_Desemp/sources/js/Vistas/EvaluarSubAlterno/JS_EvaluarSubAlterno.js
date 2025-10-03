@@ -317,7 +317,7 @@ async function enviarPeticionEvaluacion(evaluacionData) {
             throw new Error(`Error HTTP: ${response.status}`);
         }
 
-        alert('Evaluación enviada correctamente');
+        alert('Seguimiento creado correctamente');
         window.location.href = `${urlBase}Home/Index`;
     } catch (error) {
         alert(`Error: ${error.message}`);
