@@ -9,6 +9,7 @@ namespace Entidades
     public class ObtenerComportamientosYDescripcionesModel
     {
         public int idCompetencia { get; set; }
+        public int idEvaxComp { get; set; }
         public string Competencia { get; set; }
         public string DescriCompetencia { get; set; }
         public int idTipoCompetencia { get; set; }

@@ -44,6 +44,7 @@ namespace Negocios
                 lista.Add(new ObtenerComportamientosYDescripcionesModel
                 {
                     idCompetencia = Convert.ToInt32(row["idCompetencia"]),
+                    idEvaxComp = row.Table.Columns.Contains("idEvaxComp") && int.TryParse(row["idEvaxComp"]?.ToString(), out var v) ? v : 0,
                     Competencia = row["Competencia"].ToString(),
                     DescriCompetencia = row["DescriCompetencia"].ToString(),
                     idTipoCompetencia = Convert.ToInt32(row["idTipoCompetencia"]),
@@ -93,7 +94,6 @@ namespace Negocios
                     Comportamiento = row["Comportamiento"].ToString(),
                     idNivel = Convert.ToInt32(row["idNivel"]),
                     Nivel = row["Nivel"].ToString(),
-                    valorNivel = Convert.ToInt32(row["valorNivel"]),
                     Descripcion = row["DescripcionNivel"].ToString()
                 });
             }

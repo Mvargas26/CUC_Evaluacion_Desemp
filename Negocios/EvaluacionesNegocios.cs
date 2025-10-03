@@ -83,7 +83,7 @@ namespace Negocios
             new SqlParameter("@estadoEvaluacion", evaluacion.EstadoEvaluacion)
             };
 
-            _accesoBD.EjecutarSPconDT("[adm].[sp_Evaluacion_CRUD]", parametros);
+            _accesoBD.EjecutarSPconDT("sp_Evaluacion_CRUD", parametros);
         }
 
         public void EliminarEvaluacion(int idEvaluacion)
@@ -142,6 +142,7 @@ namespace Negocios
             {
                 IdEvaluacion = Convert.ToInt32(row["idEvaluacion"]),
                 IdFuncionario = row["idFuncionario"].ToString(),
+                IdConglomerado = Convert.ToInt32(row["idConglomerado"]),
                 Observaciones = row["Observaciones"]?.ToString(),
                 FechaCreacion = Convert.ToDateTime(row["fechaCreacion"]),
                 EstadoEvaluacion = Convert.ToInt32(row["estadoEvaluacion"]),

@@ -12,9 +12,20 @@
 
 
 @******************************
-MENSAJE EN CASO DE ALERTA*@
+    MENSAJE EN CASO DE ALERTA*@
 
-    @if (TempData["Mensaje"] != null)
-    {
-        <div class="alert alert-success">@TempData["Mensaje"]</div>
-    }
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+    @TempData["Mensaje"]
+
+}
+
+@if (TempData["MensajeError"] != null)
+{
+    <div class="alert alert-danger mt-3" role="alert" style="text-align: center; width: 300px;">
+        @TempData["MensajeError"]
+    </div>
+}
+
+<script type="text/javascript" async src="https://tenor.com/embed.js"></script>

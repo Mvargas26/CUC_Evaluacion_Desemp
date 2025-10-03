@@ -17,6 +17,7 @@
 }
 
 @{
+    var ultimaEvaluacionFuncionario = (Entidades.EvaluacionModel)ViewBag.ultimaEvaluacionFuncionario;
     var listaTiposObjetivos = ViewData["ListaTiposObjetivos"] as List<Entidades.TiposObjetivosModel>;
     var listaTiposCompetencias = ViewData["ListaTiposCompetencias"] as List<Entidades.TiposCompetenciasModel>;
     var tiposdeObjetivos = ViewData["tiposdeObjetivos"] as List<Entidades.TiposObjetivosModel>;
@@ -136,7 +137,8 @@
                                     data-nombre="@objetivo.NombreObjetivo"
                                     data-peso="@objetivo.Peso"
                                     data-actual="@objetivo.ValorObtenido"
-                                    data-meta="@objetivo.Meta">
+                                    data-meta="@objetivo.Meta"
+                                    data-IdEvaxObj="@objetivo.IdEvaxObj">
                                 Editar Actual
                             </button>
                         </td>
@@ -204,9 +206,16 @@
                                     <option value="" selected disabled>Seleccione...</option>
                                     @foreach (var n in niveles)
                                     {
+                                        var nivelMatch = compo.Niveles.FirstOrDefault(x => x.idNivel == n.idNivel);
                                         var isSelected = (n.idNivel == selectedNivelId) ? "selected" : "";
-                                        <option value="@n.valor" data-idnivel="@n.idNivel" @Html.Raw(isSelected)>@n.nombre</option>
-                                    }
+                                        var evax = nivelMatch?.idEvaxComp ?? 0;
+                                        <option value="@n.valor"
+                                                data-idnivel="@n.idNivel"
+                                                data-evaxcomp="@evax"
+                                                @Html.Raw(isSelected)>
+                                            @n.nombre
+                                            </option>
+                                        }
                                 </select>
                             </td>
                         </tr>
@@ -277,9 +286,15 @@
                                     {
                                         var nivelMatch = compo.Niveles.FirstOrDefault(x => x.idNivel == n.idNivel);
                                         var val = nivelMatch?.valor ?? 0;
+                                        var evax = nivelMatch?.idEvaxComp ?? 0;
                                         var isSelected = (n.idNivel == selectedNivelId) ? "selected" : "";
-                                        <option value="@val" data-idnivel="@n.idNivel" @Html.Raw(isSelected)>@n.nombre</option>
-                                    }
+                                        <option value="@val"
+                                                data-idnivel="@n.idNivel"
+                                                data-evaxcomp="@evax"
+                                                @Html.Raw(isSelected)>
+                                            @n.nombre
+                                            </option>
+                                        }
                                 </select>
                             </td>
                         </tr>
@@ -292,6 +307,17 @@
             </tbody>
         </table>
     </div>
+    <!-- ***********************************************************SECCIÓN OBSERVACIONES -->
+    <hr />
+    <div class="mb-5">
+        <h3>Observaciones:</h3>
+        <div class="col-auto">
+            <input type="text" id="txtObservaciones" class="form-control"
+                   placeholder="Ingrese sus observaciones aqui."
+                   value="@ultimaEvaluacionFuncionario.Observaciones" />
+        </div>
+    </div>
+    <hr />
     <!-- ********************************************************* Resumen Final -->
     <div class="d-flex justify-content-center">
         <div class="p-4" style="background-color: #f8d7da; max-width: 600px;">
@@ -341,10 +367,10 @@
             </table>
         </div>
     </div>
-    <!-- ******************************************************* btn Guardar Avance -->
+    <!-- ******************************************************* btn Guardar Seguimiento -->
     <div class="d-flex justify-content-center">
         <div class="text-center">
-            <button id="btnGuardarAvance" class="btn btn-success mt-3">Guardar Avance <i class="fa-solid fa-floppy-disk"></i></button>
+            <button id="btnGuardarSeguimiento" class="btn btn-success mt-3">Guardar Seguimiento <i class="fa-solid fa-floppy-disk"></i></button>
         </div>
     </div>
 

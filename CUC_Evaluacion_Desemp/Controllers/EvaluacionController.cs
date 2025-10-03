@@ -21,7 +21,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
         }
 
         #region Planificacion
-
         public ActionResult SeleccionarSubalterno() 
         {
             try
@@ -218,7 +217,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                 IdCompetencia = idCompetencia,
                                 IdComportamiento = idComportamiento,
                                 IdNivel = idNivel,
-                                ValorObtenido = 0 // si después necesitas ponerle nota real, aquí la cargas
+                                ValorObtenido = 0 
                             };
 
                             _servicioMantenimientos.EvaluacionXcompetencia.CrearEvaluacionXCompetencia(evaluacionXCompetencia);
@@ -266,6 +265,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
         }
         #endregion
+
 
         #region EvaluarFuncionario
         public ActionResult SeleccionarSubalternoParaEvaluar()
@@ -418,7 +418,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                         idNivel = ng.Key.idNivel,
                                         nombre = ng.Key.Nivel,
                                         descripcion = ng.Key.Descripcion,
-                                        valor = ng.Key.valorNivel
+                                        valor = ng.Key.valorNivel,
+                                        idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
                                     }).ToList()
                             }).ToList()
                     }).ToList();
@@ -446,7 +447,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                             idNivel = ng.Key.idNivel,
                                             nombre = ng.Key.Nivel,
                                             descripcion = ng.Key.Descripcion,
-                                            valor = ng.Key.valorNivel
+                                            valor = ng.Key.valorNivel,
+                                            idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
                                         }).ToList()
                                 }).ToList()
                         }).ToList();
@@ -483,6 +485,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 ViewBag.PesosConglomerados = PesosConglomerados;
                 ViewBag.IdConglomerado = idConglomerado;
                 ViewBag.MaximoPuntosCompetencias = MaximoPuntosCompetencias;
+                ViewBag.ultimaEvaluacionFuncionario = ultimaEvaluacionFuncionario;
 
                 return View(subalterno);
 
@@ -493,8 +496,122 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return View("Error");
             }
         }
+        [HttpPost]
+        public ActionResult GuardarSeguimiento(string evaluacionData)
+        {
+            try
+            {
+                //Convertimos de string a Json lo que viene de la vista para tratarla
+                var dataEnJSon = JsonConvert.DeserializeObject<JObject>(evaluacionData);
+
+                var cedFuncionario = dataEnJSon["cedFuncionario"]?.ToString();
+                var idConglo = dataEnJSon["idConglo"]?.ToString();
+                var observaciones = dataEnJSon["observaciones"]?.ToString();
+
+                var objetivos = dataEnJSon["objetivos"];
+                var competenciasTransversales = dataEnJSon["competenciasTransversales"];
+                var competencias = dataEnJSon["competencias"];
+
+                //consultamos la ultima evaluacion 
+                var ultimaEvaluacionFuncionario = _servicioMantenimientos.Evaluaciones.ConsultarEvaluacionComoFuncionario(cedFuncionario, Convert.ToInt32(idConglo));
+
+                //actualizamos su estado y lo guardamos
+                ultimaEvaluacionFuncionario.EstadoEvaluacion = 2; //"Estado 2 = Por aprobar"
+                ultimaEvaluacionFuncionario.Observaciones = observaciones;
+                _servicioMantenimientos.Evaluaciones.ModificarEvaluacion(ultimaEvaluacionFuncionario);
+
+                if (ultimaEvaluacionFuncionario == null)
+                {
+                    TempData["AlertMessage"] = "No hay una evaluación para usted en este conglomerado.Por favor contacte a su Jefatura para planificarla.";
+                    return RedirectToAction("Index", "Home");
+                }
+
+
+                // Actualizamos el actual de los obj
+                foreach (var objetivo in objetivos)
+                {
+                    var evaluacionXObjetivo = new EvaluacionXObjetivoModel
+                    {
+                        IdEvaxObj = Convert.ToInt32(objetivo["idEvaxObj"]),
+                        IdEvaluacion = ultimaEvaluacionFuncionario.IdEvaluacion,
+                        IdObjetivo = Convert.ToInt32(objetivo["id"]),
+                        ValorObtenido = Convert.ToDecimal(objetivo["actual"]),
+                        Peso = Convert.ToDecimal(objetivo["peso"]),
+                        Meta = objetivo["meta"].ToString()
+                    };
+
+                    _servicioMantenimientos.EvaluacionXobjetivos.ModificarEvaluacionXObjetivo(evaluacionXObjetivo);
+                }
+
+                //Actualizamos el nivel asignado de las competencias Transversales
+                foreach (var competencia in competenciasTransversales)
+                {
+                    var idCompetencia = Convert.ToInt32(competencia["idCompetencia"]);
+                    foreach (var comportamiento in competencia["comportamientos"])
+                    {
+                        var idComportamiento = Convert.ToInt32(comportamiento["idComportamiento"]);
+                        foreach (var nivel in comportamiento["niveles"])
+                        {
+                            var idNivel = Convert.ToInt32(nivel["idNivel"]);
+                            var valor = nivel["valor"] != null ? Convert.ToDecimal(nivel["valor"]) : 0m;
+                            var idEvaxComp = nivel["idEvaxComp"] != null ? Convert.ToInt32(nivel["idEvaxComp"]) : 0;
+
+                            var registro = new EvaluacionXcompetenciaModel
+                            {
+                                IdEvaxComp = idEvaxComp,
+                                IdEvaluacion = ultimaEvaluacionFuncionario.IdEvaluacion,
+                                IdCompetencia = idCompetencia,
+                                IdComportamiento = idComportamiento,
+                                IdNivel = idNivel,
+                                ValorObtenido = valor
+                            };
+                                _servicioMantenimientos.EvaluacionXcompetencia.ActualizarEvaluacionXCompetencia(registro);
+
+                        }
+                    }
+                }
+
+                foreach (var competencia in competencias)
+                {
+                    var idCompetencia = Convert.ToInt32(competencia["idCompetencia"]);
+                    foreach (var comportamiento in competencia["comportamientos"])
+                    {
+                        var idComportamiento = Convert.ToInt32(comportamiento["idComportamiento"]);
+                        foreach (var nivel in comportamiento["niveles"])
+                        {
+                            var idNivel = Convert.ToInt32(nivel["idNivel"]);
+                            var valor = nivel["valor"] != null ? Convert.ToDecimal(nivel["valor"]) : 0m;
+                            var idEvaxComp = nivel["idEvaxComp"] != null ? Convert.ToInt32(nivel["idEvaxComp"]) : 0;
+
+                            var registro = new EvaluacionXcompetenciaModel
+                            {
+                                IdEvaxComp = idEvaxComp,
+                                IdEvaluacion = ultimaEvaluacionFuncionario.IdEvaluacion,
+                                IdCompetencia = idCompetencia,
+                                IdComportamiento = idComportamiento,
+                                IdNivel = idNivel,
+                                ValorObtenido = valor
+                            };
+                                _servicioMantenimientos.EvaluacionXcompetencia.ActualizarEvaluacionXCompetencia(registro);
+
+                        }
+                    }
+                }
+
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception)
+            {
+
+                return RedirectToAction("Index", "Home");
+            }
+
+        }//fin GuardarSeguimiento
+
 
         #endregion
+
+
 
         #region AprobarComoJefe
 

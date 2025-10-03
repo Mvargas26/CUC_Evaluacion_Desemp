@@ -59,13 +59,13 @@ namespace Negocios
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Operacion", "U"),
-            new SqlParameter("@idEvaxComp", actualizada.IdEvaxComp),
-            new SqlParameter("@idEvaluacion", actualizada.IdEvaluacion),
-            new SqlParameter("@idCompetencia", actualizada.IdCompetencia),
-            new SqlParameter("@valorObtenido", actualizada.ValorObtenido),
-            new SqlParameter("@peso", actualizada.Peso),
-            new SqlParameter("@meta", actualizada.Meta ?? string.Empty)
+                new SqlParameter("@Operacion", "U"),
+                new SqlParameter("@idEvaxComp", actualizada.IdEvaxComp),
+                new SqlParameter("@idCompetencia", actualizada.IdCompetencia),
+                new SqlParameter("@valorObtenido", actualizada.ValorObtenido),
+                new SqlParameter("@idComportamiento", actualizada.IdComportamiento),
+                new SqlParameter("@idNivel", actualizada.IdNivel),
+                new SqlParameter("@idEvaluacion", actualizada.IdEvaluacion)
             };
 
             _accesoBD.EjecutarSPconDT("sp_EvaluacionPorCompetencia_CRUD", parametros);
