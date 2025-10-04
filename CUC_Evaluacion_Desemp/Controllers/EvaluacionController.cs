@@ -136,6 +136,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 ViewData["ListaConglomerados"] = _servicioMantenimientos.Conglomerados.ListarConglomerados();
                 //obtenemos los objetivos y competencias relacionadas a este congloemrado
                 var (listaObjetivos, listaCompetencias) = _servicioMantenimientos.Evaluaciones.ListarObjYCompetenciasXConglomerado(idConglomerado);
+                //Obtenemos la fase de planificacion para pintarla de titulo
+                EstadoEvaluacionModel faseActual = _servicioMantenimientos.EstadoEvaluacion.ConsultarEstadoPorID(1);
 
                 //Obtenemos las competencias, comportamientos y descrp Transversales id 2500
                 var transversales = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegocios(2500, "PorTipo");
@@ -150,6 +152,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 ViewBag.transversales = transversales;
                 ViewBag.CompetenciasDelConglomerado = CompetenciasDelConglomerado;
                 ViewBag.tiposdeObjetivos = tiposdeObjetivos;
+                ViewBag.faseActual = faseActual;
+
 
 
                 return View(subalterno);
@@ -157,7 +161,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
             catch (Exception )
             {
-                TempData["MensajeError"] = "Error al obtener las competencias.";
+                TempData["MensajeError"] = "Error al obtener las listas para planificar.";
                 return View("Error");
             }
         }
@@ -383,6 +387,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 ViewData["ListaTiposCompetencias"] = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
                 ViewData["ListaConglomerados"] = _servicioMantenimientos.Conglomerados.ListarConglomerados();
 
+                //Obtenemos la fase de Evaluacion para pintarla de titulo
+                EstadoEvaluacionModel faseActual = _servicioMantenimientos.EstadoEvaluacion.ConsultarEstadoPorID(2);
+
+
                 var ultimaEvaluacionFuncionario = _servicioMantenimientos.Evaluaciones.ConsultarEvaluacionComoFuncionario(cedulaSeleccionada, idConglomerado);
 
                 //Validamos que tenga una Evaluacion
@@ -499,6 +507,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 ViewBag.IdConglomerado = idConglomerado;
                 ViewBag.MaximoPuntosCompetencias = MaximoPuntosCompetencias;
                 ViewBag.ultimaEvaluacionFuncionario = ultimaEvaluacionFuncionario;
+                ViewBag.faseActual = faseActual;
 
                 return View(subalterno);
 

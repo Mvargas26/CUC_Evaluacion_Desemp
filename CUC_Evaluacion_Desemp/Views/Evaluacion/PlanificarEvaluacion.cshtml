@@ -20,6 +20,8 @@
     var listaTiposObjetivos = ViewData["ListaTiposObjetivos"] as List<Entidades.TiposObjetivosModel>;
     var listaTiposCompetencias = ViewData["ListaTiposCompetencias"] as List<Entidades.TiposCompetenciasModel>;
     var tiposdeObjetivos = ViewData["tiposdeObjetivos"] as List<Entidades.TiposObjetivosModel>;
+
+    var faseActual = ViewBag.faseActual;
 }
 
 <div class="container mt-4 mb-5">
@@ -74,12 +76,9 @@
 
     <!-- Fase de Planificación  -->
     <div class="mb-5">
-        <h5>Fase de Planificación</h5>
+        <h3>Usted se encuentra en la fase de: @faseActual.EstadoEvaluacion</h3>
         <p>
-            La Fase de Planificación es la definición y programación de metas y objetivos por parte de la jefatura y su subalterno.
-            Esta asignación se ejecuta en el mes de Enero de cada año; la jefatura deberá coordinar y acordar con su colaborador,
-            considerando lineamientos, el perfil del cargo y las responsabilidades a su cargo, favoreciendo el logro de los objetivos
-            y metas.
+            @faseActual.Descripcion
         </p>
         <div class="row">
             <div class="col-md-6">

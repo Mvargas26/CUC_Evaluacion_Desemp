@@ -19,70 +19,24 @@ namespace Negocios
             _accesoBD = accesoBD;
         }
 
-        public List<EstadoEvaluacionModel> ListarEstados()
-        {
-            var parametros = new SqlParameter[]
-            {
-            new SqlParameter("@Accion", "SELECT")
-            };
-
-            DataTable dt = _accesoBD.EjecutarSPconDT("sp_CrudEstadoEvaluacion", parametros);
-
-            var lista = new List<EstadoEvaluacionModel>();
-            foreach (DataRow row in dt.Rows)
-            {
-                lista.Add(new EstadoEvaluacionModel
-                {
-                    IdEstado = Convert.ToInt32(row["idEstado"]),
-                    EstadoEvaluacion = row["EstadoEvaluacion"].ToString()
-                });
-            }
-
-            return lista;
-        }
-
-        public void CrearEstado(EstadoEvaluacionModel nuevo)
-        {
-            var parametros = new SqlParameter[]
-            {
-            new SqlParameter("@Accion", "INSERT"),
-            new SqlParameter("@EstadoEvaluacion", nuevo.EstadoEvaluacion)
-            };
-
-            _accesoBD.EjecutarSPconDT("sp_CrudEstadoEvaluacion", parametros);
-        }
-
-        public void ModificarEstado(EstadoEvaluacionModel estado)
-        {
-            var parametros = new SqlParameter[]
-            {
-            new SqlParameter("@Accion", "UPDATE"),
-            new SqlParameter("@IdEstado", estado.IdEstado),
-            new SqlParameter("@EstadoEvaluacion", estado.EstadoEvaluacion)
-            };
-
-            _accesoBD.EjecutarSPconDT("sp_CrudEstadoEvaluacion", parametros);
-        }
-
-        public void EliminarEstado(int idEstado)
-        {
-            var parametros = new SqlParameter[]
-            {
-            new SqlParameter("@Accion", "DELETE"),
-            new SqlParameter("@IdEstado", idEstado)
-            };
-
-            _accesoBD.EjecutarSPconDT("sp_CrudEstadoEvaluacion", parametros);
-        }
-
         public EstadoEvaluacionModel ConsultarEstadoPorID(int idEstado)
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@IdEstado", idEstado)
+                new SqlParameter("@Operacion", "R"),
+                new SqlParameter("@IdEstado", idEstado),
+                new SqlParameter("@EstadoEvaluacion", DBNull.Value),
+                new SqlParameter("@Descripcion", DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
             };
 
-            DataTable dt = _accesoBD.EjecutarSPconDT("sp_ConsultarEstadoEvaluacionPorID", parametros);
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_EstadoEvaluacionCRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
 
             if (dt.Rows.Count == 0)
                 return null;
@@ -91,9 +45,11 @@ namespace Negocios
 
             return new EstadoEvaluacionModel
             {
-                IdEstado = Convert.ToInt32(row["idEstado"]),
-                EstadoEvaluacion = row["EstadoEvaluacion"].ToString()
+                IdEstado = Convert.ToInt32(row["IdEstado"]),
+                EstadoEvaluacion = row["EstadoEvaluacion"].ToString(),
+                Descripcion = row["Descripcion"] == DBNull.Value ? null : row["Descripcion"].ToString()
             };
         }
+
     }//fin class
 }//fin space

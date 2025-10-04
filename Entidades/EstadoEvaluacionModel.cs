@@ -12,6 +12,7 @@ namespace Entidades
     {
          public int IdEstado { get; set; }
         public string EstadoEvaluacion { get; set; }
+        public string Descripcion { get; set; }
 
     }//Fin clase 
 
