@@ -676,3 +676,4 @@ function agruparCompetencias(items) { //agrupa las competencias
     return Array.from(map.values());
 }
 
+//---------------Reporte pdf --------------

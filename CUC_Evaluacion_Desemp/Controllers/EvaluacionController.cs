@@ -1,12 +1,20 @@
 ﻿using Entidades;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using Negocios.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Xml.Linq;
+using Font = iTextSharp.text.Font;
+using Image = iTextSharp.text.Image;
 
 namespace CUC_Evaluacion_Desemp.Controllers
 {
@@ -263,7 +271,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     }
                 }
 
-
+                //Aqui creamos el reporte
+                CrearReportePDFPlanificar(dataEnJSon, evaluacionGuardada);
 
                 return RedirectToAction("Index", "Home");
             }
@@ -273,7 +282,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-        }
+        }// fin GuardarPlanificacion
+
         #endregion
 
 
@@ -639,6 +649,153 @@ namespace CUC_Evaluacion_Desemp.Controllers
         #endregion
 
 
+        #region Metodos Internos
+        private void CrearReportePDFPlanificar(JObject data, EvaluacionModel eva)
+        {
+            var dir = Server.MapPath("~/Reportes/Planificaciones");
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            var ced = data["cedFuncionario"]?.ToString() ?? eva.IdFuncionario ?? "sincedula";
+            var fechaNorm = DateTime.Now.ToString("yyyyMMdd_HHmm");
+            var nombreArchivo = $"planificar_{ced}_{fechaNorm}.pdf";
+            var ruta = Path.Combine(dir, nombreArchivo);
+
+            using (var fs = new FileStream(ruta, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (var doc = new Document(PageSize.LETTER, 36, 36, 36, 36))
+            {
+                var w = PdfWriter.GetInstance(doc, fs);
+                doc.Open();
+
+                var fTitulo = FontFactory.GetFont("Helvetica", 14, Font.BOLD);
+                var fSub = FontFactory.GetFont("Helvetica", 11, Font.BOLD);
+                var fTxt = FontFactory.GetFont("Helvetica", 10, Font.NORMAL);
+
+                var tblEncabezado = new PdfPTable(2) { WidthPercentage = 100 };
+                tblEncabezado.SetWidths(new float[] { 70, 30 });
+                var logoPath = Server.MapPath("~/sources/img/LogoCUCsinFondo.png");
+                Image logo = null;
+                if (System.IO.File.Exists(logoPath))
+                {
+                    logo = Image.GetInstance(logoPath);
+                    logo.ScaleToFit(90f, 90f);
+                }
+
+                var celTexto = new PdfPCell(new Phrase("Colegio Universitario de Cartago", FontFactory.GetFont("Helvetica", 16, Font.BOLD)))
+                {
+                    Border = 0,
+                    VerticalAlignment = Element.ALIGN_MIDDLE,
+                    HorizontalAlignment = Element.ALIGN_LEFT,
+                    PaddingTop = 10f
+                };
+
+                var celLogo = new PdfPCell { Border = 0, HorizontalAlignment = Element.ALIGN_RIGHT, VerticalAlignment = Element.ALIGN_MIDDLE };
+                if (logo != null) celLogo.AddElement(logo);
+
+                tblEncabezado.AddCell(celTexto);
+                tblEncabezado.AddCell(celLogo);
+                doc.Add(tblEncabezado);
+
+                var cb = w.DirectContent;
+                cb.SetColorStroke(new BaseColor(30, 55, 108)); // azul institucional
+                cb.SetLineWidth(2f);
+                cb.MoveTo(doc.LeftMargin, doc.Top - 100);
+                cb.LineTo(doc.PageSize.Width - doc.RightMargin, doc.Top - 100);
+                cb.Stroke();
+
+                doc.Add(new Paragraph("\nPlanificación de Evaluación", fTitulo));
+                doc.Add(new Paragraph("Fecha: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm"), fTxt));
+                doc.Add(Chunk.NEWLINE);
+
+                var tblInfo = new PdfPTable(2) { WidthPercentage = 100 };
+                tblInfo.AddCell(new PdfPCell(new Phrase("Cédula", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                tblInfo.AddCell(new PdfPCell(new Phrase(ced, fTxt)));
+                tblInfo.AddCell(new PdfPCell(new Phrase("Id Evaluación", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                tblInfo.AddCell(new PdfPCell(new Phrase(eva.IdEvaluacion.ToString(), fTxt)));
+                tblInfo.AddCell(new PdfPCell(new Phrase("Conglomerado", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                tblInfo.AddCell(new PdfPCell(new Phrase(eva.IdConglomerado.ToString(), fTxt)));
+                doc.Add(tblInfo);
+                doc.Add(Chunk.NEWLINE);
+
+                var obs = data["observaciones"]?.ToString() ?? "";
+                doc.Add(new Paragraph("Observaciones", fSub));
+                doc.Add(new Paragraph(obs, fTxt));
+                doc.Add(Chunk.NEWLINE);
+
+                var objetivos = data["objetivos"] as JArray;
+                if (objetivos != null && objetivos.Count > 0)
+                {
+                    doc.Add(new Paragraph("Objetivos", fSub));
+                    var t = new PdfPTable(4) { WidthPercentage = 100 };
+                    t.AddCell(new PdfPCell(new Phrase("Id", fSub)));
+                    t.AddCell(new PdfPCell(new Phrase("Meta", fSub)));
+                    t.AddCell(new PdfPCell(new Phrase("Peso", fSub)));
+                    t.AddCell(new PdfPCell(new Phrase("Actual", fSub)));
+                    foreach (var o in objetivos)
+                    {
+                        t.AddCell(new PdfPCell(new Phrase(o["id"]?.ToString() ?? "", fTxt)));
+                        t.AddCell(new PdfPCell(new Phrase(o["meta"]?.ToString() ?? "", fTxt)));
+                        t.AddCell(new PdfPCell(new Phrase(o["peso"]?.ToString() ?? "", fTxt)));
+                        t.AddCell(new PdfPCell(new Phrase(o["actual"]?.ToString() ?? "", fTxt)));
+                    }
+                    doc.Add(t);
+                    doc.Add(Chunk.NEWLINE);
+                }
+
+                Action<JArray, string> tablaComp = (arr, titulo) =>
+                {
+                    if (arr == null || arr.Count == 0) return;
+                    doc.Add(new Paragraph(titulo, fSub));
+                    var t = new PdfPTable(4) { WidthPercentage = 100 };
+                    t.AddCell(new PdfPCell(new Phrase("IdCompetencia", fSub)));
+                    t.AddCell(new PdfPCell(new Phrase("IdTipoCompetencia", fSub)));
+                    t.AddCell(new PdfPCell(new Phrase("IdComportamiento", fSub)));
+                    t.AddCell(new PdfPCell(new Phrase("IdNivel", fSub)));
+                    foreach (var c in arr)
+                    {
+                        var idC = c["idCompetencia"]?.ToObject<int>() ?? 0;
+                        var idTC = c["idTipoCompetencia"]?.ToObject<int>() ?? 0;
+                        var comps = c["comportamientos"] as JArray;
+                        if (comps == null || comps.Count == 0)
+                        {
+                            t.AddCell(new PdfPCell(new Phrase(idC.ToString(), fTxt)));
+                            t.AddCell(new PdfPCell(new Phrase(idTC.ToString(), fTxt)));
+                            t.AddCell(new PdfPCell(new Phrase("", fTxt)));
+                            t.AddCell(new PdfPCell(new Phrase("", fTxt)));
+                            continue;
+                        }
+                        foreach (var comp in comps)
+                        {
+                            var idComp = comp["idComportamiento"]?.ToObject<int>() ?? 0;
+                            var nivs = comp["niveles"] as JArray;
+                            if (nivs == null || nivs.Count == 0)
+                            {
+                                t.AddCell(new PdfPCell(new Phrase(idC.ToString(), fTxt)));
+                                t.AddCell(new PdfPCell(new Phrase(idTC.ToString(), fTxt)));
+                                t.AddCell(new PdfPCell(new Phrase(idComp.ToString(), fTxt)));
+                                t.AddCell(new PdfPCell(new Phrase("", fTxt)));
+                                continue;
+                            }
+                            foreach (var n in nivs)
+                            {
+                                var idN = n["idNivel"]?.ToObject<int>() ?? 0;
+                                t.AddCell(new PdfPCell(new Phrase(idC.ToString(), fTxt)));
+                                t.AddCell(new PdfPCell(new Phrase(idTC.ToString(), fTxt)));
+                                t.AddCell(new PdfPCell(new Phrase(idComp.ToString(), fTxt)));
+                                t.AddCell(new PdfPCell(new Phrase(idN.ToString(), fTxt)));
+                            }
+                        }
+                    }
+                    doc.Add(t);
+                    doc.Add(Chunk.NEWLINE);
+                };
+
+                tablaComp(data["competenciasTransversales"] as JArray, "Competencias Transversales");
+                tablaComp(data["competencias"] as JArray, "Competencias");
+
+                doc.Close();
+            }
+        }
+
+        #endregion
 
 
 
