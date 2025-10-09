@@ -652,6 +652,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
         #region Metodos Internos
         private void CrearReportePDFPlanificar(JObject data, EvaluacionModel eva)
         {
+            //-------------------------------------------Datos necesarios
+            var idConglo = data["idConglo"]?.ToString();
+            ConglomeradoModel Conglo = _servicioMantenimientos.Conglomerados.ConsultarConglomeradoID(Convert.ToInt32(idConglo));
+
             var dir = Server.MapPath("~/Reportes/Planificaciones");
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
             var ced = data["cedFuncionario"]?.ToString() ?? eva.IdFuncionario ?? "sincedula";
@@ -669,6 +673,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var fSub = FontFactory.GetFont("Helvetica", 11, Font.BOLD);
                 var fTxt = FontFactory.GetFont("Helvetica", 10, Font.NORMAL);
 
+                //----------------------------------------------------------------------Seccion titulo y Logo
                 var tblEncabezado = new PdfPTable(2) { WidthPercentage = 100 };
                 tblEncabezado.SetWidths(new float[] { 70, 30 });
                 var logoPath = Server.MapPath("~/sources/img/LogoCUCsinFondo.png");
@@ -679,7 +684,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     logo.ScaleToFit(90f, 90f);
                 }
 
-                var celTexto = new PdfPCell(new Phrase("Colegio Universitario de Cartago", FontFactory.GetFont("Helvetica", 16, Font.BOLD)))
+                var celTexto = new PdfPCell(new Phrase("Colegio Universitario de Cartago", FontFactory.GetFont("Helvetica", 20, Font.BOLD)))
                 {
                     Border = 0,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -701,45 +706,62 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 cb.LineTo(doc.PageSize.Width - doc.RightMargin, doc.Top - 100);
                 cb.Stroke();
 
+                //----------------------------------------------------------------------Seccion Estado y fecha
                 doc.Add(new Paragraph("\nPlanificación de Evaluación", fTitulo));
-                doc.Add(new Paragraph("Fecha: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm"), fTxt));
+                doc.Add(new Paragraph("Fecha de creación: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm"), fTxt));
                 doc.Add(Chunk.NEWLINE);
 
+                //----------------------------------------------------------------------Seccion Informacion Personal
                 var tblInfo = new PdfPTable(2) { WidthPercentage = 100 };
-                tblInfo.AddCell(new PdfPCell(new Phrase("Cédula", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                tblInfo.AddCell(new PdfPCell(new Phrase("Cédula:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
                 tblInfo.AddCell(new PdfPCell(new Phrase(ced, fTxt)));
-                tblInfo.AddCell(new PdfPCell(new Phrase("Id Evaluación", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                tblInfo.AddCell(new PdfPCell(new Phrase("Id Evaluación:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
                 tblInfo.AddCell(new PdfPCell(new Phrase(eva.IdEvaluacion.ToString(), fTxt)));
-                tblInfo.AddCell(new PdfPCell(new Phrase("Conglomerado", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                tblInfo.AddCell(new PdfPCell(new Phrase(eva.IdConglomerado.ToString(), fTxt)));
+                tblInfo.AddCell(new PdfPCell(new Phrase("Conglomerado:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                tblInfo.AddCell(new PdfPCell(new Phrase(Conglo.NombreConglomerado, fTxt)));
                 doc.Add(tblInfo);
                 doc.Add(Chunk.NEWLINE);
 
+                //----------------------------------------------------------------------Seccion Observaciones
                 var obs = data["observaciones"]?.ToString() ?? "";
                 doc.Add(new Paragraph("Observaciones", fSub));
                 doc.Add(new Paragraph(obs, fTxt));
                 doc.Add(Chunk.NEWLINE);
 
+                //------------------------------------------------------------------ Sección Objetivos
                 var objetivos = data["objetivos"] as JArray;
                 if (objetivos != null && objetivos.Count > 0)
                 {
-                    doc.Add(new Paragraph("Objetivos", fSub));
-                    var t = new PdfPTable(4) { WidthPercentage = 100 };
+                    var pTitulo = new Paragraph("Objetivos", fSub);
+                    pTitulo.SpacingAfter = 8f;
+                    doc.Add(pTitulo);
+
+                    var t = new PdfPTable(5) { WidthPercentage = 100 };
+                    t.SpacingBefore = 3f;
+
+                    // aqui se asignan el ancho apra cada columna id,Objetivo,Meta,Peso,Actual
+                    t.SetWidths(new float[] { 10f, 40f, 30f, 10f, 10f });
+
                     t.AddCell(new PdfPCell(new Phrase("Id", fSub)));
+                    t.AddCell(new PdfPCell(new Phrase("Objetivo", fSub)));
                     t.AddCell(new PdfPCell(new Phrase("Meta", fSub)));
                     t.AddCell(new PdfPCell(new Phrase("Peso", fSub)));
                     t.AddCell(new PdfPCell(new Phrase("Actual", fSub)));
+
                     foreach (var o in objetivos)
                     {
                         t.AddCell(new PdfPCell(new Phrase(o["id"]?.ToString() ?? "", fTxt)));
+                        t.AddCell(new PdfPCell(new Phrase(o["nombre"]?.ToString() ?? "", fTxt)));
                         t.AddCell(new PdfPCell(new Phrase(o["meta"]?.ToString() ?? "", fTxt)));
                         t.AddCell(new PdfPCell(new Phrase(o["peso"]?.ToString() ?? "", fTxt)));
                         t.AddCell(new PdfPCell(new Phrase(o["actual"]?.ToString() ?? "", fTxt)));
                     }
+
                     doc.Add(t);
                     doc.Add(Chunk.NEWLINE);
                 }
 
+                //----------------------------------------------------------------------Seccion Competencias
                 Action<JArray, string> tablaComp = (arr, titulo) =>
                 {
                     if (arr == null || arr.Count == 0) return;
