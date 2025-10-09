@@ -638,19 +638,43 @@ async function enviarPeticionEvaluacion(evaluacionData) {
 
         const response = await fetch(`${urlBase}Evaluacion/GuardarPlanificacion`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: formBody
         });
 
-        if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
 
-        alert('Evaluación planificada correctamente');
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error || 'Error al guardar la planificación');
+
+        await Swal.fire({
+            title: 'Evaluación planificada correctamente',
+            text: '¿Desea abrir el reporte PDF?',
+            icon: 'success',
+            showCancelButton: true,
+            confirmButtonText: 'Abrir PDF',
+            cancelButtonText: 'Cerrar',
+            confirmButtonColor: '#1E376C',
+            cancelButtonColor: '#6c757d'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.open(data.pdfUrl, '_blank');
+            }
+        });
+
         window.location.href = `${urlBase}Home/Index`;
-    } catch (error) {
-        alert(`Error: ${error.message}`);
+    } catch (e) {
+        Swal.fire({
+            title: 'Error',
+            text: e.message,
+            icon: 'error',
+            confirmButtonColor: '#1E376C'
+        });
     }
+
 }
 
 function agruparCompetencias(items) { //agrupa las competencias
@@ -676,4 +700,3 @@ function agruparCompetencias(items) { //agrupa las competencias
     return Array.from(map.values());
 }
 
-//---------------Reporte pdf --------------
