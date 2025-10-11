@@ -309,18 +309,41 @@ async function enviarPeticionEvaluacion(evaluacionData) {
 
         const response = await fetch(`${urlBase}Evaluacion/GuardarSeguimiento`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: formBody
         });
 
-        if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
 
-        alert('Seguimiento creado correctamente');
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error || 'Error al guardar el seguimiento');
+
+        await Swal.fire({
+            title: 'Seguimiento guardado correctamente',
+            text: '¿Desea abrir el reporte PDF?',
+            icon: 'success',
+            showCancelButton: true,
+            confirmButtonText: 'Abrir PDF',
+            cancelButtonText: 'Cerrar',
+            confirmButtonColor: '#1E376C',
+            cancelButtonColor: '#6c757d'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.open(data.pdfUrl, '_blank');
+            }
+        });
+
         window.location.href = `${urlBase}Home/Index`;
     } catch (error) {
-        alert(`Error: ${error.message}`);
+        Swal.fire({
+            title: 'Error',
+            text: error.message,
+            icon: 'error',
+            confirmButtonColor: '#1E376C'
+        });
     }
 }
 function agruparCompetencias(items) {
