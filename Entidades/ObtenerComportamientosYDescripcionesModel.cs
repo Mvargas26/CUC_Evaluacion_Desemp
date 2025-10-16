@@ -21,6 +21,8 @@ namespace Entidades
         public int valorNivel { get; set; }
         public string Descripcion { get; set; }
         public decimal? valorObtenido { get; set; }
+        public int idNivelElegido { get; set; }
+
 
     }//fin class
 }

@@ -20,6 +20,7 @@ namespace Entidades
         public string TipoCompetencia { get; set; }
         public int IdComportamiento { get; set; }
         public int IdNivel { get; set; }
+        public int idNivelElegido { get; set; }
 
     }//fn class
 }//fin space

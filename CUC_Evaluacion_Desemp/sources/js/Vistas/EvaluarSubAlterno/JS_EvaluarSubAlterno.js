@@ -154,7 +154,7 @@ function enviarEvaluacion() {
     // Recolectar datos de las tablas que pintamos
     const objetivos = obtenerDatosTablaObjetivos('#tbObjetivosAsignados tbody tr');
     const competenciasTransversalesPlanas = obtenerDatosTablaTransversales('#tbTransversalesEval tr');
-    const competenciasPlanas = obtenerDatosTablaCompetencia('#tbCompetenciasEval tbody tr');
+    const competenciasPlanas = obtenerDatosTablaCompetencias('#tbCompetenciasEval tbody tr');
     const competenciasTransversales = agruparCompetencias(competenciasTransversalesPlanas);
     const competencias = agruparCompetencias(competenciasPlanas);
 
@@ -206,9 +206,9 @@ function enviarEvaluacion() {
 
     };
 
-    console.log('TX', obtenerDatosTablaTransversales('#tbTransversalesEval tr')[0]);
-    console.log('CX', obtenerDatosTablaCompetencia('#tbCompetenciasEval tbody tr')[0]);
-    console.log('G.TX', agruparCompetencias(obtenerDatosTablaTransversales('#tbTransversalesEval tr'))[0]);
+    //console.log('TX', obtenerDatosTablaTransversales('#tbTransversalesEval tr')[0]);
+    //console.log('CX', obtenerDatosTablaCompetencias('#tbCompetenciasEval tbody tr')[0]);
+    //console.log('G.TX', agruparCompetencias(obtenerDatosTablaTransversales('#tbTransversalesEval tr'))[0]);
 
     // Enviar al servidor
     enviarPeticionEvaluacion(evaluacionData);
@@ -238,68 +238,88 @@ function obtenerDatosTablaObjetivos(selector) {
 function obtenerDatosTablaTransversales(selector) {
     const filas = document.querySelectorAll(selector);
     const datos = [];
-    let competenciaActual = null;
-    let tipoCompetenciaActual = null;
+    let idCompetenciaActual = null;
+    let idTipoCompetenciaActual = null;
 
-    Array.from(filas).forEach(fila => {
-        if (fila.hasAttribute('data-id')) {
-            competenciaActual = fila.getAttribute('data-id');
-            tipoCompetenciaActual = fila.getAttribute('data-id-tipo');
+    for (const fila of filas) {
+        if (fila.dataset.id) {
+            idCompetenciaActual = parseInt(fila.dataset.id, 10) || 0;
+            idTipoCompetenciaActual = parseInt(fila.dataset.idTipo, 10) || 0;
+            continue;
         }
-        if (fila.hasAttribute('data-comportamiento-id')) {
-            const idComportamiento = fila.getAttribute('data-comportamiento-id');
+
+        if (!idCompetenciaActual) continue;
+
+        if (fila.dataset.comportamientoId) {
+            const idComportamiento = parseInt(fila.dataset.comportamientoId, 10) || 0;
             const select = fila.querySelector('select.select-nivel-obtenido');
-            if (!select) return;
-            const opt = select.selectedOptions && select.selectedOptions[0];
-            if (!opt) return;
-            const idNivel = opt.getAttribute('data-idnivel');
-            const valor = parseFloat(opt.value) || 0;
-            const idEvaxComp = parseInt(opt.getAttribute('data-evaxcomp')) || 0;
-            if (!idNivel) return;
+            if (!select) continue;
+
+            const opt = select.options[select.selectedIndex];
+            if (!opt || opt.disabled) continue;
+
+            const idNivel = parseInt(opt.dataset.idnivel || opt.value || '0', 10) || 0;
+            const valor = parseFloat(opt.dataset.valor || opt.value || '0') || 0;
+            const idEvaxComp = parseInt(opt.dataset.evaxcomp || '0', 10) || 0;
+            const idNivelElegido = idNivel;
+
+            if (!idNivel) continue;
+
             datos.push({
-                idCompetencia: competenciaActual,
-                idTipoCompetencia: tipoCompetenciaActual,
-                idComportamiento: idComportamiento,
-                idNivel: idNivel,
-                valor: valor,
-                idEvaxComp: idEvaxComp
+                idCompetencia: idCompetenciaActual,
+                idTipoCompetencia: idTipoCompetenciaActual,
+                idComportamiento,
+                idNivel,
+                valor,
+                idEvaxComp,
+                idNivelElegido
             });
         }
-    });
+    }
     return datos;
-}//fin obtenerDatosTablaTransversales
+}
 
-function obtenerDatosTablaCompetencia(selector) {
+function obtenerDatosTablaCompetencias(selector) {
     const filas = document.querySelectorAll(selector);
     const datos = [];
-    let competenciaActual = null;
-    let tipoCompetenciaActual = null;
+    let idCompetenciaActual = null;
+    let idTipoCompetenciaActual = null;
 
-    Array.from(filas).forEach(fila => {
-        if (fila.hasAttribute('data-id')) {
-            competenciaActual = fila.getAttribute('data-id');
-            tipoCompetenciaActual = fila.getAttribute('data-id-tipo');
+    for (const fila of filas) {
+        if (fila.dataset.id) {
+            idCompetenciaActual = parseInt(fila.dataset.id, 10) || 0;
+            idTipoCompetenciaActual = parseInt(fila.dataset.idTipo, 10) || 0;
+            continue;
         }
-        if (fila.hasAttribute('data-comportamiento-id')) {
-            const idComportamiento = fila.getAttribute('data-comportamiento-id');
+
+        if (!idCompetenciaActual) continue;
+
+        if (fila.dataset.comportamientoId) {
+            const idComportamiento = parseInt(fila.dataset.comportamientoId, 10) || 0;
             const select = fila.querySelector('select.select-nivel-obtenido');
-            if (!select) return;
-            const opt = select.selectedOptions && select.selectedOptions[0];
-            if (!opt) return;
-            const idNivel = opt.getAttribute('data-idnivel');
-            const valor = parseFloat(opt.value) || 0;
-            const idEvaxComp = parseInt(opt.getAttribute('data-evaxcomp')) || 0;
-            if (!idComportamiento || !idNivel) return;
+            if (!select) continue;
+
+            const opt = select.options[select.selectedIndex];
+            if (!opt || opt.disabled) continue;
+
+            const idNivel = parseInt(opt.dataset.idnivel || opt.value || '0', 10) || 0;
+            const valor = parseFloat(opt.dataset.valor || opt.value || '0') || 0;
+            const idEvaxComp = parseInt(opt.dataset.evaxcomp || '0', 10) || 0;
+            const idNivelElegido = idNivel;
+
+            if (!idNivel) continue;
+
             datos.push({
-                idCompetencia: competenciaActual,
-                idTipoCompetencia: tipoCompetenciaActual,
-                idComportamiento: idComportamiento,
-                idNivel: idNivel,
-                valor: valor,
-                idEvaxComp: idEvaxComp
+                idCompetencia: idCompetenciaActual,
+                idTipoCompetencia: idTipoCompetenciaActual,
+                idComportamiento,
+                idNivel,
+                valor,
+                idEvaxComp,
+                idNivelElegido
             });
         }
-    });
+    }
     return datos;
 }
 

@@ -38,6 +38,7 @@ namespace Negocios
 
             var lista = new List<ObtenerComportamientosYDescripcionesModel>();
             var tieneValor = dt.Columns.Contains("valorObtenido");//funciona como un boolean para saber si viene o no
+            var tieneNivelElegido = dt.Columns.Contains("idNivelElegido");
 
             foreach (DataRow row in dt.Rows)
             {
@@ -57,7 +58,10 @@ namespace Negocios
                     Descripcion = row["Descripcion"].ToString(),
                     valorObtenido = tieneValor && row["valorObtenido"] != DBNull.Value
                             ? Convert.ToDecimal(row["valorObtenido"])
-                            : (decimal?)null
+                            : (decimal?)null,
+                    idNivelElegido = tieneNivelElegido && row["idNivelElegido"] != DBNull.Value
+                                    ? Convert.ToInt32(row["idNivelElegido"])
+            : 0
                 });
             }
 

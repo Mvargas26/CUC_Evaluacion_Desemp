@@ -242,6 +242,7 @@ namespace Negocios
                         ValorObtenido = Convert.ToDecimal(row["valorObtenido"]),
                         IdComportamiento = Convert.ToInt32(row["idComport"]),
                         IdNivel = Convert.ToInt32(row["idNivel"]),
+                        idNivelElegido = Convert.ToInt32(row["idNivelElejido"]),
                         NombreCompetencia = row["NombreCompetencia"].ToString(),
                         TipoCompetencia = row["TipoCompetencia"].ToString()
                     });

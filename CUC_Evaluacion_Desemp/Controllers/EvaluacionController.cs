@@ -531,7 +531,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 TempData["MensajeError"] = "Error al obtener las competencias.";
                 return View("Error");
             }
-        }
+        }//fin EvaluarSubAlterno
+
         [HttpPost]
         public ActionResult GuardarSeguimiento(string evaluacionData)
         {
@@ -578,58 +579,99 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                     _servicioMantenimientos.EvaluacionXobjetivos.ModificarEvaluacionXObjetivo(evaluacionXObjetivo);
                 }
-
-                //Actualizamos el nivel asignado de las competencias Transversales
+                //******************************************************************************************************************************
+                // Actualizamos competencias Transversales
                 foreach (var competencia in competenciasTransversales)
                 {
                     var idCompetencia = Convert.ToInt32(competencia["idCompetencia"]);
+
                     foreach (var comportamiento in competencia["comportamientos"])
                     {
                         var idComportamiento = Convert.ToInt32(comportamiento["idComportamiento"]);
+
+                        int idNivelElegido = 0;
+
+                        foreach (var n in comportamiento["niveles"])
+                            if (n["idNivelElegido"] != null && int.TryParse(n["idNivelElegido"]?.ToString(), out var e) && e > 0) { idNivelElegido = e; break; }
+
+                        if (idNivelElegido == 0)
+                            foreach (var n in comportamiento["niveles"])
+                                if (n["idEvaxComp"] != null && int.TryParse(n["idEvaxComp"]?.ToString(), out var evx) && evx > 0) { idNivelElegido = Convert.ToInt32(n["idNivel"]); break; }
+
+                        if (idNivelElegido == 0)
+                            foreach (var n in comportamiento["niveles"])
+                                if (decimal.TryParse(n["valor"]?.ToString(), out var val) && val > 0) { idNivelElegido = Convert.ToInt32(n["idNivel"]); break; }
+
                         foreach (var nivel in comportamiento["niveles"])
                         {
-                            var idNivel = Convert.ToInt32(nivel["idNivel"]);
-                            var valor = nivel["valor"] != null ? Convert.ToDecimal(nivel["valor"]) : 0m;
-                            var idEvaxComp = nivel["idEvaxComp"] != null ? Convert.ToInt32(nivel["idEvaxComp"]) : 0;
-
                             var registro = new EvaluacionXcompetenciaModel
                             {
-                                IdEvaxComp = idEvaxComp,
+                                IdEvaxComp = nivel["idEvaxComp"] != null ? Convert.ToInt32(nivel["idEvaxComp"]) : 0,
                                 IdEvaluacion = ultimaEvaluacionFuncionario.IdEvaluacion,
                                 IdCompetencia = idCompetencia,
                                 IdComportamiento = idComportamiento,
-                                IdNivel = idNivel,
-                                ValorObtenido = valor
+                                IdNivel = Convert.ToInt32(nivel["idNivel"]),
+                                ValorObtenido = nivel["valor"] != null ? Convert.ToDecimal(nivel["valor"]) : 0m
                             };
-                                _servicioMantenimientos.EvaluacionXcompetencia.ActualizarEvaluacionXCompetencia(registro);
 
+                            _servicioMantenimientos.EvaluacionXcompetencia.ActualizarEvaluacionXCompetencia(registro);
                         }
+
+                        // Propaga el elegido a TODAS las filas del grupo:
+                        _servicioMantenimientos.EvaluacionXcompetencia
+                            .ActualizarNivelElegidoPorGrupo(
+                                ultimaEvaluacionFuncionario.IdEvaluacion,
+                                idCompetencia,
+                                idComportamiento,
+                                idNivelElegido
+                            );
                     }
                 }
-                //Actualizamos el nivel asignado de las competencias
+                //******************************************************************************************************************************
+                // Actualizamos competencias (no transversales)
                 foreach (var competencia in competencias)
                 {
                     var idCompetencia = Convert.ToInt32(competencia["idCompetencia"]);
+
                     foreach (var comportamiento in competencia["comportamientos"])
                     {
                         var idComportamiento = Convert.ToInt32(comportamiento["idComportamiento"]);
+
+                        int idNivelElegido = 0;
+
+                        foreach (var n in comportamiento["niveles"])
+                            if (n["idNivelElegido"] != null && int.TryParse(n["idNivelElegido"]?.ToString(), out var e) && e > 0) { idNivelElegido = e; break; }
+
+                        if (idNivelElegido == 0)
+                            foreach (var n in comportamiento["niveles"])
+                                if (n["idEvaxComp"] != null && int.TryParse(n["idEvaxComp"]?.ToString(), out var evx) && evx > 0) { idNivelElegido = Convert.ToInt32(n["idNivel"]); break; }
+
+                        if (idNivelElegido == 0)
+                            foreach (var n in comportamiento["niveles"])
+                                if (decimal.TryParse(n["valor"]?.ToString(), out var val) && val > 0) { idNivelElegido = Convert.ToInt32(n["idNivel"]); break; }
+
                         foreach (var nivel in comportamiento["niveles"])
                         {
-                            var idNivel = Convert.ToInt32(nivel["idNivel"]);
-                            var valor = nivel["valor"] != null ? Convert.ToDecimal(nivel["valor"]) : 0m;
-                            var idEvaxComp = nivel["idEvaxComp"] != null ? Convert.ToInt32(nivel["idEvaxComp"]) : 0;
-
                             var registro = new EvaluacionXcompetenciaModel
                             {
-                                IdEvaxComp = idEvaxComp,
+                                IdEvaxComp = nivel["idEvaxComp"] != null ? Convert.ToInt32(nivel["idEvaxComp"]) : 0,
                                 IdEvaluacion = ultimaEvaluacionFuncionario.IdEvaluacion,
                                 IdCompetencia = idCompetencia,
                                 IdComportamiento = idComportamiento,
-                                IdNivel = idNivel,
-                                ValorObtenido = valor
+                                IdNivel = Convert.ToInt32(nivel["idNivel"]),
+                                ValorObtenido = nivel["valor"] != null ? Convert.ToDecimal(nivel["valor"]) : 0m
                             };
-                                _servicioMantenimientos.EvaluacionXcompetencia.ActualizarEvaluacionXCompetencia(registro);
+
+                            _servicioMantenimientos.EvaluacionXcompetencia.ActualizarEvaluacionXCompetencia(registro);
                         }
+
+                        _servicioMantenimientos.EvaluacionXcompetencia
+                            .ActualizarNivelElegidoPorGrupo(
+                                ultimaEvaluacionFuncionario.IdEvaluacion,
+                                idCompetencia,
+                                idComportamiento,
+                                idNivelElegido
+                            );
                     }
                 }
                 var fechaNorm = DateTime.Now.ToString("yyyyMMdd_HHmm");
