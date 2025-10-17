@@ -552,17 +552,16 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 //consultamos la ultima evaluacion 
                 var ultimaEvaluacionFuncionario = _servicioMantenimientos.Evaluaciones.ConsultarEvaluacionComoFuncionario(cedFuncionario, Convert.ToInt32(idConglo));
 
-                //actualizamos su estado y lo guardamos
-                ultimaEvaluacionFuncionario.EstadoEvaluacion = 2; //"Estado 2 = Por aprobar"
-                ultimaEvaluacionFuncionario.Observaciones = observaciones;
-                _servicioMantenimientos.Evaluaciones.ModificarEvaluacion(ultimaEvaluacionFuncionario);
-
                 if (ultimaEvaluacionFuncionario == null)
                 {
                     TempData["AlertMessage"] = "No hay una evaluación para usted en este conglomerado.Por favor contacte a su Jefatura para planificarla.";
                     return RedirectToAction("Index", "Home");
                 }
 
+                //actualizamos su estado y lo guardamos
+                ultimaEvaluacionFuncionario.EstadoEvaluacion = 2; //"Estado 2 = Por aprobar"
+                ultimaEvaluacionFuncionario.Observaciones = observaciones;
+                _servicioMantenimientos.Evaluaciones.ModificarEvaluacion(ultimaEvaluacionFuncionario);
 
                 // Actualizamos el actual de los obj
                 foreach (var objetivo in objetivos)
@@ -617,7 +616,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                             _servicioMantenimientos.EvaluacionXcompetencia.ActualizarEvaluacionXCompetencia(registro);
                         }
 
-                        // Propaga el elegido a TODAS las filas del grupo:
+                        // Ponemos el elegido a TODAS las filas del grupo )osea a los niveles relacionados a esa comeptencia:
                         _servicioMantenimientos.EvaluacionXcompetencia
                             .ActualizarNivelElegidoPorGrupo(
                                 ultimaEvaluacionFuncionario.IdEvaluacion,
@@ -919,85 +918,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 doc.Close();
             }
         }//fin
-        private static void AgregarCompetenciasAgrupadas(Document doc, PdfWriter writer, string tituloSeccion,
-            List<CompetenciasModel> lista, Font fSub, Font fTxt, bool incluirNivelAsignado)
-        {
-            if (lista == null || lista.Count == 0) return;
-
-            var fTituloSeccion = FontFactory.GetFont("Helvetica", 18, Font.BOLD | Font.UNDERLINE, new BaseColor(30, 55, 108));
-            var fCompTitulo = FontFactory.GetFont("Helvetica", 12, Font.BOLD | Font.UNDERLINE);
-            var fComport = FontFactory.GetFont("Helvetica", 11, Font.BOLD);
-
-            var titulo = new Paragraph(tituloSeccion, fTituloSeccion)
-            {
-                SpacingBefore = 10f,
-                SpacingAfter = 8f
-            };
-            doc.Add(titulo);
-
-            foreach (var comp in lista)
-            {
-                var pComp = new Paragraph(comp.Competencia, fCompTitulo)
-                {
-                    SpacingAfter = 2f
-                };
-                doc.Add(pComp);
-
-                if (!string.IsNullOrWhiteSpace(comp.Descripcion))
-                {
-                    var pDesc = new Paragraph(comp.Descripcion, fTxt)
-                    {
-                        SpacingAfter = 6f
-                    };
-                    doc.Add(pDesc);
-                }
-
-                PdfPTable t;
-                if (incluirNivelAsignado)
-                {
-                    t = new PdfPTable(3) { WidthPercentage = 100 };
-                    t.SetWidths(new float[] { 35f, 50f, 15f });
-
-                    t.AddCell(new PdfPCell(new Phrase("Comportamiento", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                    t.AddCell(new PdfPCell(new Phrase("Niveles esperados", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                    t.AddCell(new PdfPCell(new Phrase("Nivel actual asignado", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                }
-                else
-                {
-                    t = new PdfPTable(2) { WidthPercentage = 100 };
-                    t.SetWidths(new float[] { 35f, 65f });
-
-                    t.AddCell(new PdfPCell(new Phrase("Comportamiento", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                    t.AddCell(new PdfPCell(new Phrase("Niveles esperados", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                }
-
-                foreach (var compo in comp.Comportamientos)
-                {
-                    var celComp = new PdfPCell(new Phrase(compo.Nombre ?? "", fComport));
-                    var nivelesTexto = string.Join("\n", compo.Niveles.Select(n =>
-                        (string.IsNullOrWhiteSpace(n.nombre) ? "" : n.nombre) +
-                        (n.valor > 0 ? " (" + n.valor + ")" : "") +
-                        (string.IsNullOrWhiteSpace(n.descripcion) ? "" : ": " + n.descripcion)
-                    ));
-                    var celNiv = new PdfPCell(new Phrase(nivelesTexto, fTxt));
-
-                    t.AddCell(celComp);
-                    t.AddCell(celNiv);
-
-                    if (incluirNivelAsignado)
-                    {
-                        var asignado = compo.Niveles.FirstOrDefault(n => (n.idEvaxComp > 0) || (n.valor > 0));
-                        var textoAsignado = asignado != null
-                            ? $"{asignado.nombre}{(asignado.valor > 0 ? " (" + asignado.valor + ")" : "")}"
-                            : "";
-                        t.AddCell(new PdfPCell(new Phrase(textoAsignado, fTxt)));
-                    }
-                }
-
-                doc.Add(t);
-                doc.Add(new Paragraph(" ") { SpacingAfter = 6f });
-            }
-        }//fin
         private void CrearReportePDFSeguimiento(JObject data, EvaluacionModel eva, string nombreArchivo)
         {
             //-------------------------------------------Datos necesarios
@@ -1126,44 +1046,60 @@ namespace CUC_Evaluacion_Desemp.Controllers
                         IdCompetencia = g.Key.idCompetencia,
                         Competencia = g.Key.Competencia,
                         Descripcion = g.Key.DescriCompetencia,
-                        Comportamientos = g.GroupBy(k => new { k.idComport, k.Comportamiento }).Select(cg => new ComportamientoModel
-                        {
-                            idComport = cg.Key.idComport,
-                            Nombre = cg.Key.Comportamiento,
-                            Niveles = cg.GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel })
-                                        .Select(ng => new NivelComportamientoModel
-                                        {
-                                            idNivel = ng.Key.idNivel,
-                                            nombre = ng.Key.Nivel,
-                                            descripcion = ng.Key.Descripcion,
-                                            valor = ng.Key.valorNivel,
-                                            idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
-                                        }).OrderBy(x => x.valor).ToList()
-                        }).ToList()
+                        Comportamientos = g.GroupBy(k => new { k.idComport, k.Comportamiento })
+                            .Select(cg => new ComportamientoModel
+                            {
+                                idComport = cg.Key.idComport,
+                                Nombre = cg.Key.Comportamiento,
+                                Niveles = cg.GroupBy(n => new {
+                                    n.idNivel,
+                                    n.Nivel,
+                                    n.Descripcion,
+                                    n.valorNivel,
+                                    n.idNivelElegido 
+                                })
+                                    .Select(ng => new NivelComportamientoModel
+                                    {
+                                        idNivel = ng.Key.idNivel,
+                                        nombre = ng.Key.Nivel,
+                                        descripcion = ng.Key.Descripcion,
+                                        valor = ng.Key.valorNivel,
+                                        idNivelElegido = ng.Key.idNivelElegido,
+                                        idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
+                                    }).OrderBy(x => x.valor).ToList()
+                            }).ToList()
                     }).ToList();
 
                 var competenciasAgrupadas = competenciasNoTrans
-                    .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia })
-                    .Select(g => new CompetenciasModel
-                    {
-                        IdCompetencia = g.Key.idCompetencia,
-                        Competencia = g.Key.Competencia,
-                        Descripcion = g.Key.DescriCompetencia,
-                        Comportamientos = g.GroupBy(k => new { k.idComport, k.Comportamiento }).Select(cg => new ComportamientoModel
-                        {
-                            idComport = cg.Key.idComport,
-                            Nombre = cg.Key.Comportamiento,
-                            Niveles = cg.GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel })
-                                        .Select(ng => new NivelComportamientoModel
-                                        {
-                                            idNivel = ng.Key.idNivel,
-                                            nombre = ng.Key.Nivel,
-                                            descripcion = ng.Key.Descripcion,
-                                            valor = ng.Key.valorNivel,
-                                            idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
-                                        }).OrderBy(x => x.valor).ToList()
-                        }).ToList()
-                    }).ToList();
+                     .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia })
+                     .Select(g => new CompetenciasModel
+                     {
+                         IdCompetencia = g.Key.idCompetencia,
+                         Competencia = g.Key.Competencia,
+                         Descripcion = g.Key.DescriCompetencia,
+                         Comportamientos = g.GroupBy(k => new { k.idComport, k.Comportamiento })
+                             .Select(cg => new ComportamientoModel
+                             {
+                                 idComport = cg.Key.idComport,
+                                 Nombre = cg.Key.Comportamiento,
+                                 Niveles = cg.GroupBy(n => new {
+                                     n.idNivel,
+                                     n.Nivel,
+                                     n.Descripcion,
+                                     n.valorNivel,
+                                     n.idNivelElegido  // ⬅️ AGREGAR
+                                 })
+                                     .Select(ng => new NivelComportamientoModel
+                                     {
+                                         idNivel = ng.Key.idNivel,
+                                         nombre = ng.Key.Nivel,
+                                         descripcion = ng.Key.Descripcion,
+                                         valor = ng.Key.valorNivel,
+                                         idNivelElegido = ng.Key.idNivelElegido,  // ⬅️ AGREGAR
+                                         idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
+                                     }).OrderBy(x => x.valor).ToList()
+                             }).ToList()
+                     }).ToList();
 
                 AgregarCompetenciasAgrupadas(doc, w, "Competencias Transversales", transversalesAgrupadas, fSub, fTxt, true);
                 AgregarCompetenciasAgrupadas(doc, w, "Competencias", competenciasAgrupadas, fSub, fTxt, true);
@@ -1180,7 +1116,92 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 doc.Close();
             }
         }
+        private static void AgregarCompetenciasAgrupadas(Document doc, PdfWriter writer, string tituloSeccion,
+        List<CompetenciasModel> lista, Font fSub, Font fTxt, bool incluirNivelAsignado)
+        {
+            if (lista == null || lista.Count == 0) return;
 
+            var fTituloSeccion = FontFactory.GetFont("Helvetica", 18, Font.BOLD | Font.UNDERLINE, new BaseColor(30, 55, 108));
+            var fCompTitulo = FontFactory.GetFont("Helvetica", 12, Font.BOLD | Font.UNDERLINE);
+            var fComport = FontFactory.GetFont("Helvetica", 11, Font.BOLD);
+
+            var titulo = new Paragraph(tituloSeccion, fTituloSeccion)
+            {
+                SpacingBefore = 10f,
+                SpacingAfter = 8f
+            };
+            doc.Add(titulo);
+
+            foreach (var comp in lista)
+            {
+                var pComp = new Paragraph(comp.Competencia, fCompTitulo)
+                {
+                    SpacingAfter = 2f
+                };
+                doc.Add(pComp);
+
+                if (!string.IsNullOrWhiteSpace(comp.Descripcion))
+                {
+                    var pDesc = new Paragraph(comp.Descripcion, fTxt)
+                    {
+                        SpacingAfter = 6f
+                    };
+                    doc.Add(pDesc);
+                }
+
+                PdfPTable t;
+                if (incluirNivelAsignado)
+                {
+                    t = new PdfPTable(3) { WidthPercentage = 100 };
+                    t.SetWidths(new float[] { 35f, 50f, 15f });
+                    t.AddCell(new PdfPCell(new Phrase("Comportamiento", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                    t.AddCell(new PdfPCell(new Phrase("Niveles esperados", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                    t.AddCell(new PdfPCell(new Phrase("Nivel actual asignado", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                }
+                else
+                {
+                    t = new PdfPTable(2) { WidthPercentage = 100 };
+                    t.SetWidths(new float[] { 35f, 65f });
+                    t.AddCell(new PdfPCell(new Phrase("Comportamiento", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                    t.AddCell(new PdfPCell(new Phrase("Niveles esperados", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                }
+
+                foreach (var compo in comp.Comportamientos)
+                {
+                    var celComp = new PdfPCell(new Phrase(compo.Nombre ?? "", fComport));
+
+                    var nivelesTexto = string.Join("\n", compo.Niveles.Select(n =>
+                        (string.IsNullOrWhiteSpace(n.nombre) ? "" : n.nombre) +
+                        (n.valor > 0 ? " (" + n.valor + ")" : "") +
+                        (string.IsNullOrWhiteSpace(n.descripcion) ? "" : ": " + n.descripcion)
+                    ));
+
+                    var celNiv = new PdfPCell(new Phrase(nivelesTexto, fTxt));
+
+                    t.AddCell(celComp);
+                    t.AddCell(celNiv);
+
+                    if (incluirNivelAsignado)
+                    {
+                        var asignado = compo.Niveles.FirstOrDefault(n => n.idNivelElegido > 0 && n.idNivel == n.idNivelElegido);
+
+                        if (asignado == null)
+                        {
+                            asignado = compo.Niveles.FirstOrDefault(n => n.valor > 0 && n.idEvaxComp > 0);
+                        }
+
+                        var textoAsignado = asignado != null
+                            ? $"{asignado.nombre}{(asignado.valor > 0 ? " (" + asignado.valor + ")" : "")}"
+                            : "No asignado";
+
+                        t.AddCell(new PdfPCell(new Phrase(textoAsignado, fTxt)));
+                    }
+                }
+
+                doc.Add(t);
+                doc.Add(new Paragraph(" ") { SpacingAfter = 6f });
+            }
+        }
         #endregion
 
 
