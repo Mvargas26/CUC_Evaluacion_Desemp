@@ -186,7 +186,8 @@
 
                     foreach (var compo in comp.Comportamientos)
                     {
-                        var selectedNivelId = compo.idNivelElegido > 0 ? compo.idNivelElegido : (int?)null;
+                        var nivelElegido = compo.Niveles.FirstOrDefault(n => n.idNivelElegido > 0 && n.idNivel == n.idNivelElegido);
+                        var selectedNivelId = nivelElegido?.idNivel ?? 0;
 
                         <tr data-comportamiento-id="@compo.idComport">
                             <td><strong>@compo.Nombre</strong></td>
@@ -198,29 +199,26 @@
                                     <div>@desc</div>
                                 </td>
                             }
-                        <td style="width:180px;">
-                            <select class="form-select form-select-sm select-nivel-obtenido w-100"
-                                    data-idcompetencia="@comp.IdCompetencia"
-                                    data-idcomportamiento="@compo.idComport">
-                                <option value="" @(selectedNivelId == null ? "selected" : "") disabled>Seleccione...</option>
-                                @foreach (var n in niveles)
-                                {
-                                    var nivelMatch = compo.Niveles.FirstOrDefault(x => x.idNivel == n.idNivel);
-                                    var evax = nivelMatch?.idEvaxComp ?? 0;
-                                    var isSelected = (n.idNivel == selectedNivelId) ? "selected" : "";
-                                    <option value="@n.idNivel"
-                                            data-valor="@n.valor"
-                                            data-evaxcomp="@evax"
-                                            @Html.Raw(isSelected)
-                                             @(n.idNivel == selectedNivelId ? "selected" : "")>
-                                        @n.nombre
-                                    </option>
-                                }
-                            </select>
-                        </td>
+                            <td style="width:180px;">
+                                <select class="form-select form-select-sm select-nivel-obtenido w-100"
+                                        data-idcompetencia="@comp.IdCompetencia"
+                                        data-idcomportamiento="@compo.idComport">
+                                    <option value="" @(selectedNivelId == 0 ? "selected" : "") disabled>Seleccione...</option>
+                                    @foreach (var n in niveles)
+                                    {
+                                        var nivelMatch = compo.Niveles.FirstOrDefault(x => x.idNivel == n.idNivel);
+                                        var evax = nivelMatch?.idEvaxComp ?? 0;
+                                        <option value="@n.idNivel"
+                                                data-valor="@n.valor"
+                                                data-evaxcomp="@evax"
+                                                @(n.idNivel == selectedNivelId ? "selected" : "")>
+                                            @n.nombre
+                                        </option>
+                                    }
+                                </select>
+                            </td>
                         </tr>
                     }
-
                     <tr>
                         <td colspan="@totalColumnas"><hr /></td>
                     </tr>
@@ -265,7 +263,8 @@
 
                     foreach (var compo in comp.Comportamientos)
                     {
-                        var selectedNivelId = compo.idNivelElegido > 0 ? compo.idNivelElegido : (int?)null;
+                        var nivelElegido = compo.Niveles.FirstOrDefault(n => n.idNivelElegido > 0 && n.idNivel == n.idNivelElegido);
+                        var selectedNivelId = nivelElegido?.idNivel ?? 0;
 
                         <tr data-comportamiento-id="@compo.idComport">
                             <td><strong>@compo.Nombre</strong></td>
@@ -281,18 +280,16 @@
                                 <select class="form-select form-select-sm select-nivel-obtenido w-100"
                                         data-idcompetencia="@comp.IdCompetencia"
                                         data-idcomportamiento="@compo.idComport">
-                                    <option value="" @(selectedNivelId == null ? "selected" : "") disabled>Seleccione...</option>
+                                    <option value="" @(selectedNivelId == 0 ? "selected" : "") disabled>Seleccione...</option>
                                     @foreach (var n in niveles)
                                     {
                                         var nivelMatch = compo.Niveles.FirstOrDefault(x => x.idNivel == n.idNivel);
                                         var val = nivelMatch?.valor ?? 0;
                                         var evax = nivelMatch?.idEvaxComp ?? 0;
-                                        var isSelected = (n.idNivel == selectedNivelId) ? "selected" : "";
                                         <option value="@val"
                                                 data-idnivel="@n.idNivel"
                                                 data-evaxcomp="@evax"
-                                                @Html.Raw(isSelected)
-                                                 @(n.idNivel == selectedNivelId ? "selected" : "")>
+                                                @(n.idNivel == selectedNivelId ? "selected" : "")>
                                             @n.nombre
                                         </option>
                                     }

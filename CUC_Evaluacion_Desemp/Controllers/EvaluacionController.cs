@@ -401,13 +401,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 ViewData["ListaTiposCompetencias"] = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
                 ViewData["ListaConglomerados"] = _servicioMantenimientos.Conglomerados.ListarConglomerados();
 
-                //Obtenemos la fase de Evaluacion para pintarla de titulo
                 EstadoEvaluacionModel faseActual = _servicioMantenimientos.EstadoEvaluacion.ConsultarEstadoPorID(2);
-
 
                 var ultimaEvaluacionFuncionario = _servicioMantenimientos.Evaluaciones.ConsultarEvaluacionComoFuncionario(cedulaSeleccionada, idConglomerado);
 
-                //Validamos que tenga una Evaluacion
                 if (ultimaEvaluacionFuncionario == null)
                 {
                     TempData["AlertMessage"] = "No hay una evaluación para usted en este conglomerado.Por favor contacte a su Jefatura para planificarla.";
@@ -416,11 +413,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 var listaObjetivos = _servicioMantenimientos.Evaluaciones.Listar_objetivosXEvaluacion(ultimaEvaluacionFuncionario.IdEvaluacion);
 
-
-                // Traemos las competencias, comportamientos y niveles relacionados a la evaluacion
                 var CompetenciasPlanificadas = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegocios(ultimaEvaluacionFuncionario.IdEvaluacion, "PorEvaluacion");
 
-                //Separamos las transversales de las otras (con LinQ)
                 var Transversales = CompetenciasPlanificadas
                     .Where(c => Convert.ToInt32(c.idTipoCompetencia) == 2500)
                     .ToList();
@@ -429,7 +423,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     .Where(c => Convert.ToInt32(c.idTipoCompetencia) != 2500)
                     .ToList();
 
-                //agrupamos por competencia para pintar la tabla como se hizo en el js_planificar
                 var transversalesAgrupadas = Transversales
                     .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia, x.idTipoCompetencia, x.Tipo })
                     .Select(g => new CompetenciasModel
@@ -446,19 +439,19 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                 idComport = cg.Key.idComport,
                                 Nombre = cg.Key.Comportamiento,
                                 Niveles = cg
-                                    .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel })
+                                    .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel, n.idNivelElegido }) // ⬅️ AGREGAR idNivelElegido
                                     .Select(ng => new NivelComportamientoModel
                                     {
                                         idNivel = ng.Key.idNivel,
                                         nombre = ng.Key.Nivel,
                                         descripcion = ng.Key.Descripcion,
                                         valor = ng.Key.valorNivel,
+                                        idNivelElegido = ng.Key.idNivelElegido, // ⬅️ AGREGAR ESTO
                                         idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
                                     }).ToList()
                             }).ToList()
                     }).ToList();
 
-                //Agrupamos las que no son trasnversales
                 var CompetenciasAgrupadas = Competencias
                  .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia, x.idTipoCompetencia, x.Tipo })
                  .Select(g => new Entidades.CompetenciasModel
@@ -475,30 +468,24 @@ namespace CUC_Evaluacion_Desemp.Controllers
                              idComport = cg.Key.idComport,
                              Nombre = cg.Key.Comportamiento,
                              Niveles = cg
-                                 .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel })
+                                 .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel, n.idNivelElegido }) 
                                  .Select(ng => new Entidades.NivelComportamientoModel
                                  {
                                      idNivel = ng.Key.idNivel,
                                      nombre = ng.Key.Nivel,
                                      descripcion = ng.Key.Descripcion,
                                      valor = ng.Key.valorNivel,
+                                     idNivelElegido = ng.Key.idNivelElegido,
                                      idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
                                  }).ToList()
                          }).ToList()
                  }).ToList();
 
-
-                //*********************************************************************
-                // Aqui vamos al calcular el maximo de puntos para las competencias (valor de nivel maximo * cant de comprtamientos)
-                //ejemplo : 5 comportamientos a nivel intermedio que vale 2 seria = 10
-
-                //traemos la lista de niveles
                 var listaNiveles = _servicioMantenimientos.NivelesComportamientos.ListarNivelesComportamientos();
                 var valorPorNivel = listaNiveles.ToDictionary(n => n.idNivel, n => n.valor);
 
                 int Val(int idNivel) => valorPorNivel.TryGetValue(idNivel, out var v) ? v : 0;
 
-                //sacamos el valor de nivel mas alto agrupando por Comportamiento
                 var maxPorTransversal = (Transversales ?? Enumerable.Empty<ObtenerComportamientosYDescripcionesModel>())
                     .GroupBy(x => x.idComport)
                     .Select(g => Val(g.Max(e => e.idNivel)));
@@ -509,11 +496,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 int MaximoPuntosCompetencias = maxPorTransversal.Sum() + maxPorCompetencia.Sum();
 
-
-
-
-
-                ////pasamos todo a la vista
                 ViewBag.ListaObjetivos = listaObjetivos;
                 ViewBag.Transversales = transversalesAgrupadas;
                 ViewBag.CompetenciasAgrupadas = CompetenciasAgrupadas;
@@ -524,14 +506,13 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 ViewBag.faseActual = faseActual;
 
                 return View(subalterno);
-
             }
             catch (Exception)
             {
-                TempData["MensajeError"] = "Error al obtener las competencias.";
+                TempData["MensajeError"] = "Error al cargar la vista para evaluar.";
                 return View("Error");
             }
-        }//fin EvaluarSubAlterno
+        }
 
         [HttpPost]
         public ActionResult GuardarSeguimiento(string evaluacionData)
