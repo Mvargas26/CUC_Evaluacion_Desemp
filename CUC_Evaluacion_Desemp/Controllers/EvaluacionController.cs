@@ -190,6 +190,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var competenciasTransversales = dataEnJSon["competenciasTransversales"];
                 var competencias = dataEnJSon["competencias"];
 
+                EstadoEvaluacionModel faseActual = _servicioMantenimientos.EstadoEvaluacion.ConsultarEstadoPorID(1);
+
                 //Crear un objeto tipo Evaluacion y Guardarlo
                 EvaluacionModel evaluacionGuardada = _servicioMantenimientos.Evaluaciones.CrearEvaluacion(new EvaluacionModel
                 {
@@ -274,7 +276,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 // Construimos la URL del PDF para mostrarlo al usuario
                 var fechaNorm = DateTime.Now.ToString("yyyyMMdd_HHmm");
                 var nombreArchivo = $"planificar_{cedFuncionario}_{fechaNorm}.pdf";
-                CrearReportePDFPlanificar(dataEnJSon, evaluacionGuardada, nombreArchivo);
+                CrearReportePDFEvaluacion(dataEnJSon, evaluacionGuardada, nombreArchivo,faseActual);
 
                 var urlArchivo = Url.Content("~/Reportes/"+cedFuncionario+"/" + nombreArchivo);
                 return Json(new { ok = true, pdfUrl = urlArchivo, fileName = nombreArchivo, message = "Evaluación planificada correctamente" }, JsonRequestBehavior.AllowGet);
@@ -530,6 +532,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var competenciasTransversales = dataEnJSon["competenciasTransversales"];
                 var competencias = dataEnJSon["competencias"];
 
+                EstadoEvaluacionModel faseActual = _servicioMantenimientos.EstadoEvaluacion.ConsultarEstadoPorID(2);
+
                 //consultamos la ultima evaluacion 
                 var ultimaEvaluacionFuncionario = _servicioMantenimientos.Evaluaciones.ConsultarEvaluacionComoFuncionario(cedFuncionario, Convert.ToInt32(idConglo));
 
@@ -656,7 +660,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 }
                 var fechaNorm = DateTime.Now.ToString("yyyyMMdd_HHmm");
                 var nombreArchivo = $"seguimiento_{cedFuncionario}_{fechaNorm}.pdf";
-                CrearReportePDFSeguimiento(dataEnJSon, ultimaEvaluacionFuncionario, nombreArchivo);
+                CrearReportePDFEvaluacion(dataEnJSon, ultimaEvaluacionFuncionario, nombreArchivo,faseActual);
 
                 var urlArchivo = Url.Content("~/Reportes/" + cedFuncionario + "/" + nombreArchivo);
                 return Json(new { ok = true, pdfUrl = urlArchivo, fileName = nombreArchivo, message = "Seguimiento guardado correctamente" }, JsonRequestBehavior.AllowGet);
@@ -910,6 +914,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var competenciasTransversales = dataEnJSon["competenciasTransversales"];
                 var competencias = dataEnJSon["competencias"];
 
+                EstadoEvaluacionModel faseActual = _servicioMantenimientos.EstadoEvaluacion.ConsultarEstadoPorID(3);
+
                 //consultamos la ultima evaluacion 
                 var ultimaEvaluacionFuncionario = _servicioMantenimientos.Evaluaciones.ConsultarEvaluacionComoFuncionario(cedFuncionario, Convert.ToInt32(idConglo));
 
@@ -1036,7 +1042,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 }
                 var fechaNorm = DateTime.Now.ToString("yyyyMMdd_HHmm");
                 var nombreArchivo = $"cierreEvaluacion_{cedFuncionario}_{fechaNorm}.pdf";
-                CrearReportePDFcierreEvaluacion_(dataEnJSon, ultimaEvaluacionFuncionario, nombreArchivo);
+                CrearReportePDFEvaluacion(dataEnJSon, ultimaEvaluacionFuncionario, nombreArchivo,faseActual);
 
                 var urlArchivo = Url.Content("~/Reportes/" + cedFuncionario + "/" + nombreArchivo);
                 return Json(new { ok = true, pdfUrl = urlArchivo, fileName = nombreArchivo, message = "Seguimiento guardado correctamente" }, JsonRequestBehavior.AllowGet);
@@ -1051,366 +1057,218 @@ namespace CUC_Evaluacion_Desemp.Controllers
         #endregion
 
         #region Metodos Internos
-        private void CrearReportePDFPlanificar(JObject data, EvaluacionModel eva, string nombreArchivo)
+        private JsonResult CrearReportePDFEvaluacion(JObject data, EvaluacionModel eva, string nombreArchivo,EstadoEvaluacionModel faseActual)
         {
-            //-------------------------------------------Datos necesarios
-            var idConglo = data["idConglo"]?.ToString();
-            ConglomeradoModel Conglo = _servicioMantenimientos.Conglomerados.ConsultarConglomeradoID(Convert.ToInt32(idConglo));
-
-            FuncionarioModel Funcionario = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(data["cedFuncionario"]?.ToString());
-
-            var dir = Server.MapPath("~/Reportes/"+ data["cedFuncionario"]?.ToString());
-            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-            var ced = data["cedFuncionario"]?.ToString() ?? eva.IdFuncionario ?? "sincedula";
-            var fechaNorm = DateTime.Now.ToString("yyyyMMdd_HHmm");
-            var ruta = Path.Combine(dir, nombreArchivo);
-
-            using (var fs = new FileStream(ruta, FileMode.Create, FileAccess.Write, FileShare.None))
-            using (var doc = new Document(PageSize.LETTER, 36, 36, 36, 36))
+            try
             {
-                var w = PdfWriter.GetInstance(doc, fs);
-                doc.Open();
+                var idConglo = data["idConglo"]?.ToString();
+                var Conglo = _servicioMantenimientos.Conglomerados.ConsultarConglomeradoID(Convert.ToInt32(idConglo));
+                var dir = Server.MapPath("~/Reportes/" + data["cedFuncionario"]?.ToString());
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                var ced = data["cedFuncionario"]?.ToString() ?? eva.IdFuncionario ?? "sincedula";
+                var ruta = Path.Combine(dir, nombreArchivo);
+                var incluirNivelAsignado = faseActual != null && faseActual.IdEstado != 1;
 
-                var fTitulo = FontFactory.GetFont("Helvetica", 14, Font.BOLD);
-                var fSub = FontFactory.GetFont("Helvetica", 11, Font.BOLD);
-                var fTxt = FontFactory.GetFont("Helvetica", 10, Font.NORMAL);
-
-                //----------------------------------------------------------------------Seccion titulo y Logo
-                var tblEncabezado = new PdfPTable(2) { WidthPercentage = 100 };
-                tblEncabezado.SetWidths(new float[] { 70, 30 });
-                var logoPath = Server.MapPath("~/sources/img/LogoCUCsinFondo.png");
-                Image logo = null;
-                if (System.IO.File.Exists(logoPath))
+                using (var fs = new FileStream(ruta, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (var doc = new Document(PageSize.LETTER, 36, 36, 36, 36))
                 {
-                    logo = Image.GetInstance(logoPath);
-                    logo.ScaleToFit(90f, 90f);
-                }
+                    var w = PdfWriter.GetInstance(doc, fs);
+                    doc.Open();
 
-                var azulCUC = new BaseColor(30, 55, 108);
-                var celTexto = new PdfPCell(new Phrase("Colegio Universitario de Cartago",
-                    FontFactory.GetFont("Helvetica", 20, Font.BOLD, azulCUC)))
-                {
-                    Border = 0,
-                    VerticalAlignment = Element.ALIGN_MIDDLE,
-                    HorizontalAlignment = Element.ALIGN_LEFT,
-                    PaddingTop = 10f
-                };
+                    var azulCUC = new BaseColor(30, 55, 108);
+                    var fTitulo = FontFactory.GetFont("Helvetica", 14, Font.BOLD);
+                    var fSub = FontFactory.GetFont("Helvetica", 11, Font.BOLD);
+                    var fTxt = FontFactory.GetFont("Helvetica", 10, Font.NORMAL);
 
-                var celLogo = new PdfPCell { Border = 0, HorizontalAlignment = Element.ALIGN_RIGHT, VerticalAlignment = Element.ALIGN_MIDDLE };
-                if (logo != null) celLogo.AddElement(logo);
-
-                tblEncabezado.AddCell(celTexto);
-                tblEncabezado.AddCell(celLogo);
-                doc.Add(tblEncabezado);
-
-                var cb = w.DirectContent;
-                cb.SetColorStroke(azulCUC); // azul institucional
-                cb.SetLineWidth(2f);
-                cb.MoveTo(doc.LeftMargin, doc.Top - 100);
-                cb.LineTo(doc.PageSize.Width - doc.RightMargin, doc.Top - 100);
-                cb.Stroke();
-
-                //----------------------------------------------------------------------Seccion Estado y fecha
-                doc.Add(new Paragraph("\nPlanificación de Evaluación", fTitulo));
-                doc.Add(new Paragraph("Fecha de creación: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm"), fTxt));
-                doc.Add(Chunk.NEWLINE);
-
-                //----------------------------------------------------------------------Seccion Informacion Personal
-                var tblInfo = new PdfPTable(2) { WidthPercentage = 100 };
-
-                // aqui se asignan el ancho apra cada columna 
-                tblInfo.SetWidths(new float[] { 30f, 70f });
-
-                tblInfo.AddCell(new PdfPCell(new Phrase("Funcionario:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                tblInfo.AddCell(new PdfPCell(new Phrase(ced +" - "+Funcionario.Nombre+" "+Funcionario.Apellido1+" "+Funcionario.Apellido2, fTxt)));
-                tblInfo.AddCell(new PdfPCell(new Phrase("Id Evaluación:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                tblInfo.AddCell(new PdfPCell(new Phrase(eva.IdEvaluacion.ToString(), fTxt)));
-                tblInfo.AddCell(new PdfPCell(new Phrase("Conglomerado:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                tblInfo.AddCell(new PdfPCell(new Phrase(Conglo.NombreConglomerado, fTxt)));
-                doc.Add(tblInfo);
-                doc.Add(Chunk.NEWLINE);
-
-                //----------------------------------------------------------------------Seccion Observaciones
-                var obs = data["observaciones"]?.ToString() ?? "";
-                doc.Add(new Paragraph("Observaciones", fSub));
-                doc.Add(new Paragraph(obs, fTxt));
-                doc.Add(Chunk.NEWLINE);
-
-                //------------------------------------------------------------------ Sección Objetivos
-                var objetivos = data["objetivos"] as JArray;
-                if (objetivos != null && objetivos.Count > 0)
-                {
-                    var pTitulo = new Paragraph("Objetivos", fSub);
-                    pTitulo.SpacingAfter = 8f;
-                    doc.Add(pTitulo);
-
-                    var t = new PdfPTable(5) { WidthPercentage = 100 };
-                    t.SpacingBefore = 3f;
-
-                    // aqui se asignan el ancho apra cada columna id,Objetivo,Meta,Peso,Actual
-                    t.SetWidths(new float[] { 10f, 40f, 30f, 10f, 10f });
-
-                    //color de fondo para los encabezados
-                    var headerColor = BaseColor.LIGHT_GRAY;
-
-                    t.AddCell(new PdfPCell(new Phrase("Id", fSub)) { BackgroundColor = headerColor });
-                    t.AddCell(new PdfPCell(new Phrase("Objetivo", fSub)) { BackgroundColor = headerColor });
-                    t.AddCell(new PdfPCell(new Phrase("Meta", fSub)) { BackgroundColor = headerColor });
-                    t.AddCell(new PdfPCell(new Phrase("Peso", fSub)) { BackgroundColor = headerColor });
-                    t.AddCell(new PdfPCell(new Phrase("Actual", fSub)) { BackgroundColor = headerColor });
-
-                    foreach (var o in objetivos)
+                    var tblEncabezado = new PdfPTable(2) { WidthPercentage = 100 };
+                    tblEncabezado.SetWidths(new float[] { 70, 30 });
+                    var logoPath = Server.MapPath("~/sources/img/LogoCUCsinFondo.png");
+                    Image logo = null;
+                    if (System.IO.File.Exists(logoPath))
                     {
-                        t.AddCell(new PdfPCell(new Phrase(o["id"]?.ToString() ?? "", fTxt)));
-                        t.AddCell(new PdfPCell(new Phrase(o["nombre"]?.ToString() ?? "", fTxt)));
-                        t.AddCell(new PdfPCell(new Phrase(o["meta"]?.ToString() ?? "", fTxt)));
-                        t.AddCell(new PdfPCell(new Phrase(o["peso"]?.ToString() ?? "", fTxt)));
-                        t.AddCell(new PdfPCell(new Phrase(o["actual"]?.ToString() ?? "", fTxt)));
+                        logo = Image.GetInstance(logoPath);
+                        logo.ScaleToFit(90f, 90f);
                     }
 
-                    doc.Add(t);
+                    var celTexto = new PdfPCell(new Phrase("Colegio Universitario de Cartago", FontFactory.GetFont("Helvetica", 20, Font.BOLD, azulCUC)))
+                    {
+                        Border = 0,
+                        VerticalAlignment = Element.ALIGN_MIDDLE,
+                        HorizontalAlignment = Element.ALIGN_LEFT,
+                        PaddingTop = 10f
+                    };
+
+                    var celLogo = new PdfPCell { Border = 0, HorizontalAlignment = Element.ALIGN_RIGHT, VerticalAlignment = Element.ALIGN_MIDDLE };
+                    if (logo != null) celLogo.AddElement(logo);
+
+                    tblEncabezado.AddCell(celTexto);
+                    tblEncabezado.AddCell(celLogo);
+                    doc.Add(tblEncabezado);
+
+                    var cb = w.DirectContent;
+                    cb.SetColorStroke(azulCUC);
+                    cb.SetLineWidth(2f);
+                    cb.MoveTo(doc.LeftMargin, doc.Top - 100);
+                    cb.LineTo(doc.PageSize.Width - doc.RightMargin, doc.Top - 100);
+                    cb.Stroke();
+
+                    var tituloPrincipal = ((faseActual?.EstadoEvaluacion) ?? "Evaluación") + " de Evaluación";
+                    doc.Add(new Paragraph("\n" + tituloPrincipal, fTitulo));
+                    doc.Add(new Paragraph("Fecha: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm"), fTxt));
                     doc.Add(Chunk.NEWLINE);
+
+                    var tblInfo = new PdfPTable(2) { WidthPercentage = 100 };
+                    tblInfo.SetWidths(new float[] { 30f, 70f });
+
+                    if (faseActual != null && faseActual.IdEstado == 1)
+                    {
+                        var Funcionario = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(ced);
+                        tblInfo.AddCell(new PdfPCell(new Phrase("Funcionario:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                        var txtFun = Funcionario != null ? $"{ced} - {Funcionario.Nombre} {Funcionario.Apellido1} {Funcionario.Apellido2}" : ced;
+                        tblInfo.AddCell(new PdfPCell(new Phrase(txtFun, fTxt)));
+                    }
+                    else
+                    {
+                        tblInfo.AddCell(new PdfPCell(new Phrase("Cédula:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                        tblInfo.AddCell(new PdfPCell(new Phrase(ced, fTxt)));
+                    }
+
+                    tblInfo.AddCell(new PdfPCell(new Phrase("Id Evaluación:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                    tblInfo.AddCell(new PdfPCell(new Phrase(eva.IdEvaluacion.ToString(), fTxt)));
+                    tblInfo.AddCell(new PdfPCell(new Phrase("Conglomerado:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                    tblInfo.AddCell(new PdfPCell(new Phrase(Conglo?.NombreConglomerado ?? "", fTxt)));
+                    doc.Add(tblInfo);
+                    doc.Add(Chunk.NEWLINE);
+
+                    var obs = data["observaciones"]?.ToString() ?? "";
+                    if (!string.IsNullOrWhiteSpace(obs))
+                    {
+                        doc.Add(new Paragraph("Observaciones", fSub));
+                        doc.Add(new Paragraph(obs, fTxt));
+                        doc.Add(Chunk.NEWLINE);
+                    }
+
+                    var objetivos = data["objetivos"] as JArray;
+                    if (objetivos != null && objetivos.Count > 0)
+                    {
+                        var esPlanificacion = faseActual != null && faseActual.IdEstado == 1;
+                        var tituloObjetivos = esPlanificacion ? "Objetivos" : "Resultados de Objetivos";
+                        var fuenteTituloObj = esPlanificacion ? fSub : FontFactory.GetFont("Helvetica", 12, Font.BOLD | Font.UNDERLINE, azulCUC);
+                        doc.Add(new Paragraph(tituloObjetivos, fuenteTituloObj) { SpacingAfter = 8f });
+
+                        PdfPTable t;
+                        if (esPlanificacion)
+                        {
+                            t = new PdfPTable(4) { WidthPercentage = 100 };
+                            t.SpacingBefore = 3f;
+                            t.SetWidths(new float[] { 8f, 48f, 24f, 20f });
+                            t.AddCell(new PdfPCell(new Phrase("Id", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                            t.AddCell(new PdfPCell(new Phrase("Objetivo", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                            t.AddCell(new PdfPCell(new Phrase("Meta", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                            t.AddCell(new PdfPCell(new Phrase("Peso", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                            foreach (var o in objetivos)
+                            {
+                                t.AddCell(new PdfPCell(new Phrase(o["id"]?.ToString() ?? "", fTxt)));
+                                t.AddCell(new PdfPCell(new Phrase(o["nombre"]?.ToString() ?? "", fTxt)));
+                                t.AddCell(new PdfPCell(new Phrase(o["meta"]?.ToString() ?? "", fTxt)));
+                                t.AddCell(new PdfPCell(new Phrase(o["peso"]?.ToString() ?? "", fTxt)));
+                            }
+                        }
+                        else
+                        {
+                            t = new PdfPTable(5) { WidthPercentage = 100 };
+                            t.SpacingBefore = 3f;
+                            t.SetWidths(new float[] { 8f, 40f, 22f, 15f, 15f });
+                            t.AddCell(new PdfPCell(new Phrase("Id", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                            t.AddCell(new PdfPCell(new Phrase("Objetivo", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                            t.AddCell(new PdfPCell(new Phrase("Meta", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                            t.AddCell(new PdfPCell(new Phrase("Peso", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                            t.AddCell(new PdfPCell(new Phrase("Actual", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                            foreach (var o in objetivos)
+                            {
+                                t.AddCell(new PdfPCell(new Phrase(o["id"]?.ToString() ?? "", fTxt)));
+                                t.AddCell(new PdfPCell(new Phrase(o["nombre"]?.ToString() ?? "", fTxt)));
+                                t.AddCell(new PdfPCell(new Phrase(o["meta"]?.ToString() ?? "", fTxt)));
+                                t.AddCell(new PdfPCell(new Phrase(o["peso"]?.ToString() ?? "", fTxt)));
+                                t.AddCell(new PdfPCell(new Phrase(o["actual"]?.ToString() ?? "", fTxt)));
+                            }
+                        }
+                        doc.Add(t);
+                        doc.Add(Chunk.NEWLINE);
+                    }
+
+                    var competenciasPlanificadas = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegocios(eva.IdEvaluacion, "PorEvaluacion");
+                    var transversales = competenciasPlanificadas.Where(c => Convert.ToInt32(c.idTipoCompetencia) == 2500).ToList();
+                    var competenciasNoTrans = competenciasPlanificadas.Where(c => Convert.ToInt32(c.idTipoCompetencia) != 2500).ToList();
+                    var transversalesAgrupadas = AgruparCompetencias(transversales, faseActual.IdEstado);
+                    var competenciasAgrupadas = AgruparCompetencias(competenciasNoTrans, faseActual.IdEstado);
+
+                    var tituloCompetencias = (faseActual != null && faseActual.IdEstado == 1) ? "Competencias del Conglomerado" : "Competencias";
+
+                    AgregarCompetenciasAgrupadas(doc, w, "Competencias Transversales", transversalesAgrupadas, fSub, fTxt, faseActual.IdEstado);
+                    AgregarCompetenciasAgrupadas(doc, w, tituloCompetencias, competenciasAgrupadas, fSub, fTxt, faseActual.IdEstado);
+
+                    doc.Add(new Paragraph("\n\n\n"));
+                    var firmas = new PdfPTable(2) { WidthPercentage = 100 };
+                    firmas.SetWidths(new float[] { 50f, 50f });
+                    firmas.SpacingBefore = 15f;
+
+                    firmas.AddCell(new PdfPCell(new Phrase("Firma Jefatura:\n\n\n\n\n\n________________________________", fSub))
+                    {
+                        Border = 0,
+                        HorizontalAlignment = Element.ALIGN_LEFT,
+                        PaddingTop = 15f
+                    });
+
+                    firmas.AddCell(new PdfPCell(new Phrase("Firma Funcionario(a):\n\n\n\n\n\n____________________________", fSub))
+                    {
+                        Border = 0,
+                        HorizontalAlignment = Element.ALIGN_RIGHT,
+                        PaddingTop = 15f
+                    });
+
+                    doc.Add(firmas);
+                    doc.Close();
                 }
-
-                //----------------------- Sección Competencias (agrupadas)
-                var competenciasPlanificadas = _servicioMantenimientos.ObtenerComportamientosYDescripciones
-                    .ListarComportamientosYDescripcionesNegocios(eva.IdEvaluacion, "PorEvaluacion");
-
-                var transversales = competenciasPlanificadas
-                    .Where(c => Convert.ToInt32(c.idTipoCompetencia) == 2500)
-                    .ToList();
-
-                var competenciasNoTrans = competenciasPlanificadas
-                    .Where(c => Convert.ToInt32(c.idTipoCompetencia) != 2500)
-                    .ToList();
-
-                var transversalesAgrupadas = transversales
-                    .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia, x.idTipoCompetencia, x.Tipo })
-                    .Select(g => new CompetenciasModel
-                    {
-                        IdCompetencia = g.Key.idCompetencia,
-                        Competencia = g.Key.Competencia,
-                        Descripcion = g.Key.DescriCompetencia,
-                        IdTipoCompetencia = g.Key.idTipoCompetencia,
-                        TipoCompetencia = new TiposCompetenciasModel { IdTipoCompetencia = g.Key.idTipoCompetencia, Tipo = g.Key.Tipo },
-                        Comportamientos = g
-                            .GroupBy(k => new { k.idComport, k.Comportamiento })
-                            .Select(cg => new ComportamientoModel
-                            {
-                                idComport = cg.Key.idComport,
-                                Nombre = cg.Key.Comportamiento,
-                                Niveles = cg
-                                    .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel })
-                                    .Select(ng => new NivelComportamientoModel
-                                    {
-                                        idNivel = ng.Key.idNivel,
-                                        nombre = ng.Key.Nivel,
-                                        descripcion = ng.Key.Descripcion,
-                                        valor = ng.Key.valorNivel,
-                                        idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
-                                    }).OrderBy(x => x.valor).ToList()
-                            }).ToList()
-                    }).ToList();
-
-                var competenciasAgrupadas = competenciasNoTrans
-                    .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia, x.idTipoCompetencia, x.Tipo })
-                    .Select(g => new CompetenciasModel
-                    {
-                        IdCompetencia = g.Key.idCompetencia,
-                        Competencia = g.Key.Competencia,
-                        Descripcion = g.Key.DescriCompetencia,
-                        IdTipoCompetencia = g.Key.idTipoCompetencia,
-                        TipoCompetencia = new TiposCompetenciasModel { IdTipoCompetencia = g.Key.idTipoCompetencia, Tipo = g.Key.Tipo },
-                        Comportamientos = g
-                            .GroupBy(k => new { k.idComport, k.Comportamiento })
-                            .Select(cg => new ComportamientoModel
-                            {
-                                idComport = cg.Key.idComport,
-                                Nombre = cg.Key.Comportamiento,
-                                Niveles = cg
-                                    .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel })
-                                    .Select(ng => new NivelComportamientoModel
-                                    {
-                                        idNivel = ng.Key.idNivel,
-                                        nombre = ng.Key.Nivel,
-                                        descripcion = ng.Key.Descripcion,
-                                        valor = ng.Key.valorNivel,
-                                        idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
-                                    }).OrderBy(x => x.valor).ToList()
-                            }).ToList()
-                    }).ToList();
-
-                AgregarCompetenciasAgrupadas(doc, w, "Competencias Transversales", transversalesAgrupadas, fSub, fTxt,false);
-                AgregarCompetenciasAgrupadas(doc, w, "Competencias del Conglomerado", competenciasAgrupadas, fSub, fTxt,false);
-
-                //------------------------------------------------------------------ Sección Firmas
-                // Espacio antes de las firmas
-                doc.Add(new Paragraph("\n\n\n"));
-
-                // Sección de firmas institucionales
-                var firmas = new PdfPTable(2) { WidthPercentage = 100 };
-                firmas.SetWidths(new float[] { 50f, 50f });
-                firmas.SpacingBefore = 15f;
-
-                firmas.AddCell(new PdfPCell(new Phrase("Firma Jefatura:\n\n\n\n\n\n________________________________", fSub))
+                return Json(new { success = true, message = "Reporte generado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
                 {
-                    Border = 0,
-                    HorizontalAlignment = Element.ALIGN_LEFT,
-                    PaddingTop = 15f
-                });
-
-                firmas.AddCell(new PdfPCell(new Phrase("Firma Funcionario(a):\n\n\n\n\n\n____________________________", fSub))
-                {
-                    Border = 0,
-                    HorizontalAlignment = Element.ALIGN_RIGHT,
-                    PaddingTop = 15f
-                });
-
-                doc.Add(firmas);
-
-                doc.Close();
+                    success = false,
+                    message = "Error al generar el reporte.",
+                    error = ex.Message
+                }, JsonRequestBehavior.AllowGet);
             }
         }//fin
-        private void CrearReportePDFSeguimiento(JObject data, EvaluacionModel eva, string nombreArchivo)
+        private List<CompetenciasModel> AgruparCompetencias(List<ObtenerComportamientosYDescripcionesModel> competencias, int idEstado)
         {
-            //-------------------------------------------Datos necesarios
-            var idConglo = data["idConglo"]?.ToString();
-            var Conglo = _servicioMantenimientos.Conglomerados.ConsultarConglomeradoID(Convert.ToInt32(idConglo));
-            var dir = Server.MapPath("~/Reportes/" + data["cedFuncionario"]?.ToString());
-            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-            var ced = data["cedFuncionario"]?.ToString() ?? eva.IdFuncionario ?? "sincedula";
-            var ruta = Path.Combine(dir, nombreArchivo);
+            bool incluirIdNivelElegido = idEstado != 1;
 
-            using (var fs = new FileStream(ruta, FileMode.Create, FileAccess.Write, FileShare.None))
-            using (var doc = new Document(PageSize.LETTER, 36, 36, 36, 36))
+            if (incluirIdNivelElegido)
             {
-                var w = PdfWriter.GetInstance(doc, fs);
-                doc.Open();
-                //----------------------------------------------------------------------Seccion titulo y Logo
-                var azul = new BaseColor(30, 55, 108);
-                var fTitulo = FontFactory.GetFont("Helvetica", 14, Font.BOLD);
-                var fSub = FontFactory.GetFont("Helvetica", 11, Font.BOLD);
-                var fTxt = FontFactory.GetFont("Helvetica", 10, Font.NORMAL);
-
-                var tblEncabezado = new PdfPTable(2) { WidthPercentage = 100 };
-                tblEncabezado.SetWidths(new float[] { 70f, 30f });
-                var logoPath = Server.MapPath("~/sources/img/LogoCUCsinFondo.png");
-                Image logo = null;
-                if (System.IO.File.Exists(logoPath))
-                {
-                    logo = Image.GetInstance(logoPath);
-                    logo.ScaleToFit(90f, 90f);
-                }
-                var celTexto = new PdfPCell(new Phrase("Colegio Universitario de Cartago", FontFactory.GetFont("Helvetica", 20, Font.BOLD, azul)))
-                {
-                    Border = 0,
-                    VerticalAlignment = Element.ALIGN_MIDDLE,
-                    HorizontalAlignment = Element.ALIGN_LEFT,
-                    PaddingTop = 10f
-                };
-                var celLogo = new PdfPCell { Border = 0, HorizontalAlignment = Element.ALIGN_RIGHT, VerticalAlignment = Element.ALIGN_MIDDLE };
-                if (logo != null) celLogo.AddElement(logo);
-                tblEncabezado.AddCell(celTexto);
-                tblEncabezado.AddCell(celLogo);
-                doc.Add(tblEncabezado);
-
-                var cb = w.DirectContent;
-                cb.SetColorStroke(azul);
-                cb.SetLineWidth(2f);
-                cb.MoveTo(doc.LeftMargin, doc.Top - 100);
-                cb.LineTo(doc.PageSize.Width - doc.RightMargin, doc.Top - 100);
-                cb.Stroke();
-
-                //----------------------------------------------------------------------Seccion Estado y fecha
-                doc.Add(new Paragraph("\nSeguimiento de Evaluación", fTitulo));
-                doc.Add(new Paragraph("Fecha: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm"), fTxt));
-                doc.Add(Chunk.NEWLINE);
-
-                //----------------------------------------------------------------------Seccion Informacion Personal
-                var tblInfo = new PdfPTable(2) { WidthPercentage = 100 };
-                tblInfo.SetWidths(new float[] { 30f, 70f });
-                tblInfo.AddCell(new PdfPCell(new Phrase("Cédula:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                tblInfo.AddCell(new PdfPCell(new Phrase(ced, fTxt)));
-                tblInfo.AddCell(new PdfPCell(new Phrase("Id Evaluación:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                tblInfo.AddCell(new PdfPCell(new Phrase(eva.IdEvaluacion.ToString(), fTxt)));
-                tblInfo.AddCell(new PdfPCell(new Phrase("Conglomerado:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                tblInfo.AddCell(new PdfPCell(new Phrase(Conglo.NombreConglomerado, fTxt)));
-                doc.Add(tblInfo);
-                doc.Add(Chunk.NEWLINE);
-
-                //----------------------------------------------------------------------Seccion Observaciones
-                var obs = data["observaciones"]?.ToString() ?? "";
-                var ptObs = new Paragraph("Observaciones", fSub) { SpacingAfter = 6f };
-                doc.Add(ptObs);
-                doc.Add(new Paragraph(obs, fTxt));
-                doc.Add(Chunk.NEWLINE);
-
-                //----------------------------------------------------------------------Seccion Objetivos
-                var objetivos = data["objetivos"] as JArray;
-                if (objetivos != null && objetivos.Count > 0)
-                {
-                    var pTitulo = new Paragraph("Resultados de Objetivos", FontFactory.GetFont("Helvetica", 12, Font.BOLD | Font.UNDERLINE, azul)) 
-                    { 
-                        SpacingAfter = 8f 
-                    };
-                    doc.Add(pTitulo);
-
-                    var t = new PdfPTable(5) { WidthPercentage = 100 };
-                    t.SpacingBefore = 3f;
-                    t.SetWidths(new float[] { 8f, 40f, 32f, 10f, 10f});
-
-                    var header = BaseColor.LIGHT_GRAY;
-                    t.AddCell(new PdfPCell(new Phrase("Id", fSub)) { BackgroundColor = header });
-                    t.AddCell(new PdfPCell(new Phrase("Objetivo", fSub)) { BackgroundColor = header });
-                    t.AddCell(new PdfPCell(new Phrase("Meta", fSub)) { BackgroundColor = header });
-                    t.AddCell(new PdfPCell(new Phrase("Peso", fSub)) { BackgroundColor = header });
-                    t.AddCell(new PdfPCell(new Phrase("Actual", fSub)) { BackgroundColor = header });
-
-                    foreach (var o in objetivos)
-                    {
-                        var id = o["id"]?.ToString() ?? "";
-                        var nombre = o["nombre"]?.ToString() ?? "";
-                        var meta = o["meta"]?.ToString() ?? "";
-                        var peso = Convert.ToDecimal(o["peso"] ?? 0m);
-                        var actual = Convert.ToDecimal(o["actual"] ?? 0m);
-
-                        t.AddCell(new PdfPCell(new Phrase(id, fTxt)));
-                        t.AddCell(new PdfPCell(new Phrase(nombre, fTxt)));
-                        t.AddCell(new PdfPCell(new Phrase(meta, fTxt)));
-                        t.AddCell(new PdfPCell(new Phrase(peso.ToString("0.##"), fTxt)));
-                        t.AddCell(new PdfPCell(new Phrase(actual.ToString("0.##"), fTxt)));
-                    }
-
-                    doc.Add(t);
-                    doc.Add(Chunk.NEWLINE);
-                }
-
-                //----------------------------------------------------------------------Seccion Competencias
-                var competenciasPlanificadas = _servicioMantenimientos.ObtenerComportamientosYDescripciones
-                    .ListarComportamientosYDescripcionesNegocios(eva.IdEvaluacion, "PorEvaluacion");
-
-                var transversales = competenciasPlanificadas.Where(c => Convert.ToInt32(c.idTipoCompetencia) == 2500).ToList();
-                var competenciasNoTrans = competenciasPlanificadas.Where(c => Convert.ToInt32(c.idTipoCompetencia) != 2500).ToList();
-
-                var transversalesAgrupadas = transversales
-                    .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia })
+                return competencias
+                    .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia, x.idTipoCompetencia, x.Tipo })
                     .Select(g => new CompetenciasModel
                     {
                         IdCompetencia = g.Key.idCompetencia,
                         Competencia = g.Key.Competencia,
                         Descripcion = g.Key.DescriCompetencia,
-                        Comportamientos = g.GroupBy(k => new { k.idComport, k.Comportamiento })
+                        IdTipoCompetencia = g.Key.idTipoCompetencia,
+                        TipoCompetencia = new TiposCompetenciasModel
+                        {
+                            IdTipoCompetencia = g.Key.idTipoCompetencia,
+                            Tipo = g.Key.Tipo
+                        },
+                        Comportamientos = g
+                            .GroupBy(k => new { k.idComport, k.Comportamiento })
                             .Select(cg => new ComportamientoModel
                             {
                                 idComport = cg.Key.idComport,
                                 Nombre = cg.Key.Comportamiento,
-                                Niveles = cg.GroupBy(n => new {
-                                    n.idNivel,
-                                    n.Nivel,
-                                    n.Descripcion,
-                                    n.valorNivel,
-                                    n.idNivelElegido 
-                                })
+                                Niveles = cg
+                                    .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel, n.idNivelElegido })
                                     .Select(ng => new NivelComportamientoModel
                                     {
                                         idNivel = ng.Key.idNivel,
@@ -1422,337 +1280,111 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                     }).OrderBy(x => x.valor).ToList()
                             }).ToList()
                     }).ToList();
-
-                var competenciasAgrupadas = competenciasNoTrans
-                     .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia })
-                     .Select(g => new CompetenciasModel
-                     {
-                         IdCompetencia = g.Key.idCompetencia,
-                         Competencia = g.Key.Competencia,
-                         Descripcion = g.Key.DescriCompetencia,
-                         Comportamientos = g.GroupBy(k => new { k.idComport, k.Comportamiento })
-                             .Select(cg => new ComportamientoModel
-                             {
-                                 idComport = cg.Key.idComport,
-                                 Nombre = cg.Key.Comportamiento,
-                                 Niveles = cg.GroupBy(n => new {
-                                     n.idNivel,
-                                     n.Nivel,
-                                     n.Descripcion,
-                                     n.valorNivel,
-                                     n.idNivelElegido  // ⬅️ AGREGAR
-                                 })
-                                     .Select(ng => new NivelComportamientoModel
-                                     {
-                                         idNivel = ng.Key.idNivel,
-                                         nombre = ng.Key.Nivel,
-                                         descripcion = ng.Key.Descripcion,
-                                         valor = ng.Key.valorNivel,
-                                         idNivelElegido = ng.Key.idNivelElegido,  // ⬅️ AGREGAR
-                                         idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
-                                     }).OrderBy(x => x.valor).ToList()
-                             }).ToList()
-                     }).ToList();
-
-                AgregarCompetenciasAgrupadas(doc, w, "Competencias Transversales", transversalesAgrupadas, fSub, fTxt, true);
-                AgregarCompetenciasAgrupadas(doc, w, "Competencias", competenciasAgrupadas, fSub, fTxt, true);
-
-                //------------------------------------------------------------------ Sección Firmas
-                doc.Add(new Paragraph("\n\n\n"));
-                var firmas = new PdfPTable(2) { WidthPercentage = 100 };
-                firmas.SetWidths(new float[] { 50f, 50f });
-                firmas.SpacingBefore = 15f;
-                firmas.AddCell(new PdfPCell(new Phrase("Firma Jefatura: ________________________________", fSub)) { Border = 0, HorizontalAlignment = Element.ALIGN_LEFT, PaddingTop = 15f });
-                firmas.AddCell(new PdfPCell(new Phrase("Firma Funcionario(a): ____________________________", fSub)) { Border = 0, HorizontalAlignment = Element.ALIGN_RIGHT, PaddingTop = 15f });
-                doc.Add(firmas);
-
-                doc.Close();
             }
-        }
-        private void CrearReportePDFcierreEvaluacion_(JObject data, EvaluacionModel eva, string nombreArchivo)
-        {
-            //-------------------------------------------Datos necesarios
-            var idConglo = data["idConglo"]?.ToString();
-            var Conglo = _servicioMantenimientos.Conglomerados.ConsultarConglomeradoID(Convert.ToInt32(idConglo));
-            var dir = Server.MapPath("~/Reportes/" + data["cedFuncionario"]?.ToString());
-            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-            var ced = data["cedFuncionario"]?.ToString() ?? eva.IdFuncionario ?? "sincedula";
-            var ruta = Path.Combine(dir, nombreArchivo);
-
-            using (var fs = new FileStream(ruta, FileMode.Create, FileAccess.Write, FileShare.None))
-            using (var doc = new Document(PageSize.LETTER, 36, 36, 36, 36))
+            else
             {
-                var w = PdfWriter.GetInstance(doc, fs);
-                doc.Open();
-                //----------------------------------------------------------------------Seccion titulo y Logo
-                var azul = new BaseColor(30, 55, 108);
-                var fTitulo = FontFactory.GetFont("Helvetica", 14, Font.BOLD);
-                var fSub = FontFactory.GetFont("Helvetica", 11, Font.BOLD);
-                var fTxt = FontFactory.GetFont("Helvetica", 10, Font.NORMAL);
-
-                var tblEncabezado = new PdfPTable(2) { WidthPercentage = 100 };
-                tblEncabezado.SetWidths(new float[] { 70f, 30f });
-                var logoPath = Server.MapPath("~/sources/img/LogoCUCsinFondo.png");
-                Image logo = null;
-                if (System.IO.File.Exists(logoPath))
-                {
-                    logo = Image.GetInstance(logoPath);
-                    logo.ScaleToFit(90f, 90f);
-                }
-                var celTexto = new PdfPCell(new Phrase("Colegio Universitario de Cartago", FontFactory.GetFont("Helvetica", 20, Font.BOLD, azul)))
-                {
-                    Border = 0,
-                    VerticalAlignment = Element.ALIGN_MIDDLE,
-                    HorizontalAlignment = Element.ALIGN_LEFT,
-                    PaddingTop = 10f
-                };
-                var celLogo = new PdfPCell { Border = 0, HorizontalAlignment = Element.ALIGN_RIGHT, VerticalAlignment = Element.ALIGN_MIDDLE };
-                if (logo != null) celLogo.AddElement(logo);
-                tblEncabezado.AddCell(celTexto);
-                tblEncabezado.AddCell(celLogo);
-                doc.Add(tblEncabezado);
-
-                var cb = w.DirectContent;
-                cb.SetColorStroke(azul);
-                cb.SetLineWidth(2f);
-                cb.MoveTo(doc.LeftMargin, doc.Top - 100);
-                cb.LineTo(doc.PageSize.Width - doc.RightMargin, doc.Top - 100);
-                cb.Stroke();
-
-                //----------------------------------------------------------------------Seccion Estado y fecha
-                doc.Add(new Paragraph("\nCierre de Evaluación", fTitulo));
-                doc.Add(new Paragraph("Fecha: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm"), fTxt));
-                doc.Add(Chunk.NEWLINE);
-
-                //----------------------------------------------------------------------Seccion Informacion Personal
-                var tblInfo = new PdfPTable(2) { WidthPercentage = 100 };
-                tblInfo.SetWidths(new float[] { 30f, 70f });
-                tblInfo.AddCell(new PdfPCell(new Phrase("Cédula:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                tblInfo.AddCell(new PdfPCell(new Phrase(ced, fTxt)));
-                tblInfo.AddCell(new PdfPCell(new Phrase("Id Evaluación:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                tblInfo.AddCell(new PdfPCell(new Phrase(eva.IdEvaluacion.ToString(), fTxt)));
-                tblInfo.AddCell(new PdfPCell(new Phrase("Conglomerado:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                tblInfo.AddCell(new PdfPCell(new Phrase(Conglo.NombreConglomerado, fTxt)));
-                doc.Add(tblInfo);
-                doc.Add(Chunk.NEWLINE);
-
-                //----------------------------------------------------------------------Seccion Observaciones
-                var obs = data["observaciones"]?.ToString() ?? "";
-                var ptObs = new Paragraph("Observaciones", fSub) { SpacingAfter = 6f };
-                doc.Add(ptObs);
-                doc.Add(new Paragraph(obs, fTxt));
-                doc.Add(Chunk.NEWLINE);
-
-                //----------------------------------------------------------------------Seccion Objetivos
-                var objetivos = data["objetivos"] as JArray;
-                if (objetivos != null && objetivos.Count > 0)
-                {
-                    var pTitulo = new Paragraph("Resultados de Objetivos", FontFactory.GetFont("Helvetica", 12, Font.BOLD | Font.UNDERLINE, azul))
-                    {
-                        SpacingAfter = 8f
-                    };
-                    doc.Add(pTitulo);
-
-                    var t = new PdfPTable(5) { WidthPercentage = 100 };
-                    t.SpacingBefore = 3f;
-                    t.SetWidths(new float[] { 8f, 40f, 32f, 10f, 10f });
-
-                    var header = BaseColor.LIGHT_GRAY;
-                    t.AddCell(new PdfPCell(new Phrase("Id", fSub)) { BackgroundColor = header });
-                    t.AddCell(new PdfPCell(new Phrase("Objetivo", fSub)) { BackgroundColor = header });
-                    t.AddCell(new PdfPCell(new Phrase("Meta", fSub)) { BackgroundColor = header });
-                    t.AddCell(new PdfPCell(new Phrase("Peso", fSub)) { BackgroundColor = header });
-                    t.AddCell(new PdfPCell(new Phrase("Actual", fSub)) { BackgroundColor = header });
-
-                    foreach (var o in objetivos)
-                    {
-                        var id = o["id"]?.ToString() ?? "";
-                        var nombre = o["nombre"]?.ToString() ?? "";
-                        var meta = o["meta"]?.ToString() ?? "";
-                        var peso = Convert.ToDecimal(o["peso"] ?? 0m);
-                        var actual = Convert.ToDecimal(o["actual"] ?? 0m);
-
-                        t.AddCell(new PdfPCell(new Phrase(id, fTxt)));
-                        t.AddCell(new PdfPCell(new Phrase(nombre, fTxt)));
-                        t.AddCell(new PdfPCell(new Phrase(meta, fTxt)));
-                        t.AddCell(new PdfPCell(new Phrase(peso.ToString("0.##"), fTxt)));
-                        t.AddCell(new PdfPCell(new Phrase(actual.ToString("0.##"), fTxt)));
-                    }
-
-                    doc.Add(t);
-                    doc.Add(Chunk.NEWLINE);
-                }
-
-                //----------------------------------------------------------------------Seccion Competencias
-                var competenciasPlanificadas = _servicioMantenimientos.ObtenerComportamientosYDescripciones
-                    .ListarComportamientosYDescripcionesNegocios(eva.IdEvaluacion, "PorEvaluacion");
-
-                var transversales = competenciasPlanificadas.Where(c => Convert.ToInt32(c.idTipoCompetencia) == 2500).ToList();
-                var competenciasNoTrans = competenciasPlanificadas.Where(c => Convert.ToInt32(c.idTipoCompetencia) != 2500).ToList();
-
-                var transversalesAgrupadas = transversales
-                    .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia })
+                return competencias
+                    .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia, x.idTipoCompetencia, x.Tipo })
                     .Select(g => new CompetenciasModel
                     {
                         IdCompetencia = g.Key.idCompetencia,
                         Competencia = g.Key.Competencia,
                         Descripcion = g.Key.DescriCompetencia,
-                        Comportamientos = g.GroupBy(k => new { k.idComport, k.Comportamiento })
+                        IdTipoCompetencia = g.Key.idTipoCompetencia,
+                        TipoCompetencia = new TiposCompetenciasModel
+                        {
+                            IdTipoCompetencia = g.Key.idTipoCompetencia,
+                            Tipo = g.Key.Tipo
+                        },
+                        Comportamientos = g
+                            .GroupBy(k => new { k.idComport, k.Comportamiento })
                             .Select(cg => new ComportamientoModel
                             {
                                 idComport = cg.Key.idComport,
                                 Nombre = cg.Key.Comportamiento,
-                                Niveles = cg.GroupBy(n => new {
-                                    n.idNivel,
-                                    n.Nivel,
-                                    n.Descripcion,
-                                    n.valorNivel,
-                                    n.idNivelElegido
-                                })
+                                Niveles = cg
+                                    .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel })
                                     .Select(ng => new NivelComportamientoModel
                                     {
                                         idNivel = ng.Key.idNivel,
                                         nombre = ng.Key.Nivel,
                                         descripcion = ng.Key.Descripcion,
                                         valor = ng.Key.valorNivel,
-                                        idNivelElegido = ng.Key.idNivelElegido,
                                         idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
                                     }).OrderBy(x => x.valor).ToList()
                             }).ToList()
                     }).ToList();
-
-                var competenciasAgrupadas = competenciasNoTrans
-                     .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia })
-                     .Select(g => new CompetenciasModel
-                     {
-                         IdCompetencia = g.Key.idCompetencia,
-                         Competencia = g.Key.Competencia,
-                         Descripcion = g.Key.DescriCompetencia,
-                         Comportamientos = g.GroupBy(k => new { k.idComport, k.Comportamiento })
-                             .Select(cg => new ComportamientoModel
-                             {
-                                 idComport = cg.Key.idComport,
-                                 Nombre = cg.Key.Comportamiento,
-                                 Niveles = cg.GroupBy(n => new {
-                                     n.idNivel,
-                                     n.Nivel,
-                                     n.Descripcion,
-                                     n.valorNivel,
-                                     n.idNivelElegido  // ⬅️ AGREGAR
-                                 })
-                                     .Select(ng => new NivelComportamientoModel
-                                     {
-                                         idNivel = ng.Key.idNivel,
-                                         nombre = ng.Key.Nivel,
-                                         descripcion = ng.Key.Descripcion,
-                                         valor = ng.Key.valorNivel,
-                                         idNivelElegido = ng.Key.idNivelElegido,  // ⬅️ AGREGAR
-                                         idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
-                                     }).OrderBy(x => x.valor).ToList()
-                             }).ToList()
-                     }).ToList();
-
-                AgregarCompetenciasAgrupadas(doc, w, "Competencias Transversales", transversalesAgrupadas, fSub, fTxt, true);
-                AgregarCompetenciasAgrupadas(doc, w, "Competencias", competenciasAgrupadas, fSub, fTxt, true);
-
-                //------------------------------------------------------------------ Sección Firmas
-                doc.Add(new Paragraph("\n\n\n"));
-                var firmas = new PdfPTable(2) { WidthPercentage = 100 };
-                firmas.SetWidths(new float[] { 50f, 50f });
-                firmas.SpacingBefore = 15f;
-                firmas.AddCell(new PdfPCell(new Phrase("Firma Jefatura: ________________________________", fSub)) { Border = 0, HorizontalAlignment = Element.ALIGN_LEFT, PaddingTop = 15f });
-                firmas.AddCell(new PdfPCell(new Phrase("Firma Funcionario(a): ____________________________", fSub)) { Border = 0, HorizontalAlignment = Element.ALIGN_RIGHT, PaddingTop = 15f });
-                doc.Add(firmas);
-
-                doc.Close();
             }
         }
         private static void AgregarCompetenciasAgrupadas(Document doc, PdfWriter writer, string tituloSeccion,
-        List<CompetenciasModel> lista, Font fSub, Font fTxt, bool incluirNivelAsignado)
-        {
-            if (lista == null || lista.Count == 0) return;
-
-            var fTituloSeccion = FontFactory.GetFont("Helvetica", 18, Font.BOLD | Font.UNDERLINE, new BaseColor(30, 55, 108));
-            var fCompTitulo = FontFactory.GetFont("Helvetica", 12, Font.BOLD | Font.UNDERLINE);
-            var fComport = FontFactory.GetFont("Helvetica", 11, Font.BOLD);
-
-            var titulo = new Paragraph(tituloSeccion, fTituloSeccion)
+        List<CompetenciasModel> lista, Font fSub, Font fTxt, int idEstado)
             {
-                SpacingBefore = 10f,
-                SpacingAfter = 8f
-            };
-            doc.Add(titulo);
+                if (lista == null || lista.Count == 0) return;
 
-            foreach (var comp in lista)
-            {
-                var pComp = new Paragraph(comp.Competencia, fCompTitulo)
-                {
-                    SpacingAfter = 2f
-                };
-                doc.Add(pComp);
+                var fTituloSeccion = FontFactory.GetFont("Helvetica", 18, Font.BOLD | Font.UNDERLINE, new BaseColor(30, 55, 108));
+                var fCompTitulo = FontFactory.GetFont("Helvetica", 12, Font.BOLD | Font.UNDERLINE);
+                var fComport = FontFactory.GetFont("Helvetica", 11, Font.BOLD);
 
-                if (!string.IsNullOrWhiteSpace(comp.Descripcion))
+                var titulo = new Paragraph(tituloSeccion, fTituloSeccion) { SpacingBefore = 10f, SpacingAfter = 8f };
+                doc.Add(titulo);
+
+                foreach (var comp in lista)
                 {
-                    var pDesc = new Paragraph(comp.Descripcion, fTxt)
+                    var pComp = new Paragraph(comp.Competencia, fCompTitulo) { SpacingAfter = 2f };
+                    doc.Add(pComp);
+
+                    if (!string.IsNullOrWhiteSpace(comp.Descripcion))
                     {
-                        SpacingAfter = 6f
-                    };
-                    doc.Add(pDesc);
-                }
-
-                PdfPTable t;
-                if (incluirNivelAsignado)
-                {
-                    t = new PdfPTable(3) { WidthPercentage = 100 };
-                    t.SetWidths(new float[] { 35f, 50f, 15f });
-                    t.AddCell(new PdfPCell(new Phrase("Comportamiento", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                    t.AddCell(new PdfPCell(new Phrase("Niveles esperados", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                    t.AddCell(new PdfPCell(new Phrase("Nivel actual asignado", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                }
-                else
-                {
-                    t = new PdfPTable(2) { WidthPercentage = 100 };
-                    t.SetWidths(new float[] { 35f, 65f });
-                    t.AddCell(new PdfPCell(new Phrase("Comportamiento", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                    t.AddCell(new PdfPCell(new Phrase("Niveles esperados", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
-                }
-
-                foreach (var compo in comp.Comportamientos)
-                {
-                    var celComp = new PdfPCell(new Phrase(compo.Nombre ?? "", fComport));
-
-                    var nivelesTexto = string.Join("\n", compo.Niveles.Select(n =>
-                        (string.IsNullOrWhiteSpace(n.nombre) ? "" : n.nombre) +
-                        (n.valor > 0 ? " (" + n.valor + ")" : "") +
-                        (string.IsNullOrWhiteSpace(n.descripcion) ? "" : ": " + n.descripcion)
-                    ));
-
-                    var celNiv = new PdfPCell(new Phrase(nivelesTexto, fTxt));
-
-                    t.AddCell(celComp);
-                    t.AddCell(celNiv);
-
-                    if (incluirNivelAsignado)
-                    {
-                        var asignado = compo.Niveles.FirstOrDefault(n => n.idNivelElegido > 0 && n.idNivel == n.idNivelElegido);
-
-                        if (asignado == null)
-                        {
-                            asignado = compo.Niveles.FirstOrDefault(n => n.valor > 0 && n.idEvaxComp > 0);
-                        }
-
-                        var textoAsignado = asignado != null
-                            ? $"{asignado.nombre}{(asignado.valor > 0 ? " (" + asignado.valor + ")" : "")}"
-                            : "No asignado";
-
-                        t.AddCell(new PdfPCell(new Phrase(textoAsignado, fTxt)));
+                        var pDesc = new Paragraph(comp.Descripcion, fTxt) { SpacingAfter = 6f };
+                        doc.Add(pDesc);
                     }
-                }
 
-                doc.Add(t);
-                doc.Add(new Paragraph(" ") { SpacingAfter = 6f });
+                    PdfPTable t;
+                    if (idEstado != 1)
+                    {
+                        t = new PdfPTable(3) { WidthPercentage = 100 };
+                        t.SetWidths(new float[] { 35f, 50f, 15f });
+                        t.AddCell(new PdfPCell(new Phrase("Comportamiento", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                        t.AddCell(new PdfPCell(new Phrase("Niveles esperados", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                        t.AddCell(new PdfPCell(new Phrase("Nivel actual asignado", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                    }
+                    else
+                    {
+                        t = new PdfPTable(2) { WidthPercentage = 100 };
+                        t.SetWidths(new float[] { 35f, 65f });
+                        t.AddCell(new PdfPCell(new Phrase("Comportamiento", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                        t.AddCell(new PdfPCell(new Phrase("Niveles esperados", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                    }
+
+                    foreach (var compo in comp.Comportamientos)
+                    {
+                        var celComp = new PdfPCell(new Phrase(compo.Nombre ?? "", fComport));
+                        var nivelesTexto = string.Join("\n", compo.Niveles.Select(n =>
+                            (string.IsNullOrWhiteSpace(n.nombre) ? "" : n.nombre) +
+                            (n.valor > 0 ? " (" + n.valor + ")" : "") +
+                            (string.IsNullOrWhiteSpace(n.descripcion) ? "" : ": " + n.descripcion)
+                        ));
+                        var celNiv = new PdfPCell(new Phrase(nivelesTexto, fTxt));
+
+                        t.AddCell(celComp);
+                        t.AddCell(celNiv);
+
+                        if (idEstado != 1)
+                        {
+                            var asignado = compo.Niveles.FirstOrDefault(n => n.idNivelElegido > 0 && n.idNivel == n.idNivelElegido);
+                            if (asignado == null) asignado = compo.Niveles.FirstOrDefault(n => n.idEvaxComp > 0);
+                            var textoAsignado = asignado != null
+                                ? $"{asignado.nombre}{(asignado.valor > 0 ? " (" + asignado.valor + ")" : "")}"
+                                : "No asignado";
+                            t.AddCell(new PdfPCell(new Phrase(textoAsignado, fTxt)));
+                        }
+                    }
+
+                    doc.Add(t);
+                    doc.Add(new Paragraph(" ") { SpacingAfter = 6f });
+                }
             }
-        }
+
         #endregion
 
 
