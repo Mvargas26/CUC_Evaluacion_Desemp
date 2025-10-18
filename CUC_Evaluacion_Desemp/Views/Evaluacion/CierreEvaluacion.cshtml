@@ -1,0 +1,447 @@
+﻿@model Entidades.FuncionarioModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Evaluación del Desempeño CUC";
+}
+<script>
+    var urlBase = '@Url.Content("~")';
+</script>
+
+@functions {
+    static Random rnd = new Random();
+}
+
+@{
+    string[] coloresFuertes = { "#E63946", "#F4A261", "#2A9D8F", "#264653", "#8E44AD", "#D72638", "#3D348B", "#FF7F50" };
+}
+
+@{
+    var ultimaEvaluacionFuncionario = (Entidades.EvaluacionModel)ViewBag.ultimaEvaluacionFuncionario;
+    var listaTiposObjetivos = ViewData["ListaTiposObjetivos"] as List<Entidades.TiposObjetivosModel>;
+    var listaTiposCompetencias = ViewData["ListaTiposCompetencias"] as List<Entidades.TiposCompetenciasModel>;
+    var tiposdeObjetivos = ViewData["tiposdeObjetivos"] as List<Entidades.TiposObjetivosModel>;
+
+    var transversales = (List<Entidades.CompetenciasModel>)ViewBag.Transversales;
+    var CompetenciasAgrupadas = (List<Entidades.CompetenciasModel>)ViewBag.CompetenciasAgrupadas;
+
+    var faseActual = ViewBag.faseActual;
+
+}
+
+<input type="hidden" id="MaximoPuntosCompetencias" value="@ViewBag.MaximoPuntosCompetencias" />
+
+<div class="container mt-4 mb-5">
+    <!-- Encabezado principal -->
+    <h2 class="mb-2 text-center">Gestión Institucional de Recursos Humanos</h2>
+    <h4 class="mb-4 text-center">Evaluación del Desempeño @DateTime.Now.Year</h4>
+
+    <!-- Texto introductorio -->
+    <p>
+        Con el objetivo de dar cumplimiento a que todo trabajador debe ser evaluado por el proceso de evaluación de desempeño
+        establecido en los "Lineamientos Metodológicos Generales para la Evaluación del Desempeño de las personas servidoras públicas",
+        cubiertas por la rectoría del Ministerio de Planificación Nacional y Política Económica (MIDEPLAN) dispuestas en la
+        Directriz N°029-PLAN, anuando a la Ley de Marco de Empleo Público y a la Ley de Fortalecimiento de las Finanzas Públicas.
+    </p>
+
+    <!-- Sección "Conglomerado "  -->
+    <div class="my-5">
+        @{
+            var idConglomerado = ViewBag.IdConglomerado;
+            var listaConglomerados = ViewData["ListaConglomerados"] as List<Entidades.ConglomeradoModel>;
+            var nombreConglomerado = listaConglomerados?.FirstOrDefault(c => c.IdConglomerado == idConglomerado)?.NombreConglomerado ?? "Conglomerado ?";
+        }
+        <h4 class="text-center">@nombreConglomerado</h4>
+        <div class="row justify-content-center mt-4">
+            @if (ViewBag.PesosConglomerados != null)
+            {
+                foreach (var item in ViewBag.PesosConglomerados)
+                {
+                    var randomColor = coloresFuertes[rnd.Next(coloresFuertes.Length)];
+                    <div class="col-sm-3 text-center">
+                        <div class="rounded-circle text-white mx-auto d-flex align-items-center justify-content-center"
+                             style="width:80px; height:80px; background-color:@randomColor;">
+                            @item.Porcentaje.ToString("0")%
+                        </div>
+                        @{
+                            listaTiposObjetivos = ViewData["ListaTiposObjetivos"] as List<Entidades.TiposObjetivosModel>;
+                            var nombreTipo = listaTiposObjetivos?.FirstOrDefault(t => t.IdTipoObjetivo == item.IdTipoObjetivo)?.Tipo;
+
+                            listaTiposCompetencias = ViewData["ListaTiposCompetencias"] as List<Entidades.TiposCompetenciasModel>;
+                            var nombreTipoCompet = listaTiposCompetencias?.FirstOrDefault(t => t.IdTipoCompetencia == item.IdTipoCompetencia)?.Tipo;
+
+                            var nombreFinal = !string.IsNullOrEmpty(nombreTipo)
+                            ? nombreTipo
+                            : !string.IsNullOrEmpty(nombreTipoCompet) ? nombreTipoCompet : "Desconocido";
+                        }
+                        <p class="mt-2">@nombreFinal</p>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Fase de Planificación  -->
+    <div class="mb-5">
+        <h3>Usted se encuentra en la fase de: @faseActual.EstadoEvaluacion</h3>
+        <p>
+            @faseActual.Descripcion
+        </p>
+        <div class="row">
+            <div class="col-md-6">
+                <ul>
+                    <li><strong>Dependencia:</strong> @Model.Dependencia</li>
+                    <li><strong>Cedula:</strong> @Model.Cedula</li>
+                    <li id="ceduFuncionario" hidden>@Model.Cedula</li>
+                    <li id="idConglo" hidden>@idConglomerado</li>
+                    <li>
+                        <strong>Funcionario:</strong> @Model.Nombre @Model.Apellido1 @Model.Apellido2
+                    </li>
+                    <li><strong>Puesto:</strong> @Model.Puesto</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+            </div>
+        </div>
+    </div>
+    <hr />
+    <!-- ***********************************************************SECCIÓN para Objetivos Asignados -->
+    <div class="mb-5">
+        <h3>Objetivos Asignados</h3>
+        <table id="tbObjetivosAsignados" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Nombre</th>
+                    <th>Peso</th>
+                    <th>Meta</th>
+                    <th>Actual</th>
+                    <th>Acciones</th>
+                    <th class="d-none">ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var objetivo in ViewBag.ListaObjetivos)
+                {
+                    <tr>
+                        <td>@objetivo.TipoObjetivo</td>
+                        <td>@objetivo.NombreObjetivo</td>
+                        <td>@objetivo.Peso<span>%</span></td>
+                        <td>@objetivo.Meta</td>
+                        <td>@objetivo.ValorObtenido<span>%</span></td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-warning btn-editar-actual"
+                                    data-id="@objetivo.IdObjetivo"
+                                    data-tipo="@objetivo.TipoObjetivo"
+                                    data-nombre="@objetivo.NombreObjetivo"
+                                    data-peso="@objetivo.Peso"
+                                    data-actual="@objetivo.ValorObtenido"
+                                    data-meta="@objetivo.Meta"
+                                    data-IdEvaxObj="@objetivo.IdEvaxObj">
+                                Editar Actual
+                            </button>
+                        </td>
+                        <td class="d-none">@objetivo.IdEvaxObj</td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <hr />
+    <!-- ***********************************************************SECCIÓN COMPETENCIAS TRANSVERSALES -->
+    <div class="mb-5">
+        <h3>Competencias Transversales</h3>
+        <table class="table table-bordered" id="tbTransversalesEval">
+            <tbody>
+                @foreach (var comp in transversales)
+                {
+                    var niveles = comp.Comportamientos
+                        .SelectMany(c => c.Niveles)
+                        .GroupBy(n => new { n.idNivel, n.nombre, n.valor })
+                        .OrderBy(g => g.Key.idNivel)
+                        .Select(g => g.Key)
+                        .ToList();
+                    var totalColumnas = 1 + niveles.Count + 1;
+
+                    <tr data-id="@comp.IdCompetencia" data-id-tipo="@comp.IdTipoCompetencia">
+                        <th colspan="@totalColumnas" class="text-center" style="background:#f8f9fa; font-weight:bold;">
+                            Competencia: @comp.Competencia
+                        </th>
+                    </tr>
+                    <tr>
+                        <td colspan="@totalColumnas" class="text-center" style="font-weight:bold;">
+                            Descripción: @comp.Descripcion
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Comportamientos</th>
+                        @foreach (var n in niveles)
+                        {
+                            <th data-nivel-id="@n.idNivel">@n.nombre = @n.valor</th>
+                        }
+                        <th>Asignar nivel</th>
+                    </tr>
+
+                    foreach (var compo in comp.Comportamientos)
+                    {
+                        var nivelElegido = compo.Niveles.FirstOrDefault(n => n.idNivelElegido > 0 && n.idNivel == n.idNivelElegido);
+                        var selectedNivelId = nivelElegido?.idNivel ?? 0;
+
+                        <tr data-comportamiento-id="@compo.idComport">
+                            <td><strong>@compo.Nombre</strong></td>
+                            @foreach (var n in niveles)
+                            {
+                                var nivelMatch = compo.Niveles.FirstOrDefault(x => x.idNivel == n.idNivel);
+                                var desc = nivelMatch?.descripcion ?? "";
+                                <td data-comportamiento-id="@compo.idComport" data-nivel-id="@n.idNivel">
+                                    <div>@desc</div>
+                                </td>
+                            }
+                            <td style="width:180px;">
+                                <select class="form-select form-select-sm select-nivel-obtenido w-100"
+                                        data-idcompetencia="@comp.IdCompetencia"
+                                        data-idcomportamiento="@compo.idComport">
+                                    <option value="" @(selectedNivelId == 0 ? "selected" : "") disabled>Seleccione...</option>
+                                    @foreach (var n in niveles)
+                                    {
+                                        var nivelMatch = compo.Niveles.FirstOrDefault(x => x.idNivel == n.idNivel);
+                                        var evax = nivelMatch?.idEvaxComp ?? 0;
+                                        <option value="@n.idNivel"
+                                                data-valor="@n.valor"
+                                                data-evaxcomp="@evax"
+                                                @(n.idNivel == selectedNivelId ? "selected" : "")>
+                                            @n.nombre
+                                        </option>
+                                    }
+                                </select>
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td colspan="@totalColumnas"><hr /></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <hr />
+    <!-- ***********************************************************SECCIÓN COMPETENCIAS QUE NO SON  TRANSVERSALES -->
+    <div class="mb-5">
+        <h3>Competencias</h3>
+        <table class="table table-bordered" id="tbCompetenciasEval">
+            <tbody>
+                @foreach (var comp in CompetenciasAgrupadas)
+                {
+                    var niveles = comp.Comportamientos
+                        .SelectMany(c => c.Niveles)
+                        .GroupBy(n => new { n.idNivel, n.nombre })
+                        .OrderBy(g => g.Key.idNivel)
+                        .Select(g => g.Key)
+                        .ToList();
+                    var totalColumnas = 1 + niveles.Count + 1;
+
+                    <tr data-id="@comp.IdCompetencia" data-id-tipo="@comp.IdTipoCompetencia">
+                        <th colspan="@totalColumnas" class="text-center" style="background:#f8f9fa; font-weight:bold;">
+                            Competencia: @comp.Competencia
+                        </th>
+                    </tr>
+                    <tr>
+                        <td colspan="@totalColumnas" class="text-center" style="font-weight:bold;">
+                            Descripción: @comp.Descripcion
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Comportamientos</th>
+                        @foreach (var n in niveles)
+                        {
+                            <th data-nivel-id="@n.idNivel">@n.nombre</th>
+                        }
+                        <th>Asignar Nivel</th>
+                    </tr>
+
+                    foreach (var compo in comp.Comportamientos)
+                    {
+                        var nivelElegido = compo.Niveles.FirstOrDefault(n => n.idNivelElegido > 0 && n.idNivel == n.idNivelElegido);
+                        var selectedNivelId = nivelElegido?.idNivel ?? 0;
+
+                        <tr data-comportamiento-id="@compo.idComport">
+                            <td><strong>@compo.Nombre</strong></td>
+                            @foreach (var n in niveles)
+                            {
+                                var nivelMatch = compo.Niveles.FirstOrDefault(x => x.idNivel == n.idNivel);
+                                var desc = nivelMatch?.descripcion ?? "";
+                                <td data-comportamiento-id="@compo.idComport" data-nivel-id="@n.idNivel">
+                                    <div>@desc</div>
+                                </td>
+                            }
+                            <td class="col-nivel-obtenido" style="width:180px;">
+                                <select class="form-select form-select-sm select-nivel-obtenido w-100"
+                                        data-idcompetencia="@comp.IdCompetencia"
+                                        data-idcomportamiento="@compo.idComport">
+                                    <option value="" @(selectedNivelId == 0 ? "selected" : "") disabled>Seleccione...</option>
+                                    @foreach (var n in niveles)
+                                    {
+                                        var nivelMatch = compo.Niveles.FirstOrDefault(x => x.idNivel == n.idNivel);
+                                        var val = nivelMatch?.valor ?? 0;
+                                        var evax = nivelMatch?.idEvaxComp ?? 0;
+                                        <option value="@val"
+                                                data-idnivel="@n.idNivel"
+                                                data-evaxcomp="@evax"
+                                                @(n.idNivel == selectedNivelId ? "selected" : "")>
+                                            @n.nombre
+                                        </option>
+                                    }
+                                </select>
+                            </td>
+                        </tr>
+                    }
+
+                    <tr>
+                        <td colspan="@totalColumnas"><hr /></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <!-- ***********************************************************SECCIÓN OBSERVACIONES -->
+    <hr />
+    <div class="mb-5">
+        <h3>Observaciones:</h3>
+        <div class="col-12">
+            <textarea id="txtObservaciones"
+                      class="form-control"
+                      placeholder="Ingrese sus observaciones aquí."
+                      rows="4">@ultimaEvaluacionFuncionario.Observaciones</textarea>
+        </div>
+    </div>
+    <hr />
+    <!-- ********************************************************* Resumen Final -->
+    <div class="d-flex justify-content-center">
+        <div class="p-4" style="background-color: #f8d7da; max-width: 600px;">
+            <h5 class="text-center">Resumen para: @Model.Nombre @Model.Apellido1 @Model.Apellido2</h5>
+            <table id="tablaResultados" class="table table-borderless align-middle">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Porcentaje</th>
+                        <th style="width: 100px;">Valor</th>
+                        <th class="d-none">id tipo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.PesosConglomerados)
+                    {
+                        var nombreTipo = listaTiposObjetivos?.FirstOrDefault(t => t.IdTipoObjetivo == item?.IdTipoObjetivo)?.Tipo;
+                        var nombreTipoCompet = listaTiposCompetencias?.FirstOrDefault(t => t.IdTipoCompetencia == item?.IdTipoCompetencia)?.Tipo;
+                        var nombreFinal = nombreTipo ?? nombreTipoCompet ?? "Desconocido";
+
+                        var idTipoObjetivo = item?.IdTipoObjetivo ?? 0;
+                        var idTipoCompetencia = item?.IdTipoCompetencia ?? 0;
+                        var idTipo = idTipoObjetivo != 0 ? idTipoObjetivo : idTipoCompetencia;
+                        var tipo = idTipoObjetivo != 0 ? "Objetivo" : "Competencia";
+
+                        <tr>
+                            <td><strong>@nombreFinal</strong></td>
+                            <td><strong>@(item?.Porcentaje.ToString("0") ?? "0")%</strong></td>
+                            <td style="width: 100px;">
+                                <input type="number" class="form-control input-calificacion"
+                                       placeholder="@(item?.Porcentaje.ToString("0") ?? "0")%" readonly />
+                            </td>
+                            <td class="d-none" data-tipo-id="@idTipo" data-tipo-categoria="@tipo">
+                                @idTipo
+                            </td>
+                        </tr>
+                    }
+
+                    <tr>
+                        <td><strong>Resultado:</strong></td>
+                        <td><strong> 100%</strong></td>
+                        <td style="width: 100px;">
+                            <input type="number" class="form-control" id="resultado-total" readonly />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- ******************************************************* btn Guardar Seguimiento -->
+    <div class="d-flex justify-content-center">
+        <div class="text-center">
+            <button id="btnCerrarEvaluación" class="btn btn-success mt-3">Cerrar Evaluación <i class="fa-solid fa-floppy-disk"></i></button>
+        </div>
+    </div>
+
+
+
+    @****************************************************************************************************************************
+        ******************************************     MODALES          ************************************************************
+        ****************************************************************************************************************************@
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="confirmacionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">Confirmación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="mensajeConfirmacion">¿Está seguro de realizar esta acción?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-danger" id="btnEliminar">Sí</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal EditarActual Objetivos -->
+    <div class="modal fade" id="editarActualModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">Editar Valor Actual</h5>
+                    <button type="button" class="btn-close" onclick="cerrarModal()" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Tipo:</label>
+                        <p class="form-control-plaintext" id="modalTipoObjetivo"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>Objetivo:</label>
+                        <p class="form-control-plaintext" id="modalNombreObjetivo"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>Peso:</label>
+                        <p class="form-control-plaintext" id="modalPesoObjetivo"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>Meta:</label>
+                        <p class="form-control-plaintext" id="modalMetaObjetivo"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalValorActual">Valor Actual (%):</label>
+                        <input type="number" class="form-control" id="modalValorActual">
+                        <small id="valorError" class="text-danger d-none">El valor debe estar entre 1 y <span id="maxPeso"></span>%</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="modalBtnConfirmar">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @section Scripts {
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="~/sources/js/vistas/CierreEvaluacion/JS_CierreEvaluacion.js"></script>
+
+
+    }
+
+</div>

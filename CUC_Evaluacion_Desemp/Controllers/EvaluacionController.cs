@@ -439,14 +439,14 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                 idComport = cg.Key.idComport,
                                 Nombre = cg.Key.Comportamiento,
                                 Niveles = cg
-                                    .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel, n.idNivelElegido }) // ⬅️ AGREGAR idNivelElegido
+                                    .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel, n.idNivelElegido }) 
                                     .Select(ng => new NivelComportamientoModel
                                     {
                                         idNivel = ng.Key.idNivel,
                                         nombre = ng.Key.Nivel,
                                         descripcion = ng.Key.Descripcion,
                                         valor = ng.Key.valorNivel,
-                                        idNivelElegido = ng.Key.idNivelElegido, // ⬅️ AGREGAR ESTO
+                                        idNivelElegido = ng.Key.idNivelElegido,
                                         idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
                                     }).ToList()
                             }).ToList()
@@ -668,15 +668,387 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
         }//fin GuardarSeguimiento
 
-
         #endregion
 
+        #region CierreEvaluacion
+        public ActionResult SeleccionarSubalternoCierreEvaluacion()
+        {
+            try
+            {
+                var listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosConEvaluacionPorJefe("44444444");
+
+                return View(listaSubAlternos);
 
 
-        #region AprobarComoJefe
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener la lista.";
+                return View("Error");
+            }
+        }//fin
+
+        [HttpPost]
+        public ActionResult SeleccionarSubalternoCierreEvaluacion(string cedulaSeleccionada)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(cedulaSeleccionada))
+                {
+                    TempData["MensajeError"] = "Debe seleccionar un subalterno.";
+                    return RedirectToAction("SeleccionarSubalternoCierreEvaluacion");
+                }
+
+                return RedirectToAction("ConglomeradosPorFuncCierreEvaluacion", new { cedulaSeleccionada = cedulaSeleccionada });
+
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al seleccionar Funcionario.";
+                return RedirectToAction(nameof(SeleccionarSubalternoCierreEvaluacion));
+            }
+        }
+
+        public ActionResult ConglomeradosPorFuncCierreEvaluacion(string cedulaSeleccionada)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(cedulaSeleccionada))
+                {
+                    TempData["MensajeError"] = "Debe seleccionar un Conglomerado para el funcionario a evaluar.";
+                    return RedirectToAction("SeleccionarSubalternoCierreEvaluacion");
+                }
+
+                ViewBag.cedulaSeleccionada = cedulaSeleccionada;
+
+                var listaConglomerados = _servicioMantenimientos.Funcionario.ConglomeradosPorFunc(cedulaSeleccionada);
+                return View(listaConglomerados);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener la lista.";
+                return RedirectToAction(nameof(SeleccionarSubalternoCierreEvaluacion));
+            }
+
+        }
+
+        [HttpPost]
+        public ActionResult SelecPeriodoPorFunCierreEvaluacion(FormCollection coleccion)
+        {
+            try
+            {
+                string cedulaSeleccionada = coleccion["cedulaSeleccionada"];
+                string idConglomerado = coleccion["idConglomerado"];
+
+                ViewBag.cedulaSeleccionada = cedulaSeleccionada;
+                ViewBag.idConglomerado = idConglomerado;
+
+                if (string.IsNullOrEmpty(idConglomerado))
+                {
+                    TempData["MensajeError"] = "Debe seleccionar un Conglomerado.";
+                    return RedirectToAction("SeleccionarSubalternoCierreEvaluacion", new { cedulaSeleccionada = cedulaSeleccionada });
+                }
+
+                var periodos = _servicioMantenimientos.Periodos.ListarPeriodosAnioActual();
+                return View(periodos);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener la lista.";
+                return RedirectToAction(nameof(SeleccionarSubalternoCierreEvaluacion));
+            }
+        }
+
+        [HttpPost]
+        public ActionResult CierreEvaluacion(FormCollection coleccion)
+        {
+            try
+            {
+                string cedulaSeleccionada = coleccion["cedulaSeleccionada"];
+                int idConglomerado = Convert.ToInt32(coleccion["idConglomerado"]);
+                string idPeriodo = coleccion["idPeriodo"];
+
+                if (string.IsNullOrEmpty(cedulaSeleccionada) || string.IsNullOrEmpty(coleccion["idConglomerado"]))
+                {
+                    TempData["MensajeError"] = "Debe seleccionar un funcionario y un conglomerado.";
+                    return RedirectToAction("SeleccionarSubalterno");
+                }
+
+                var subalterno = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(cedulaSeleccionada);
+                var PesosConglomerados = _servicioMantenimientos.Conglomerados.ConsultarPesosXConglomerado(idConglomerado);
+                ViewData["ListaTiposObjetivos"] = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
+                ViewData["ListaTiposCompetencias"] = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
+                ViewData["ListaConglomerados"] = _servicioMantenimientos.Conglomerados.ListarConglomerados();
+
+                EstadoEvaluacionModel faseActual = _servicioMantenimientos.EstadoEvaluacion.ConsultarEstadoPorID(3);
+
+                var ultimaEvaluacionFuncionario = _servicioMantenimientos.Evaluaciones.ConsultarEvaluacionComoFuncionario(cedulaSeleccionada, idConglomerado);
+
+                if (ultimaEvaluacionFuncionario == null)
+                {
+                    TempData["AlertMessage"] = "No hay una evaluación para usted en este conglomerado.Por favor contacte a su Jefatura para planificarla.";
+                    return RedirectToAction("Index", "Home");
+                }
+
+                var listaObjetivos = _servicioMantenimientos.Evaluaciones.Listar_objetivosXEvaluacion(ultimaEvaluacionFuncionario.IdEvaluacion);
+
+                var CompetenciasPlanificadas = _servicioMantenimientos.ObtenerComportamientosYDescripciones.
+                    ListarComportamientosYDescripcionesNegocios(ultimaEvaluacionFuncionario.IdEvaluacion, "PorEvaluacion");
+
+                var Transversales = CompetenciasPlanificadas
+                    .Where(c => Convert.ToInt32(c.idTipoCompetencia) == 2500)
+                    .ToList();
+
+                var Competencias = CompetenciasPlanificadas
+                    .Where(c => Convert.ToInt32(c.idTipoCompetencia) != 2500)
+                    .ToList();
+
+                var transversalesAgrupadas = Transversales
+                    .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia, x.idTipoCompetencia, x.Tipo })
+                    .Select(g => new CompetenciasModel
+                    {
+                        IdCompetencia = g.Key.idCompetencia,
+                        Competencia = g.Key.Competencia,
+                        Descripcion = g.Key.DescriCompetencia,
+                        IdTipoCompetencia = g.Key.idTipoCompetencia,
+                        TipoCompetencia = new TiposCompetenciasModel { IdTipoCompetencia = g.Key.idTipoCompetencia, Tipo = g.Key.Tipo },
+                        Comportamientos = g
+                            .GroupBy(k => new { k.idComport, k.Comportamiento })
+                            .Select(cg => new ComportamientoModel
+                            {
+                                idComport = cg.Key.idComport,
+                                Nombre = cg.Key.Comportamiento,
+                                Niveles = cg
+                                    .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel, n.idNivelElegido }) 
+                                    .Select(ng => new NivelComportamientoModel
+                                    {
+                                        idNivel = ng.Key.idNivel,
+                                        nombre = ng.Key.Nivel,
+                                        descripcion = ng.Key.Descripcion,
+                                        valor = ng.Key.valorNivel,
+                                        idNivelElegido = ng.Key.idNivelElegido, 
+                                        idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
+                                    }).ToList()
+                            }).ToList()
+                    }).ToList();
+
+                var CompetenciasAgrupadas = Competencias
+                 .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia, x.idTipoCompetencia, x.Tipo })
+                 .Select(g => new Entidades.CompetenciasModel
+                 {
+                     IdCompetencia = g.Key.idCompetencia,
+                     Competencia = g.Key.Competencia,
+                     Descripcion = g.Key.DescriCompetencia,
+                     IdTipoCompetencia = g.Key.idTipoCompetencia,
+                     TipoCompetencia = new Entidades.TiposCompetenciasModel { IdTipoCompetencia = g.Key.idTipoCompetencia, Tipo = g.Key.Tipo },
+                     Comportamientos = g
+                         .GroupBy(k => new { k.idComport, k.Comportamiento })
+                         .Select(cg => new Entidades.ComportamientoModel
+                         {
+                             idComport = cg.Key.idComport,
+                             Nombre = cg.Key.Comportamiento,
+                             Niveles = cg
+                                 .GroupBy(n => new { n.idNivel, n.Nivel, n.Descripcion, n.valorNivel, n.idNivelElegido })
+                                 .Select(ng => new Entidades.NivelComportamientoModel
+                                 {
+                                     idNivel = ng.Key.idNivel,
+                                     nombre = ng.Key.Nivel,
+                                     descripcion = ng.Key.Descripcion,
+                                     valor = ng.Key.valorNivel,
+                                     idNivelElegido = ng.Key.idNivelElegido,
+                                     idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
+                                 }).ToList()
+                         }).ToList()
+                 }).ToList();
+
+                var listaNiveles = _servicioMantenimientos.NivelesComportamientos.ListarNivelesComportamientos();
+                var valorPorNivel = listaNiveles.ToDictionary(n => n.idNivel, n => n.valor);
+
+                int Val(int idNivel) => valorPorNivel.TryGetValue(idNivel, out var v) ? v : 0;
+
+                var maxPorTransversal = (Transversales ?? Enumerable.Empty<ObtenerComportamientosYDescripcionesModel>())
+                    .GroupBy(x => x.idComport)
+                    .Select(g => Val(g.Max(e => e.idNivel)));
+
+                var maxPorCompetencia = (Competencias ?? Enumerable.Empty<ObtenerComportamientosYDescripcionesModel>())
+                    .GroupBy(x => x.idComport)
+                    .Select(g => Val(g.Max(e => e.idNivel)));
+
+                int MaximoPuntosCompetencias = maxPorTransversal.Sum() + maxPorCompetencia.Sum();
+
+                ViewBag.ListaObjetivos = listaObjetivos;
+                ViewBag.Transversales = transversalesAgrupadas;
+                ViewBag.CompetenciasAgrupadas = CompetenciasAgrupadas;
+                ViewBag.PesosConglomerados = PesosConglomerados;
+                ViewBag.IdConglomerado = idConglomerado;
+                ViewBag.MaximoPuntosCompetencias = MaximoPuntosCompetencias;
+                ViewBag.ultimaEvaluacionFuncionario = ultimaEvaluacionFuncionario;
+                ViewBag.faseActual = faseActual;
+
+                return View(subalterno);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al cargar la vista para evaluar.";
+                return View("Error");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult GuardarCierreEvaluacion(string evaluacionData)
+        {
+            try
+            {
+                //Convertimos de string a Json lo que viene de la vista para tratarla
+                var dataEnJSon = JsonConvert.DeserializeObject<JObject>(evaluacionData);
+
+                var cedFuncionario = dataEnJSon["cedFuncionario"]?.ToString();
+                var idConglo = dataEnJSon["idConglo"]?.ToString();
+                var observaciones = dataEnJSon["observaciones"]?.ToString();
+
+                var objetivos = dataEnJSon["objetivos"];
+                var competenciasTransversales = dataEnJSon["competenciasTransversales"];
+                var competencias = dataEnJSon["competencias"];
+
+                //consultamos la ultima evaluacion 
+                var ultimaEvaluacionFuncionario = _servicioMantenimientos.Evaluaciones.ConsultarEvaluacionComoFuncionario(cedFuncionario, Convert.ToInt32(idConglo));
+
+                if (ultimaEvaluacionFuncionario == null)
+                {
+                    TempData["AlertMessage"] = "No hay una evaluación para usted en este conglomerado.Por favor contacte a su Jefatura para planificarla.";
+                    return RedirectToAction("Index", "Home");
+                }
+
+                //actualizamos su estado y lo guardamos
+                ultimaEvaluacionFuncionario.EstadoEvaluacion = 3; //"Estado 3 = Cierre de evaluación"
+                ultimaEvaluacionFuncionario.Observaciones = observaciones;
+                _servicioMantenimientos.Evaluaciones.ModificarEvaluacion(ultimaEvaluacionFuncionario);
+
+                // Actualizamos el actual de los obj
+                foreach (var objetivo in objetivos)
+                {
+                    var evaluacionXObjetivo = new EvaluacionXObjetivoModel
+                    {
+                        IdEvaxObj = Convert.ToInt32(objetivo["idEvaxObj"]),
+                        IdEvaluacion = ultimaEvaluacionFuncionario.IdEvaluacion,
+                        IdObjetivo = Convert.ToInt32(objetivo["id"]),
+                        ValorObtenido = Convert.ToDecimal(objetivo["actual"]),
+                        Peso = Convert.ToDecimal(objetivo["peso"]),
+                        Meta = objetivo["meta"].ToString()
+                    };
+
+                    _servicioMantenimientos.EvaluacionXobjetivos.ModificarEvaluacionXObjetivo(evaluacionXObjetivo);
+                }
+                //******************************************************************************************************************************
+                // Actualizamos competencias Transversales
+                foreach (var competencia in competenciasTransversales)
+                {
+                    var idCompetencia = Convert.ToInt32(competencia["idCompetencia"]);
+
+                    foreach (var comportamiento in competencia["comportamientos"])
+                    {
+                        var idComportamiento = Convert.ToInt32(comportamiento["idComportamiento"]);
+
+                        int idNivelElegido = 0;
+
+                        foreach (var n in comportamiento["niveles"])
+                            if (n["idNivelElegido"] != null && int.TryParse(n["idNivelElegido"]?.ToString(), out var e) && e > 0) { idNivelElegido = e; break; }
+
+                        if (idNivelElegido == 0)
+                            foreach (var n in comportamiento["niveles"])
+                                if (n["idEvaxComp"] != null && int.TryParse(n["idEvaxComp"]?.ToString(), out var evx) && evx > 0) { idNivelElegido = Convert.ToInt32(n["idNivel"]); break; }
+
+                        if (idNivelElegido == 0)
+                            foreach (var n in comportamiento["niveles"])
+                                if (decimal.TryParse(n["valor"]?.ToString(), out var val) && val > 0) { idNivelElegido = Convert.ToInt32(n["idNivel"]); break; }
+
+                        foreach (var nivel in comportamiento["niveles"])
+                        {
+                            var registro = new EvaluacionXcompetenciaModel
+                            {
+                                IdEvaxComp = nivel["idEvaxComp"] != null ? Convert.ToInt32(nivel["idEvaxComp"]) : 0,
+                                IdEvaluacion = ultimaEvaluacionFuncionario.IdEvaluacion,
+                                IdCompetencia = idCompetencia,
+                                IdComportamiento = idComportamiento,
+                                IdNivel = Convert.ToInt32(nivel["idNivel"]),
+                                ValorObtenido = nivel["valor"] != null ? Convert.ToDecimal(nivel["valor"]) : 0m
+                            };
+
+                            _servicioMantenimientos.EvaluacionXcompetencia.ActualizarEvaluacionXCompetencia(registro);
+                        }
+
+                        // Ponemos el elegido a TODAS las filas del grupo )osea a los niveles relacionados a esa comeptencia:
+                        _servicioMantenimientos.EvaluacionXcompetencia
+                            .ActualizarNivelElegidoPorGrupo(
+                                ultimaEvaluacionFuncionario.IdEvaluacion,
+                                idCompetencia,
+                                idComportamiento,
+                                idNivelElegido
+                            );
+                    }
+                }
+                //******************************************************************************************************************************
+                // Actualizamos competencias (no transversales)
+                foreach (var competencia in competencias)
+                {
+                    var idCompetencia = Convert.ToInt32(competencia["idCompetencia"]);
+
+                    foreach (var comportamiento in competencia["comportamientos"])
+                    {
+                        var idComportamiento = Convert.ToInt32(comportamiento["idComportamiento"]);
+
+                        int idNivelElegido = 0;
+
+                        foreach (var n in comportamiento["niveles"])
+                            if (n["idNivelElegido"] != null && int.TryParse(n["idNivelElegido"]?.ToString(), out var e) && e > 0) { idNivelElegido = e; break; }
+
+                        if (idNivelElegido == 0)
+                            foreach (var n in comportamiento["niveles"])
+                                if (n["idEvaxComp"] != null && int.TryParse(n["idEvaxComp"]?.ToString(), out var evx) && evx > 0) { idNivelElegido = Convert.ToInt32(n["idNivel"]); break; }
+
+                        if (idNivelElegido == 0)
+                            foreach (var n in comportamiento["niveles"])
+                                if (decimal.TryParse(n["valor"]?.ToString(), out var val) && val > 0) { idNivelElegido = Convert.ToInt32(n["idNivel"]); break; }
+
+                        foreach (var nivel in comportamiento["niveles"])
+                        {
+                            var registro = new EvaluacionXcompetenciaModel
+                            {
+                                IdEvaxComp = nivel["idEvaxComp"] != null ? Convert.ToInt32(nivel["idEvaxComp"]) : 0,
+                                IdEvaluacion = ultimaEvaluacionFuncionario.IdEvaluacion,
+                                IdCompetencia = idCompetencia,
+                                IdComportamiento = idComportamiento,
+                                IdNivel = Convert.ToInt32(nivel["idNivel"]),
+                                ValorObtenido = nivel["valor"] != null ? Convert.ToDecimal(nivel["valor"]) : 0m
+                            };
+
+                            _servicioMantenimientos.EvaluacionXcompetencia.ActualizarEvaluacionXCompetencia(registro);
+                        }
+
+                        _servicioMantenimientos.EvaluacionXcompetencia
+                            .ActualizarNivelElegidoPorGrupo(
+                                ultimaEvaluacionFuncionario.IdEvaluacion,
+                                idCompetencia,
+                                idComportamiento,
+                                idNivelElegido
+                            );
+                    }
+                }
+                var fechaNorm = DateTime.Now.ToString("yyyyMMdd_HHmm");
+                var nombreArchivo = $"cierreEvaluacion_{cedFuncionario}_{fechaNorm}.pdf";
+                CrearReportePDFcierreEvaluacion_(dataEnJSon, ultimaEvaluacionFuncionario, nombreArchivo);
+
+                var urlArchivo = Url.Content("~/Reportes/" + cedFuncionario + "/" + nombreArchivo);
+                return Json(new { ok = true, pdfUrl = urlArchivo, fileName = nombreArchivo, message = "Seguimiento guardado correctamente" }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { ok = false, error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+
+        }//fin GuardarSeguimiento
 
         #endregion
-
 
         #region Metodos Internos
         private void CrearReportePDFPlanificar(JObject data, EvaluacionModel eva, string nombreArchivo)
@@ -1038,6 +1410,204 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                     n.Descripcion,
                                     n.valorNivel,
                                     n.idNivelElegido 
+                                })
+                                    .Select(ng => new NivelComportamientoModel
+                                    {
+                                        idNivel = ng.Key.idNivel,
+                                        nombre = ng.Key.Nivel,
+                                        descripcion = ng.Key.Descripcion,
+                                        valor = ng.Key.valorNivel,
+                                        idNivelElegido = ng.Key.idNivelElegido,
+                                        idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
+                                    }).OrderBy(x => x.valor).ToList()
+                            }).ToList()
+                    }).ToList();
+
+                var competenciasAgrupadas = competenciasNoTrans
+                     .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia })
+                     .Select(g => new CompetenciasModel
+                     {
+                         IdCompetencia = g.Key.idCompetencia,
+                         Competencia = g.Key.Competencia,
+                         Descripcion = g.Key.DescriCompetencia,
+                         Comportamientos = g.GroupBy(k => new { k.idComport, k.Comportamiento })
+                             .Select(cg => new ComportamientoModel
+                             {
+                                 idComport = cg.Key.idComport,
+                                 Nombre = cg.Key.Comportamiento,
+                                 Niveles = cg.GroupBy(n => new {
+                                     n.idNivel,
+                                     n.Nivel,
+                                     n.Descripcion,
+                                     n.valorNivel,
+                                     n.idNivelElegido  // ⬅️ AGREGAR
+                                 })
+                                     .Select(ng => new NivelComportamientoModel
+                                     {
+                                         idNivel = ng.Key.idNivel,
+                                         nombre = ng.Key.Nivel,
+                                         descripcion = ng.Key.Descripcion,
+                                         valor = ng.Key.valorNivel,
+                                         idNivelElegido = ng.Key.idNivelElegido,  // ⬅️ AGREGAR
+                                         idEvaxComp = ng.Select(z => z.idEvaxComp).FirstOrDefault(v => v > 0)
+                                     }).OrderBy(x => x.valor).ToList()
+                             }).ToList()
+                     }).ToList();
+
+                AgregarCompetenciasAgrupadas(doc, w, "Competencias Transversales", transversalesAgrupadas, fSub, fTxt, true);
+                AgregarCompetenciasAgrupadas(doc, w, "Competencias", competenciasAgrupadas, fSub, fTxt, true);
+
+                //------------------------------------------------------------------ Sección Firmas
+                doc.Add(new Paragraph("\n\n\n"));
+                var firmas = new PdfPTable(2) { WidthPercentage = 100 };
+                firmas.SetWidths(new float[] { 50f, 50f });
+                firmas.SpacingBefore = 15f;
+                firmas.AddCell(new PdfPCell(new Phrase("Firma Jefatura: ________________________________", fSub)) { Border = 0, HorizontalAlignment = Element.ALIGN_LEFT, PaddingTop = 15f });
+                firmas.AddCell(new PdfPCell(new Phrase("Firma Funcionario(a): ____________________________", fSub)) { Border = 0, HorizontalAlignment = Element.ALIGN_RIGHT, PaddingTop = 15f });
+                doc.Add(firmas);
+
+                doc.Close();
+            }
+        }
+        private void CrearReportePDFcierreEvaluacion_(JObject data, EvaluacionModel eva, string nombreArchivo)
+        {
+            //-------------------------------------------Datos necesarios
+            var idConglo = data["idConglo"]?.ToString();
+            var Conglo = _servicioMantenimientos.Conglomerados.ConsultarConglomeradoID(Convert.ToInt32(idConglo));
+            var dir = Server.MapPath("~/Reportes/" + data["cedFuncionario"]?.ToString());
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            var ced = data["cedFuncionario"]?.ToString() ?? eva.IdFuncionario ?? "sincedula";
+            var ruta = Path.Combine(dir, nombreArchivo);
+
+            using (var fs = new FileStream(ruta, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (var doc = new Document(PageSize.LETTER, 36, 36, 36, 36))
+            {
+                var w = PdfWriter.GetInstance(doc, fs);
+                doc.Open();
+                //----------------------------------------------------------------------Seccion titulo y Logo
+                var azul = new BaseColor(30, 55, 108);
+                var fTitulo = FontFactory.GetFont("Helvetica", 14, Font.BOLD);
+                var fSub = FontFactory.GetFont("Helvetica", 11, Font.BOLD);
+                var fTxt = FontFactory.GetFont("Helvetica", 10, Font.NORMAL);
+
+                var tblEncabezado = new PdfPTable(2) { WidthPercentage = 100 };
+                tblEncabezado.SetWidths(new float[] { 70f, 30f });
+                var logoPath = Server.MapPath("~/sources/img/LogoCUCsinFondo.png");
+                Image logo = null;
+                if (System.IO.File.Exists(logoPath))
+                {
+                    logo = Image.GetInstance(logoPath);
+                    logo.ScaleToFit(90f, 90f);
+                }
+                var celTexto = new PdfPCell(new Phrase("Colegio Universitario de Cartago", FontFactory.GetFont("Helvetica", 20, Font.BOLD, azul)))
+                {
+                    Border = 0,
+                    VerticalAlignment = Element.ALIGN_MIDDLE,
+                    HorizontalAlignment = Element.ALIGN_LEFT,
+                    PaddingTop = 10f
+                };
+                var celLogo = new PdfPCell { Border = 0, HorizontalAlignment = Element.ALIGN_RIGHT, VerticalAlignment = Element.ALIGN_MIDDLE };
+                if (logo != null) celLogo.AddElement(logo);
+                tblEncabezado.AddCell(celTexto);
+                tblEncabezado.AddCell(celLogo);
+                doc.Add(tblEncabezado);
+
+                var cb = w.DirectContent;
+                cb.SetColorStroke(azul);
+                cb.SetLineWidth(2f);
+                cb.MoveTo(doc.LeftMargin, doc.Top - 100);
+                cb.LineTo(doc.PageSize.Width - doc.RightMargin, doc.Top - 100);
+                cb.Stroke();
+
+                //----------------------------------------------------------------------Seccion Estado y fecha
+                doc.Add(new Paragraph("\nCierre de Evaluación", fTitulo));
+                doc.Add(new Paragraph("Fecha: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm"), fTxt));
+                doc.Add(Chunk.NEWLINE);
+
+                //----------------------------------------------------------------------Seccion Informacion Personal
+                var tblInfo = new PdfPTable(2) { WidthPercentage = 100 };
+                tblInfo.SetWidths(new float[] { 30f, 70f });
+                tblInfo.AddCell(new PdfPCell(new Phrase("Cédula:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                tblInfo.AddCell(new PdfPCell(new Phrase(ced, fTxt)));
+                tblInfo.AddCell(new PdfPCell(new Phrase("Id Evaluación:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                tblInfo.AddCell(new PdfPCell(new Phrase(eva.IdEvaluacion.ToString(), fTxt)));
+                tblInfo.AddCell(new PdfPCell(new Phrase("Conglomerado:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                tblInfo.AddCell(new PdfPCell(new Phrase(Conglo.NombreConglomerado, fTxt)));
+                doc.Add(tblInfo);
+                doc.Add(Chunk.NEWLINE);
+
+                //----------------------------------------------------------------------Seccion Observaciones
+                var obs = data["observaciones"]?.ToString() ?? "";
+                var ptObs = new Paragraph("Observaciones", fSub) { SpacingAfter = 6f };
+                doc.Add(ptObs);
+                doc.Add(new Paragraph(obs, fTxt));
+                doc.Add(Chunk.NEWLINE);
+
+                //----------------------------------------------------------------------Seccion Objetivos
+                var objetivos = data["objetivos"] as JArray;
+                if (objetivos != null && objetivos.Count > 0)
+                {
+                    var pTitulo = new Paragraph("Resultados de Objetivos", FontFactory.GetFont("Helvetica", 12, Font.BOLD | Font.UNDERLINE, azul))
+                    {
+                        SpacingAfter = 8f
+                    };
+                    doc.Add(pTitulo);
+
+                    var t = new PdfPTable(5) { WidthPercentage = 100 };
+                    t.SpacingBefore = 3f;
+                    t.SetWidths(new float[] { 8f, 40f, 32f, 10f, 10f });
+
+                    var header = BaseColor.LIGHT_GRAY;
+                    t.AddCell(new PdfPCell(new Phrase("Id", fSub)) { BackgroundColor = header });
+                    t.AddCell(new PdfPCell(new Phrase("Objetivo", fSub)) { BackgroundColor = header });
+                    t.AddCell(new PdfPCell(new Phrase("Meta", fSub)) { BackgroundColor = header });
+                    t.AddCell(new PdfPCell(new Phrase("Peso", fSub)) { BackgroundColor = header });
+                    t.AddCell(new PdfPCell(new Phrase("Actual", fSub)) { BackgroundColor = header });
+
+                    foreach (var o in objetivos)
+                    {
+                        var id = o["id"]?.ToString() ?? "";
+                        var nombre = o["nombre"]?.ToString() ?? "";
+                        var meta = o["meta"]?.ToString() ?? "";
+                        var peso = Convert.ToDecimal(o["peso"] ?? 0m);
+                        var actual = Convert.ToDecimal(o["actual"] ?? 0m);
+
+                        t.AddCell(new PdfPCell(new Phrase(id, fTxt)));
+                        t.AddCell(new PdfPCell(new Phrase(nombre, fTxt)));
+                        t.AddCell(new PdfPCell(new Phrase(meta, fTxt)));
+                        t.AddCell(new PdfPCell(new Phrase(peso.ToString("0.##"), fTxt)));
+                        t.AddCell(new PdfPCell(new Phrase(actual.ToString("0.##"), fTxt)));
+                    }
+
+                    doc.Add(t);
+                    doc.Add(Chunk.NEWLINE);
+                }
+
+                //----------------------------------------------------------------------Seccion Competencias
+                var competenciasPlanificadas = _servicioMantenimientos.ObtenerComportamientosYDescripciones
+                    .ListarComportamientosYDescripcionesNegocios(eva.IdEvaluacion, "PorEvaluacion");
+
+                var transversales = competenciasPlanificadas.Where(c => Convert.ToInt32(c.idTipoCompetencia) == 2500).ToList();
+                var competenciasNoTrans = competenciasPlanificadas.Where(c => Convert.ToInt32(c.idTipoCompetencia) != 2500).ToList();
+
+                var transversalesAgrupadas = transversales
+                    .GroupBy(x => new { x.idCompetencia, x.Competencia, x.DescriCompetencia })
+                    .Select(g => new CompetenciasModel
+                    {
+                        IdCompetencia = g.Key.idCompetencia,
+                        Competencia = g.Key.Competencia,
+                        Descripcion = g.Key.DescriCompetencia,
+                        Comportamientos = g.GroupBy(k => new { k.idComport, k.Comportamiento })
+                            .Select(cg => new ComportamientoModel
+                            {
+                                idComport = cg.Key.idComport,
+                                Nombre = cg.Key.Comportamiento,
+                                Niveles = cg.GroupBy(n => new {
+                                    n.idNivel,
+                                    n.Nivel,
+                                    n.Descripcion,
+                                    n.valorNivel,
+                                    n.idNivelElegido
                                 })
                                     .Select(ng => new NivelComportamientoModel
                                     {

@@ -93,7 +93,7 @@
     @*********************************************************************************
          ESTA PARTE DEBE ESTAR EN LA VISTA PARA QUE FUNCIONEN LAS RUTAS
         *********************************************************************************@
-    <script>
+<script>
         window.menuData = {
         mantenimientos: {
             sections: [
@@ -135,6 +135,12 @@
                      items: [
                          { text: "Evaluar Sub-Alterno", url: "@Url.Action("SeleccionarSubalternoParaEvaluar", "Evaluacion")" }
                      ],
+                },
+                {
+                     title: "Cierre de Evaluación",
+                     items: [
+                         { text: "Evaluar Sub-Alterno", url: "@Url.Action("SeleccionarSubalternoCierreEvaluacion", "Evaluacion")" }
+                     ],
                 }
             ],
         },
@@ -149,7 +155,7 @@
             ]
         }
     };
-    </script>
+</script>
 
 
 
