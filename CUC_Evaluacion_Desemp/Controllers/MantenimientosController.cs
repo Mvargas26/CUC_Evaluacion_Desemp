@@ -1288,7 +1288,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
-
         [HttpPost]
         public ActionResult CreaComportamientos(ComportamientoModel nuevoComportamiento)
         {
@@ -1317,8 +1316,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return RedirectToAction(nameof(ManteniComportamientos));
             }
         }
-
-
 
         [HttpPost]
         public ActionResult EditaComportamiento(ComportamientoModel comportamientoModificado)
@@ -1368,11 +1365,103 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
-
-
-
         #endregion
 
+        #region NivelesComportamientos
+
+        public ActionResult ManteniNivelesComportamientos()
+        {
+            try
+            {
+                var NivelesComportamientos = _servicioMantenimientos.NivelesComportamientos.ListarNivelesComportamientos();
+                return View(NivelesComportamientos);
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                   ? "¡ALERTA! Ya existe."
+                   : "Error al crear ";
+                return View("Error");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult CreaNivelComportamiento(NivelComportamientoModel nuevoNivelComportamiento)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+
+                    _servicioMantenimientos.NivelesComportamientos.InsertarNivelComportamiento(nuevoNivelComportamiento);
+
+                    TempData["MensajeExito"] = $"Nivel Comportamiento {nuevoNivelComportamiento.nombre} creado correctamente.";
+                    return RedirectToAction(nameof(ManteniNivelesComportamientos));
+                }
+                else
+                {
+
+                    return View("ManteniNivelesComportamientos", nuevoNivelComportamiento);
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                                   ? "¡ALERTA! Ya existe."
+                                   : "Error al crear.";
+                return RedirectToAction(nameof(ManteniNivelesComportamientos));
+            }
+        }
+
+        [HttpPost]
+        public ActionResult EditarNivelComportamiento(NivelComportamientoModel nuevoNivelComportamiento)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _servicioMantenimientos.NivelesComportamientos.ActualizarNivelComportamiento(nuevoNivelComportamiento);
+                    TempData["MensajeExito"] = $" {nuevoNivelComportamiento.nombre} fue modificado correctamente.";
+                    return RedirectToAction(nameof(ManteniNivelesComportamientos));
+                }
+                else
+                {
+                    return View("ManteniNivelesComportamientos", nuevoNivelComportamiento);
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = ex.Message.Contains("UNIQUE KEY")
+                    ? "¡ALERTA! Ya existe."
+                    : "Error al crear ";
+                return RedirectToAction(nameof(ManteniNivelesComportamientos));
+            }
+        }
+
+        [HttpPost]
+        public ActionResult EliminarNivelComportamiento(int id)
+        {
+            try
+            {
+                var nivelComportamiento = _servicioMantenimientos.NivelesComportamientos.ConsultarNivelComportamientoID(id);
+                if (nivelComportamiento == null)
+                {
+                    TempData["MensajeError"] = $"El comportamiento con ID {id} no fue encontrado.";
+                }
+                else
+                {
+                    _servicioMantenimientos.NivelesComportamientos.EliminarNivelComportamiento(id);
+                    TempData["MensajeExito"] = $"Comportamiento {nivelComportamiento.nombre} eliminado correctamente.";
+                }
+                return RedirectToAction(nameof(ManteniNivelesComportamientos));
+            }
+            catch
+            {
+                TempData["MensajeError"] = "Error al eliminar.";
+                return RedirectToAction(nameof(ManteniNivelesComportamientos));
+            }
+        }
+        #endregion
 
     }
 

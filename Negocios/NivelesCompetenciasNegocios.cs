@@ -56,14 +56,14 @@ namespace Negocios
         {
             var parametros = new SqlParameter[]
             {
-        new SqlParameter("@Operacion", "SELECTID"),
-        new SqlParameter("@idNivel", idNivel),
-        new SqlParameter("@nombre", DBNull.Value),
-        new SqlParameter("@valor", DBNull.Value),
-        new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
+                new SqlParameter("@Operacion", "SELECTID"),
+                new SqlParameter("@idNivel", idNivel),
+                new SqlParameter("@nombre", DBNull.Value),
+                new SqlParameter("@valor", DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
             };
 
-            DataTable dt = _accesoBD.EjecutarSPconDT("sp_NivelesCompetenciasCRUD", parametros);
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_NivelesComportamientosCRUD", parametros);
 
             string mensajeError = parametros.Last().Value?.ToString();
             if (!string.IsNullOrWhiteSpace(mensajeError))
@@ -88,14 +88,14 @@ namespace Negocios
         {
             var parametros = new SqlParameter[]
             {
-        new SqlParameter("@Operacion", "INSERT"),
-        new SqlParameter("@idNivel", DBNull.Value),
-        new SqlParameter("@nombre", modelo.nombre),
-        new SqlParameter("@valor", modelo.valor),
-        new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
+                new SqlParameter("@Operacion", "INSERT"),
+                new SqlParameter("@idNivel", DBNull.Value),
+                new SqlParameter("@nombre", modelo.nombre),
+                new SqlParameter("@valor", modelo.valor),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
             };
 
-            _accesoBD.EjecutarSPconDT("sp_NivelesCompetenciasCRUD", parametros);
+            _accesoBD.EjecutarSPconDT("sp_NivelesComportamientosCRUD", parametros);
 
             string mensajeError = parametros.Last().Value?.ToString();
             if (!string.IsNullOrWhiteSpace(mensajeError))
@@ -108,14 +108,14 @@ namespace Negocios
         {
             var parametros = new SqlParameter[]
             {
-        new SqlParameter("@Operacion", "UPDATE"),
-        new SqlParameter("@idNivel", modelo.idNivel),
-        new SqlParameter("@nombre", modelo.nombre),
-        new SqlParameter("@valor", modelo.valor),
-        new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
+                new SqlParameter("@Operacion", "UPDATE"),
+                new SqlParameter("@idNivel", modelo.idNivel),
+                new SqlParameter("@nombre", modelo.nombre),
+                new SqlParameter("@valor", modelo.valor),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
             };
 
-            _accesoBD.EjecutarSPconDT("sp_NivelesCompetenciasCRUD", parametros);
+            _accesoBD.EjecutarSPconDT("sp_NivelesComportamientosCRUD", parametros);
 
             string mensajeError = parametros.Last().Value?.ToString();
             if (!string.IsNullOrWhiteSpace(mensajeError))
@@ -128,14 +128,14 @@ namespace Negocios
         {
             var parametros = new SqlParameter[]
             {
-        new SqlParameter("@Operacion", "DELETE"),
-        new SqlParameter("@idNivel", idNivel),
-        new SqlParameter("@nombre", DBNull.Value),
-        new SqlParameter("@valor", DBNull.Value),
-        new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
+                new SqlParameter("@Operacion", "DELETE"),
+                new SqlParameter("@idNivel", idNivel),
+                new SqlParameter("@nombre", DBNull.Value),
+                new SqlParameter("@valor", DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
             };
 
-            _accesoBD.EjecutarSPconDT("sp_NivelesCompetenciasCRUD", parametros);
+            _accesoBD.EjecutarSPconDT("sp_NivelesComportamientosCRUD", parametros);
 
             string mensajeError = parametros.Last().Value?.ToString();
             if (!string.IsNullOrWhiteSpace(mensajeError))

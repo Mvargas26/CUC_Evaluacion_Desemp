@@ -263,6 +263,7 @@
     <Content Include="Views\Evaluacion\ConglomeradosPorFuncCierreEvaluacion.cshtml" />
     <Content Include="Views\Evaluacion\SelecPeriodoPorFunCierreEvaluacion.cshtml" />
     <Content Include="Views\Evaluacion\CierreEvaluacion.cshtml" />
+    <Content Include="Views\Mantenimientos\ManteniNivelesComportamientos.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
