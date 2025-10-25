@@ -26,6 +26,7 @@
     var CompetenciasAgrupadas = (List<Entidades.CompetenciasModel>)ViewBag.CompetenciasAgrupadas;
 
     var faseActual = ViewBag.faseActual;
+    var idPeriodo = ViewBag.idPeriodo;
 
 }
 
@@ -94,6 +95,7 @@
                     <li><strong>Cedula:</strong> @Model.Cedula</li>
                     <li id="ceduFuncionario" hidden>@Model.Cedula</li>
                     <li id="idConglo" hidden>@idConglomerado</li>
+                    <li id="idPeriodo" hidden>@idPeriodo</li>
                     <li>
                         <strong>Funcionario:</strong> @Model.Nombre @Model.Apellido1 @Model.Apellido2
                     </li>

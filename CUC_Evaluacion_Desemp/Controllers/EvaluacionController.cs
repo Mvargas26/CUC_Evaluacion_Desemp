@@ -508,6 +508,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 ViewBag.MaximoPuntosCompetencias = MaximoPuntosCompetencias;
                 ViewBag.ultimaEvaluacionFuncionario = ultimaEvaluacionFuncionario;
                 ViewBag.faseActual = faseActual;
+                ViewBag.idPeriodo = idPeriodo;
 
                 return View(subalterno);
             }
@@ -533,6 +534,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var objetivos = dataEnJSon["objetivos"];
                 var competenciasTransversales = dataEnJSon["competenciasTransversales"];
                 var competencias = dataEnJSon["competencias"];
+                var notaFinal = dataEnJSon["notaFinal"]?.ToString();
+                var idPeriodo = dataEnJSon["idPeriodo"]?.ToString();
+
+
 
                 EstadoEvaluacionModel faseActual = _servicioMantenimientos.EstadoEvaluacion.ConsultarEstadoPorID(2);
 
@@ -548,6 +553,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 //actualizamos su estado y lo guardamos
                 ultimaEvaluacionFuncionario.EstadoEvaluacion = 2; //"Estado 2 = Por aprobar"
                 ultimaEvaluacionFuncionario.Observaciones = observaciones;
+                ultimaEvaluacionFuncionario.NotaFinal = Convert.ToDecimal(notaFinal);
+                ultimaEvaluacionFuncionario.IdPeriodo = Convert.ToInt32(idPeriodo);
                 _servicioMantenimientos.Evaluaciones.ModificarEvaluacion(ultimaEvaluacionFuncionario);
 
                 // Actualizamos el actual de los obj

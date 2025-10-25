@@ -162,6 +162,8 @@ function enviarEvaluacion() {
     const observaciones = document.getElementById('txtObservaciones').value;
     const cedFuncionario = document.getElementById('ceduFuncionario').innerText;
     const idConglo = document.getElementById('idConglo').innerText;
+    const notaFinal = document.getElementById('resultado-total').value;
+    const idPeriodo = document.getElementById('idPeriodo').innerText;
 
     // Valida que ambas tablas tengan datos ****************************
     if (competenciasTransversales.length === 0) {
@@ -202,15 +204,11 @@ function enviarEvaluacion() {
         competencias: competencias,
         observaciones: observaciones,
         cedFuncionario: cedFuncionario,
-        idConglo: idConglo
-
+        idConglo: idConglo,
+        idPeriodo: idPeriodo,
+        notaFinal: notaFinal
     };
 
-    //console.log('TX', obtenerDatosTablaTransversales('#tbTransversalesEval tr')[0]);
-    //console.log('CX', obtenerDatosTablaCompetencias('#tbCompetenciasEval tbody tr')[0]);
-    //console.log('G.TX', agruparCompetencias(obtenerDatosTablaTransversales('#tbTransversalesEval tr'))[0]);
-
-    // Enviar al servidor
     enviarPeticionEvaluacion(evaluacionData);
 }
 function parseNum(s) {
