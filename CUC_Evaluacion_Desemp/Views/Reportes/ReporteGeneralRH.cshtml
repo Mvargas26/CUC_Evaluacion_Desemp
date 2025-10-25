@@ -1,0 +1,207 @@
+﻿@{
+    ViewBag.Title = "Reportes de Desempeño - RRHH";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid" id="viewReportesRRHH">
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-3">Reportes de Evaluación de Desempeño</h3>
+            <div class="alert alert-info py-2 px-3">
+                Consulta global o filtrada por Departamento, Funcionario, Conglomerado o Puesto. Todos los resultados son exportables a PDF.
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        @******************************************************************************************************************************************@
+        @****************************************  Seccion Paramentros de Consulta*****************************************************************@
+        @******************************************************************************************************************************************@
+        <div class="card-header bg-light">
+            <strong>Parámetros de consulta</strong>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label for="tipoReporte" class="form-label">Tipo de reporte</label>
+                    <select class="form-control" id="tipoReporte" name="tipoReporte">
+                        <option value="" selected disabled>Seleccione...</option>
+                        <option value="departamento">Departamento</option>
+                        <option value="funcionario">Funcionario</option>
+                        <option value="conglomerado">Conglomerado</option>
+                        <option value="puesto">Puesto</option>
+                    </select>
+                </div>
+
+                @*--------------------------------------------------------------------- Combo Periodo ----------------------------------------------------*@
+                <div class="col-md-6">
+                    <label for="idPeriodo" class="form-label">Período de evaluación</label>
+                    <select class="form-control" id="idPeriodo" name="idPeriodo" required>
+                        <option value="" selected disabled>Seleccione período</option>
+                        @if (ViewBag.Periodos != null)
+                        {
+                            foreach (var p in (List<SelectListItem>)ViewBag.Periodos)
+                            {
+                                <option value="@p.Value">@p.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                @*--------------------------------------------------------------------- Combo Departamento ----------------------------------------------------*@
+                <div class="col-md-6 d-none" id="filtroDepartamentoWrapper">
+                    <label for="idDepartamento" class="form-label">Departamento</label>
+                    <select class="form-control" id="idDepartamento" name="idDepartamento">
+                        <option value="">Seleccione departamento</option>
+                        @if (ViewBag.Departamentos != null)
+                        {
+                            foreach (var d in (List<SelectListItem>)ViewBag.Departamentos)
+                            {
+                                <option value="@d.Value">@d.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                @*--------------------------------------------------------------------- Combo Funcionario ----------------------------------------------------*@
+                <div class="col-md-6 d-none" id="filtroFuncionarioWrapper">
+                    <label for="buscaFuncionario" class="form-label">Funcionario</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="buscaFuncionario" name="buscaFuncionario" placeholder="Cédula o nombre completo">
+                        <button class="btn btn-outline-secondary" type="button" id="btnBuscarFuncionario">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                    <div class="small text-muted" id="resultadoFuncionarioSeleccionado"></div>
+                    <input type="hidden" id="cedFuncionarioSeleccionado" name="cedFuncionarioSeleccionado" value="" />
+                </div>
+
+                @*--------------------------------------------------------------------- Combo Conglomerado ----------------------------------------------------*@
+                <div class="col-md-6 d-none" id="filtroConglomeradoWrapper">
+                    <label for="idConglomerado" class="form-label">Conglomerado</label>
+                    <select class="form-control" id="idConglomerado" name="idConglomerado">
+                        <option value="">Seleccione conglomerado</option>
+                        @if (ViewBag.Conglomerados != null)
+                        {
+                            foreach (var c in (List<SelectListItem>)ViewBag.Conglomerados)
+                            {
+                                <option value="@c.Value">@c.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                @*--------------------------------------------------------------------- Combo Puesto ----------------------------------------------------*@
+                <div class="col-md-6 d-none" id="filtroPuestoWrapper">
+                    <label for="idPuesto" class="form-label">Puesto</label>
+                    <select class="form-control" id="idPuesto" name="idPuesto">
+                        <option value="">Seleccione puesto</option>
+                        @if (ViewBag.Puestos != null)
+                        {
+                            foreach (var pto in (List<SelectListItem>)ViewBag.Puestos)
+                            {
+                                <option value="@pto.Value">@pto.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-6 text-start text-md-end">
+                    <button class="btn btn-primary w-100" id="btnBuscarReporte">
+                        <i class="bi bi-bar-chart-line"></i> Buscar
+                    </button>
+                </div>
+
+                <div class="col-md-6 text-start text-md-end">
+                    <button class="btn btn-danger w-100" id="btnExportarPDF" disabled>
+                        <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+        @******************************************************************************************************************************************@
+        @****************************************  Seccion Resumen Consolidado    *****************************************************************@
+        @******************************************************************************************************************************************@
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <strong>Resumen consolidado</strong>
+                        <span class="text-muted small" id="resumenContextoSeleccion"></span>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table table-sm table-striped table-bordered align-middle mb-0" id="tbConsolidado">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th scope="col">Criterio</th>
+                                    <th scope="col">Cantidad Funcionarios</th>
+                                    <th scope="col">Promedio Nota Final</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbConsolidadoBody">
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">
+                                        No hay datos. Seleccione filtros y presione Buscar.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer small text-muted">
+                        El resumen aplica a Departamento, Conglomerado o Puesto. Para Funcionario se muestra el detalle individual.
+                    </div>
+                </div>
+            </div>
+        </div>
+        @******************************************************************************************************************************************@
+        @****************************************  Seccion Detalle Evaluacion     *****************************************************************@
+        @******************************************************************************************************************************************@
+        <div class="row" id="bloqueResultadosDetalle">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <strong>Detalle de evaluaciones</strong>
+                        <span class="text-muted small" id="detalleContextoSeleccion"></span>
+                    </div>
+
+                    <div class="card-body table-responsive">
+                        <table class="table table-sm table-hover table-bordered align-middle" id="tbResultadosDetalle">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th scope="col">Funcionario</th>
+                                    <th scope="col">Observaciones</th>
+                                    <th scope="col" class="text-end">Nota final</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbResultadosDetalleBody">
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">
+                                        Sin resultados. Aún no se ha realizado la búsqueda.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-between flex-column flex-md-row small">
+                        <div class="text-muted">
+                            Los datos corresponden al período seleccionado. Solo se muestran evaluaciones finalizadas.
+                        </div>
+                        <div class="text-muted" id="totalRegistrosLabel">
+                            Total registros: 0
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*--------------------------------------------------------------------- Alert ----------------------------------------------------*@
+        <div id="alertaValidacion" class="alert @(ViewBag.ErrorCarga == null ? "alert-warning d-none" : "alert-danger")">
+            @(ViewBag.ErrorCarga == null ? "" : ViewBag.ErrorCarga)
+        </div>
+    </div>
+ </div>
+    @section scripts {
+        <script src="~/sources/js/vistas/ReporteGeneralRH/JS_ReporteGeneralRH.js"></script>
+        <script defer src="~/sources/js/accionOcultarCerrarMensajes.js"></script>
+    }
+

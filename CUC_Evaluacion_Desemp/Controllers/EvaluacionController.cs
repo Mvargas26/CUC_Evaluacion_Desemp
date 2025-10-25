@@ -21,7 +21,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
     public class EvaluacionController : Controller
     {
         private readonly IMantenimientosService _servicioMantenimientos;
-
         public EvaluacionController(IMantenimientosService servicio)
         {
             _servicioMantenimientos = servicio;

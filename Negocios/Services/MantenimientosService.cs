@@ -31,19 +31,17 @@ namespace Negocios.Services
         public PesosConglomeradoNegocios PesosConglomerado { get; }
         public TiposCompetenciasNegocios TiposCompetencias { get; }
         public TiposObjetivosNegocios TiposObjetivos { get; }
-
         public EstadoFuncionariosNegocios EstadoFuncionarios { get; }
         public AreasNegocios Areas { get; }
-
         public FuncionarioPorAreaNegocios FuncionarioPorArea { get; }
         public CarrerasNegocios Carreras { get; }
         public PeriodosNegocios Periodos {  get; }
         public ComportamientosNegocios Comportamientos { get; }
         public NivelesComportamientosNegocios NivelesComportamientos { get; }
-
         public CompetenciaPorComportamientoNegocios CompetenciaPorComportamiento { get; }
         public ComportamientoPorNivelNegocios ComportamientoPorNivel { get; }
         public ObtenerComportamientosYDescripcionesNegocios ObtenerComportamientosYDescripciones {  get; }
+        public ReportesNegocios ReportesNegocios { get; }
 
 
         public MantenimientosService(
@@ -72,7 +70,8 @@ namespace Negocios.Services
             NivelesComportamientosNegocios nivelesComportamientos,
             CompetenciaPorComportamientoNegocios competenciaPorComportamiento,
             ComportamientoPorNivelNegocios comportamientoPorNivel,
-            ObtenerComportamientosYDescripcionesNegocios obtenerComportamientosYDescripciones
+            ObtenerComportamientosYDescripcionesNegocios obtenerComportamientosYDescripciones,
+            ReportesNegocios reportesNegocios
 
             )
         {
@@ -102,6 +101,7 @@ namespace Negocios.Services
             CompetenciaPorComportamiento = competenciaPorComportamiento;
             ComportamientoPorNivel = comportamientoPorNivel;
             ObtenerComportamientosYDescripciones = obtenerComportamientosYDescripciones;
+            ReportesNegocios = reportesNegocios;
         }
     }
 }
