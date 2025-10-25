@@ -19,6 +19,8 @@ namespace Entidades
 
         public int EstadoEvaluacion { get; set; }
         public int IdConglomerado { get; set; }
+        public int? IdPeriodo { get; set; }
+        public decimal? NotaFinal { get; set; }
 
     }//Fin Clase
 }//Fin Space 

@@ -467,6 +467,8 @@ function enviarEvaluacion() {
     const observaciones = document.getElementById('txtObservaciones').value;
     const cedFuncionario = document.getElementById('ceduFuncionario').innerText;
     const idConglo = document.getElementById('idConglo').innerText;
+    const idPeriodo = document.getElementById('idPeriodo').innerText;
+    const notaFinal = document.getElementById('resultado-total').value;
 
     // Valida que ambas tablas tengan datos ****************************
     if (competenciasTransversales.length === 0) {
@@ -535,8 +537,9 @@ function enviarEvaluacion() {
         competencias: competencias,
         observaciones: observaciones,
         cedFuncionario: cedFuncionario,
-        idConglo: idConglo
-
+        idConglo: idConglo,
+        idPeriodo: idPeriodo,
+        notaFinal: notaFinal
     };
 
     // Enviar al servidor

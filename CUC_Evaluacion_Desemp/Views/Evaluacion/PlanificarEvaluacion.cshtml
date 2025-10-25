@@ -22,6 +22,11 @@
     var tiposdeObjetivos = ViewData["tiposdeObjetivos"] as List<Entidades.TiposObjetivosModel>;
 
     var faseActual = ViewBag.faseActual;
+
+    var idConglomerado = ViewBag.IdConglomerado;
+    var idPeriodo = ViewBag.idPeriodo;
+    var listaConglomerados = ViewData["ListaConglomerados"] as List<Entidades.ConglomeradoModel>;
+    var nombreConglomerado = listaConglomerados?.FirstOrDefault(c => c.IdConglomerado == idConglomerado)?.NombreConglomerado ?? "Conglomerado ?";
 }
 
 <div class="container mt-4 mb-5">
@@ -39,11 +44,6 @@
 
     <!-- Sección "Conglomerado "  -->
     <div class="my-5">
-        @{
-            var idConglomerado = ViewBag.IdConglomerado;
-            var listaConglomerados = ViewData["ListaConglomerados"] as List<Entidades.ConglomeradoModel>;
-            var nombreConglomerado = listaConglomerados?.FirstOrDefault(c => c.IdConglomerado == idConglomerado)?.NombreConglomerado ?? "Conglomerado ?";
-        }
         <h4 class="text-center">@nombreConglomerado</h4>
         <div class="row justify-content-center mt-4">
             @if (ViewBag.PesosConglomerados != null)
@@ -87,6 +87,7 @@
                     <li><strong>Cedula:</strong> @Model.Cedula</li>
                     <li id="ceduFuncionario" hidden>@Model.Cedula</li>
                     <li id="idConglo" hidden>@idConglomerado</li>
+                    <li id="idPeriodo" hidden>@idPeriodo</li>
                     <li>
                         <strong>Funcionario:</strong> @Model.Nombre @Model.Apellido1 @Model.Apellido2
                     </li>

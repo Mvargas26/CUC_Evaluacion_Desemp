@@ -160,8 +160,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 ViewBag.CompetenciasDelConglomerado = CompetenciasDelConglomerado;
                 ViewBag.tiposdeObjetivos = tiposdeObjetivos;
                 ViewBag.faseActual = faseActual;
-
-
+                ViewBag.idPeriodo = idPeriodo;
 
                 return View(subalterno);
 
@@ -183,6 +182,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 var cedFuncionario = dataEnJSon["cedFuncionario"]?.ToString();
                 var idConglo = dataEnJSon["idConglo"]?.ToString();
+                var idPeriodo = dataEnJSon["idPeriodo"]?.ToString();
+                var notaFinal = dataEnJSon["notaFinal"]?.ToString();
                 var observaciones = dataEnJSon["observaciones"]?.ToString();
 
                 var objetivos = dataEnJSon["objetivos"];
@@ -198,7 +199,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     Observaciones = observaciones.ToString(),
                     FechaCreacion = DateTime.Now,
                     EstadoEvaluacion = 1, // planificada
-                    IdConglomerado = Convert.ToInt32(idConglo)
+                    IdConglomerado = Convert.ToInt32(idConglo),
+                    IdPeriodo = Convert.ToInt32(idPeriodo),
+                    NotaFinal=Convert.ToDecimal(notaFinal)
                 });
 
                 // Guardamos los objetivos ya teniendo el id de la eva
