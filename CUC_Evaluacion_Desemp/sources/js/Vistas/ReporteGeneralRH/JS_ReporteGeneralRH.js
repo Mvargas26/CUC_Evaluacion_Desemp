@@ -1,184 +1,206 @@
 ﻿(function () {
-    const ddlTipoReporte = document.getElementById('tipoReporte');
-    const ddlDepartamento = document.getElementById('idDepartamento');
-    const ddlConglomerado = document.getElementById('idConglomerado');
-    const ddlPuesto = document.getElementById('idPuesto');
-    const ddlPeriodo = document.getElementById('idPeriodo');
+    // ============================================
+    // CONFIGURACIÓN Y ELEMENTOS DEL DOM
+    // ============================================
+    const elementos = {
+        // Dropdowns
+        tipoReporte: document.getElementById('tipoReporte'),
+        departamento: document.getElementById('idDepartamento'),
+        conglomerado: document.getElementById('idConglomerado'),
+        puesto: document.getElementById('idPuesto'),
+        periodo: document.getElementById('idPeriodo'),
 
-    const filtroDepartamentoWrapper = document.getElementById('filtroDepartamentoWrapper');
-    const filtroFuncionarioWrapper = document.getElementById('filtroFuncionarioWrapper');
-    const filtroConglomeradoWrapper = document.getElementById('filtroConglomeradoWrapper');
-    const filtroPuestoWrapper = document.getElementById('filtroPuestoWrapper');
+        // Wrappers de filtros
+        filtros: {
+            departamento: document.getElementById('filtroDepartamentoWrapper'),
+            funcionario: document.getElementById('filtroFuncionarioWrapper'),
+            conglomerado: document.getElementById('filtroConglomeradoWrapper'),
+            puesto: document.getElementById('filtroPuestoWrapper')
+        },
 
-    const txtBuscaFuncionario = document.getElementById('buscaFuncionario');
-    const cedFuncionarioSeleccionado = document.getElementById('cedFuncionarioSeleccionado');
-    const resFunSel = document.getElementById('resultadoFuncionarioSeleccionado');
+        // Búsqueda de funcionario
+        buscaFuncionario: document.getElementById('buscaFuncionario'),
+        cedFuncionario: document.getElementById('cedFuncionarioSeleccionado'),
+        resultadoFuncionario: document.getElementById('resultadoFuncionarioSeleccionado'),
 
-    const alertaValidacion = document.getElementById('alertaValidacion');
+        // Alertas y resultados
+        alerta: document.getElementById('alertaValidacion'),
+        consolidadoBody: document.getElementById('tbConsolidadoBody'),
+        detalleBody: document.getElementById('tbResultadosDetalleBody'),
+        resumenContexto: document.getElementById('resumenContextoSeleccion'),
+        detalleContexto: document.getElementById('detalleContextoSeleccion'),
+        totalRegistros: document.getElementById('totalRegistrosLabel'),
 
-    const tbConsolidadoBody = document.getElementById('tbConsolidadoBody');
-    const tbResultadosDetalleBody = document.getElementById('tbResultadosDetalleBody');
+        // Botones
+        btnBuscarFuncionario: document.getElementById('btnBuscarFuncionario'),
+        btnBuscarReporte: document.getElementById('btnBuscarReporte'),
+        btnExportarPDF: document.getElementById('btnExportarPDF')
+    };
 
-    const resumenContextoSeleccion = document.getElementById('resumenContextoSeleccion');
-    const detalleContextoSeleccion = document.getElementById('detalleContextoSeleccion');
-    const totalRegistrosLabel = document.getElementById('totalRegistrosLabel');
+    if (!elementos.tipoReporte) return;
 
-    const btnBuscarFuncionario = document.getElementById('btnBuscarFuncionario');
-    const btnBuscarReporte = document.getElementById('btnBuscarReporte');
-    const btnExportarPDF = document.getElementById('btnExportarPDF');
+    // ============================================
+    // CONFIGURACIÓN DE TIPOS DE REPORTE
+    // ============================================
+    const tiposReporte = {
+        departamento: { label: 'Departamento', elemento: elementos.departamento },
+        funcionario: { label: 'Funcionario', elemento: elementos.cedFuncionario },
+        conglomerado: { label: 'Conglomerado', elemento: elementos.conglomerado },
+        puesto: { label: 'Puesto', elemento: elementos.puesto }
+    };
 
-    if (!ddlTipoReporte) return;
+    // ============================================
+    // FUNCIONES DE UTILIDAD
+    // ============================================
+    const utils = {
+        ocultarFiltros() {
+            Object.values(elementos.filtros).forEach(filtro =>
+                filtro?.classList.add('d-none')
+            );
+        },
 
-    ddlTipoReporte.addEventListener('change', function () {
-        ocultarTodosLosFiltros();
+        mostrarFiltro(tipo) {
+            elementos.filtros[tipo]?.classList.remove('d-none');
+        },
 
-        switch (this.value) {
-            case 'departamento':
-                filtroDepartamentoWrapper.classList.remove('d-none');
-                break;
-            case 'funcionario':
-                filtroFuncionarioWrapper.classList.remove('d-none');
-                break;
-            case 'conglomerado':
-                filtroConglomeradoWrapper.classList.remove('d-none');
-                break;
-            case 'puesto':
-                filtroPuestoWrapper.classList.remove('d-none');
-                break;
+        formatearNumero(valor, decimales = 2) {
+            if (valor === null || valor === undefined || valor === '') return '';
+            const num = Number(valor);
+            return isNaN(num) ? valor : num.toFixed(decimales);
+        },
+
+        mostrarAlerta(mensaje, tipo = 'danger') {
+            if (!elementos.alerta) return;
+            elementos.alerta.innerText = mensaje;
+            elementos.alerta.classList.remove('d-none', 'alert-danger', 'alert-warning');
+            elementos.alerta.classList.add(`alert-${tipo}`);
+        },
+
+        limpiarAlerta() {
+            if (!elementos.alerta) return;
+            elementos.alerta.innerText = '';
+            elementos.alerta.classList.add('d-none');
+        },
+
+        obtenerTextoSeleccionado(dropdown) {
+            return dropdown.options[dropdown.selectedIndex]?.text || '';
         }
-    });
+    };
 
-    if (btnBuscarFuncionario) {
-        btnBuscarFuncionario.addEventListener('click', function () {
-            const criterio = (txtBuscaFuncionario.value || '').trim();
-            if (criterio === '') return;
-
-            cedFuncionarioSeleccionado.value = "0101010101";
-            resFunSel.innerText = "Juan Pérez Mora (0101010101)";
-        });
-    }
-
-    if (btnBuscarReporte) {
-        btnBuscarReporte.addEventListener('click', async function () {
-            limpiarAlerta();
-
-            const tipo = ddlTipoReporte.value;
-            const periodo = ddlPeriodo.value;
-
-            let filtroValor = '';
-            let filtroLabel = '';
-
+    // ============================================
+    // VALIDACIÓN DE FILTROS
+    // ============================================
+    const validacion = {
+        validarFiltros(tipo, periodo) {
             if (!tipo) {
-                mostrarError('Debe seleccionar el tipo de reporte.');
-                return;
+                utils.mostrarAlerta('Debe seleccionar el tipo de reporte.');
+                return false;
             }
 
             if (!periodo) {
-                mostrarError('Debe seleccionar el período de evaluación.');
+                utils.mostrarAlerta('Debe seleccionar el período de evaluación.');
+                return false;
+            }
+
+            return true;
+        },
+
+        obtenerDatosFiltro(tipo) {
+            const config = tiposReporte[tipo];
+            if (!config) return null;
+
+            let valor, label;
+
+            if (tipo === 'funcionario') {
+                valor = elementos.cedFuncionario.value;
+                label = elementos.resultadoFuncionario.innerText;
+            } else {
+                valor = config.elemento.value;
+                label = utils.obtenerTextoSeleccionado(config.elemento);
+            }
+
+            if (!valor) {
+                utils.mostrarAlerta(`Debe seleccionar el ${config.label.toLowerCase()}.`);
+                return null;
+            }
+
+            return { valor, label };
+        },
+
+        construirContexto(tipo, filtroLabel, periodo) {
+            const tipoLabel = tiposReporte[tipo]?.label || '';
+            return `${tipoLabel}: ${filtroLabel || '-'} | Período ${periodo}`;
+        }
+    };
+
+    // ============================================
+    // RENDERIZADO DE RESULTADOS
+    // ============================================
+    const render = {
+        consolidado(datos) {
+            if (!datos?.length) {
+                elementos.consolidadoBody.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">
+                            No hay datos consolidados para esta selección.
+                        </td>
+                    </tr>
+                `;
                 return;
             }
 
-            if (tipo === 'departamento') {
-                filtroValor = ddlDepartamento.value;
-                filtroLabel = ddlDepartamento.options[ddlDepartamento.selectedIndex]?.text || '';
-                if (!filtroValor) {
-                    mostrarError('Debe seleccionar el departamento.');
-                    return;
-                }
+            const filas = datos.map(row => `
+                <tr>
+                    <td>${row.Criterio || ''}</td>
+                    <td class="text-end">${row.CantidadFuncionarios ?? 0}</td>
+                    <td class="text-end">${utils.formatearNumero(row.PromedioNotaFinal)}</td>
+                </tr>
+            `).join('');
+
+            elementos.consolidadoBody.innerHTML = filas;
+        },
+
+        detalle(datos) {
+            if (!datos?.length) {
+                elementos.detalleBody.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">
+                            Sin resultados para los filtros indicados.
+                        </td>
+                    </tr>
+                `;
+                elementos.totalRegistros.innerText = 'Total registros: 0';
+                return;
             }
 
-            if (tipo === 'funcionario') {
-                filtroValor = cedFuncionarioSeleccionado.value;
-                filtroLabel = resFunSel.innerText;
-                if (!filtroValor) {
-                    mostrarError('Debe seleccionar el funcionario.');
-                    return;
-                }
+            const filas = datos.map(row => `
+                <tr>
+                    <td>${row.Funcionario || ''}</td>
+                    <td>${row.Observaciones || ''}</td>
+                    <td class="text-end">${utils.formatearNumero(row.NotaFinal)}</td>
+                </tr>
+            `).join('');
+
+            elementos.detalleBody.innerHTML = filas;
+            elementos.totalRegistros.innerText = `Total registros: ${datos.length}`;
+        },
+
+        resultados(data) {
+            if (!data) {
+                utils.mostrarAlerta('No se recibieron datos del servidor.');
+                return;
             }
 
-            if (tipo === 'conglomerado') {
-                filtroValor = ddlConglomerado.value;
-                filtroLabel = ddlConglomerado.options[ddlConglomerado.selectedIndex]?.text || '';
-                if (!filtroValor) {
-                    mostrarError('Debe seleccionar el conglomerado.');
-                    return;
-                }
-            }
+            this.consolidado(data.consolidado);
+            this.detalle(data.detalle);
+        }
+    };
 
-            if (tipo === 'puesto') {
-                filtroValor = ddlPuesto.value;
-                filtroLabel = ddlPuesto.options[ddlPuesto.selectedIndex]?.text || '';
-                if (!filtroValor) {
-                    mostrarError('Debe seleccionar el puesto.');
-                    return;
-                }
-            }
-
-            const payload = { tipoReporte: tipo, filtro: filtroValor, periodo: periodo };
-            const contexto = construirContextoResumen(tipo, filtroLabel, periodo);
-            resumenContextoSeleccion.innerText = contexto;
-            detalleContextoSeleccion.innerText = contexto;
-
-            await enviarPeticionReporteRRHH(payload);
-        });
-
-    }
-
-    if (btnExportarPDF) {
-        btnExportarPDF.addEventListener('click', function () {
-            const tipo = ddlTipoReporte.value;
-            const periodo = ddlPeriodo.value;
-
-            let filtroValor = '';
-
-            if (tipo === 'departamento') filtroValor = ddlDepartamento.value;
-            if (tipo === 'funcionario') filtroValor = cedFuncionarioSeleccionado.value;
-            if (tipo === 'conglomerado') filtroValor = ddlConglomerado.value;
-            if (tipo === 'puesto') filtroValor = ddlPuesto.value;
-
-            const dataExport = {
-                tipoReporte: tipo,
-                filtro: filtroValor,
-                periodo: periodo
-            };
-
-            console.log('Exportar PDF con:', dataExport);
-        });
-    }
-
-    function ocultarTodosLosFiltros() {
-        filtroDepartamentoWrapper.classList.add('d-none');
-        filtroFuncionarioWrapper.classList.add('d-none');
-        filtroConglomeradoWrapper.classList.add('d-none');
-        filtroPuestoWrapper.classList.add('d-none');
-    }
-
-    function mostrarError(msg) {
-        if (!alertaValidacion) return;
-        alertaValidacion.innerText = msg;
-        alertaValidacion.classList.remove('d-none');
-        alertaValidacion.classList.remove('alert-warning');
-        alertaValidacion.classList.add('alert-danger');
-    }
-
-    function limpiarAlerta() {
-        if (!alertaValidacion) return;
-        alertaValidacion.innerText = '';
-        alertaValidacion.classList.add('d-none');
-    }
-
-    function construirContextoResumen(tipo, filtroLabel, periodo) {
-        let tipoTxt = '';
-        if (tipo === 'departamento') tipoTxt = 'Departamento';
-        if (tipo === 'funcionario') tipoTxt = 'Funcionario';
-        if (tipo === 'conglomerado') tipoTxt = 'Conglomerado';
-        if (tipo === 'puesto') tipoTxt = 'Puesto';
-
-        return tipoTxt + ': ' + (filtroLabel || '-') + ' | Período ' + periodo;
-    }
-
-    async function enviarPeticionReporteRRHH(filtros) {
-        try {
+    // ============================================
+    // LLAMADA AL BAKND
+    // ============================================
+    const api = {
+        async obtenerReporte(filtros) {
             const formBody = `reporteGeneralData=${encodeURIComponent(JSON.stringify(filtros))}`;
 
             const response = await fetch(`${urlBase}Reportes/TraerReporteGeneralRH`, {
@@ -190,7 +212,9 @@
                 body: formBody
             });
 
-            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
 
             const data = await response.json();
 
@@ -198,119 +222,84 @@
                 throw new Error(data.error);
             }
 
-            renderResultados(data);
-            btnExportarPDF.disabled = false;
-
-        } catch (e) {
-            Swal.fire({
-                title: 'Error',
-                text: e.message || 'Ocurrió un error al obtener la información.',
-                icon: 'error',
-                confirmButtonColor: '#1E376C'
-            });
+            return data;
         }
-    }
+    };
+
+    // ============================================
+    // MANEJADORES DE EVENTOS
+    // ============================================
+    const handlers = {
+        cambioTipoReporte() {
+            utils.ocultarFiltros();
+            const tipo = elementos.tipoReporte.value;
+            if (tipo) utils.mostrarFiltro(tipo);
+        },
+
+        buscarFuncionario() {
+            const criterio = elementos.buscaFuncionario.value?.trim();
+            if (!criterio) return;
+
+            elementos.cedFuncionario.value = "0101010101";
+            elementos.resultadoFuncionario.innerText = "Juan Pérez Mora (0101010101)";
+        },
+
+        async buscarReporte() {
+            utils.limpiarAlerta();
+
+            const tipo = elementos.tipoReporte.value;
+            const periodo = elementos.periodo.value;
+
+            if (!validacion.validarFiltros(tipo, periodo)) return;
+
+            const datosFiltro = validacion.obtenerDatosFiltro(tipo);
+            if (!datosFiltro) return;
+
+            const payload = {
+                tipoReporte: tipo,
+                filtro: datosFiltro.valor,
+                periodo: periodo
+            };
+
+            const contexto = validacion.construirContexto(tipo, datosFiltro.label, periodo);
+            elementos.resumenContexto.innerText = contexto;
+            elementos.detalleContexto.innerText = contexto;
+
+            try {
+                const data = await api.obtenerReporte(payload);
+                render.resultados(data);
+                elementos.btnExportarPDF.disabled = false;
+            } catch (error) {
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message || 'Ocurrió un error al obtener la información.',
+                    icon: 'error',
+                    confirmButtonColor: '#1E376C'
+                });
+            }
+        },
+
+        exportarPDF() {
+            const tipo = elementos.tipoReporte.value;
+            const config = tiposReporte[tipo];
+            if (!config) return;
+
+            const dataExport = {
+                tipoReporte: tipo,
+                filtro: config.elemento.value,
+                periodo: elementos.periodo.value
+            };
+
+            console.log('Exportar PDF con:', dataExport);
+        }
+    };
+
+    // ============================================
+    // INICIALIZACIÓN DE EVENTOS
+    // ============================================
+    elementos.tipoReporte.addEventListener('change', handlers.cambioTipoReporte);
+    elementos.btnBuscarFuncionario?.addEventListener('click', handlers.buscarFuncionario);
+    elementos.btnBuscarReporte?.addEventListener('click', handlers.buscarReporte);
+    elementos.btnExportarPDF?.addEventListener('click', handlers.exportarPDF);
 
 })();
-
-function renderResultados(data) {
-
-    // Seguridad básica: si no vino nada, mostramos mensaje genérico
-    if (!data) {
-        mostrarError('No se recibieron datos del servidor.');
-        return;
-    }
-
-    // =========================
-    // PINTAR CONSOLIDADO
-    // =========================
-    if (data.consolidado && data.consolidado.length > 0) {
-
-        // Construimos filas <tr>...</tr> para cada item del consolidado
-        const filasConsolidado = data.consolidado.map(function (row) {
-
-            // Formateo defensivo
-            const criterio = row.Criterio || '';
-            const cantFunc = (row.CantidadFuncionarios !== null && row.CantidadFuncionarios !== undefined)
-                ? row.CantidadFuncionarios
-                : 0;
-
-            // PromedioNotaFinal puede venir como decimal largo del SQL;
-            // intentamos limitarlo a 2 decimales si es numérico
-            let promedio = row.PromedioNotaFinal;
-            if (promedio === null || promedio === undefined || promedio === "") {
-                promedio = '';
-            } else {
-                const num = Number(promedio);
-                promedio = isNaN(num) ? promedio : num.toFixed(2);
-            }
-
-            return `
-                    <tr>
-                        <td>${criterio}</td>
-                        <td class="text-end">${cantFunc}</td>
-                        <td class="text-end">${promedio}</td>
-                    </tr>
-                `;
-        }).join('');
-
-        tbConsolidadoBody.innerHTML = filasConsolidado;
-
-    } else {
-        // Si no hay datos de consolidado
-        tbConsolidadoBody.innerHTML = `
-                <tr>
-                    <td colspan="3" class="text-center text-muted py-4">
-                        No hay datos consolidados para esta selección.
-                    </td>
-                </tr>
-            `;
-    }
-
-    // =========================
-    // PINTAR DETALLE
-    // =========================
-    if (data.detalle && data.detalle.length > 0) {
-
-        const filasDetalle = data.detalle.map(function (row) {
-
-            const funcionario = row.Funcionario || '';
-            const observaciones = row.Observaciones || '';
-
-            // NotaFinal también la formateamos si es numérica
-            let nota = row.NotaFinal;
-            if (nota === null || nota === undefined || nota === "") {
-                nota = '';
-            } else {
-                const num2 = Number(nota);
-                nota = isNaN(num2) ? nota : num2.toFixed(2);
-            }
-
-            return `
-                    <tr>
-                        <td>${funcionario}</td>
-                        <td>${observaciones}</td>
-                        <td class="text-end">${nota}</td>
-                    </tr>
-                `;
-        }).join('');
-
-        tbResultadosDetalleBody.innerHTML = filasDetalle;
-
-        // Actualizar total registros en el footer
-        totalRegistrosLabel.innerText = 'Total registros: ' + data.detalle.length;
-
-    } else {
-
-        tbResultadosDetalleBody.innerHTML = `
-                <tr>
-                    <td colspan="3" class="text-center text-muted py-4">
-                        Sin resultados para los filtros indicados.
-                    </td>
-                </tr>
-            `;
-
-        totalRegistrosLabel.innerText = 'Total registros: 0';
-    }
-}
-
