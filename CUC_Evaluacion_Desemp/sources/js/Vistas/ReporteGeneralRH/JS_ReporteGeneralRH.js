@@ -211,7 +211,106 @@
         }
     }
 
-
-
-
 })();
+
+function renderResultados(data) {
+
+    // Seguridad básica: si no vino nada, mostramos mensaje genérico
+    if (!data) {
+        mostrarError('No se recibieron datos del servidor.');
+        return;
+    }
+
+    // =========================
+    // PINTAR CONSOLIDADO
+    // =========================
+    if (data.consolidado && data.consolidado.length > 0) {
+
+        // Construimos filas <tr>...</tr> para cada item del consolidado
+        const filasConsolidado = data.consolidado.map(function (row) {
+
+            // Formateo defensivo
+            const criterio = row.Criterio || '';
+            const cantFunc = (row.CantidadFuncionarios !== null && row.CantidadFuncionarios !== undefined)
+                ? row.CantidadFuncionarios
+                : 0;
+
+            // PromedioNotaFinal puede venir como decimal largo del SQL;
+            // intentamos limitarlo a 2 decimales si es numérico
+            let promedio = row.PromedioNotaFinal;
+            if (promedio === null || promedio === undefined || promedio === "") {
+                promedio = '';
+            } else {
+                const num = Number(promedio);
+                promedio = isNaN(num) ? promedio : num.toFixed(2);
+            }
+
+            return `
+                    <tr>
+                        <td>${criterio}</td>
+                        <td class="text-end">${cantFunc}</td>
+                        <td class="text-end">${promedio}</td>
+                    </tr>
+                `;
+        }).join('');
+
+        tbConsolidadoBody.innerHTML = filasConsolidado;
+
+    } else {
+        // Si no hay datos de consolidado
+        tbConsolidadoBody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center text-muted py-4">
+                        No hay datos consolidados para esta selección.
+                    </td>
+                </tr>
+            `;
+    }
+
+    // =========================
+    // PINTAR DETALLE
+    // =========================
+    if (data.detalle && data.detalle.length > 0) {
+
+        const filasDetalle = data.detalle.map(function (row) {
+
+            const funcionario = row.Funcionario || '';
+            const observaciones = row.Observaciones || '';
+
+            // NotaFinal también la formateamos si es numérica
+            let nota = row.NotaFinal;
+            if (nota === null || nota === undefined || nota === "") {
+                nota = '';
+            } else {
+                const num2 = Number(nota);
+                nota = isNaN(num2) ? nota : num2.toFixed(2);
+            }
+
+            return `
+                    <tr>
+                        <td>${funcionario}</td>
+                        <td>${observaciones}</td>
+                        <td class="text-end">${nota}</td>
+                    </tr>
+                `;
+        }).join('');
+
+        tbResultadosDetalleBody.innerHTML = filasDetalle;
+
+        // Actualizar total registros en el footer
+        totalRegistrosLabel.innerText = 'Total registros: ' + data.detalle.length;
+
+    } else {
+
+        tbResultadosDetalleBody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center text-muted py-4">
+                        Sin resultados para los filtros indicados.
+                    </td>
+                </tr>
+            `;
+
+        totalRegistrosLabel.innerText = 'Total registros: 0';
+    }
+}
+
