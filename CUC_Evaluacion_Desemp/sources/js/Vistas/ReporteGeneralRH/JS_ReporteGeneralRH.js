@@ -235,13 +235,84 @@
             const tipo = elementos.tipoReporte.value;
             if (tipo) utils.mostrarFiltro(tipo);
         },
-
-        buscarFuncionario() {
+        async buscarFuncionario() {
             const criterio = elementos.buscaFuncionario.value?.trim();
             if (!criterio) return;
 
-            elementos.cedFuncionario.value = "0101010101";
-            elementos.resultadoFuncionario.innerText = "Juan Pérez Mora (0101010101)";
+            utils.limpiarAlerta();
+
+            try {
+                const resp = await fetch(`${urlBase}Reportes/BuscarFuncionariosPorCedONombre?criterio=${encodeURIComponent(criterio)}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!resp.ok) {
+                    throw new Error(`Error HTTP: ${resp.status}`);
+                }
+
+                const data = await resp.json();
+
+                if (data.error) {
+                    utils.mostrarAlerta(data.error, 'warning');
+                    return;
+                }
+
+                const resultados = data.data || [];
+                const lista = document.getElementById('listaResultadosFuncionario');
+                if (!lista) {
+                    throw new Error('No se encontró el contenedor de resultados de funcionario.');
+                }
+
+                if (!resultados.length) {
+                    lista.innerHTML = `
+                <div class="list-group-item text-muted text-center">
+                    Sin coincidencias
+                </div>
+            `;
+                    lista.classList.remove('d-none');
+                    return;
+                }
+
+                lista.innerHTML = resultados.map(f => `
+            <button type="button"
+                class="list-group-item list-group-item-action"
+                data-ced="${f.cedula}"
+                data-nombre="${f.nombreCompleto}">
+                ${f.nombreCompleto} (${f.cedula})
+            </button>
+        `).join('');
+
+                lista.classList.remove('d-none');
+
+                lista.querySelectorAll('button').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const ced = btn.getAttribute('data-ced');
+                        const nom = btn.getAttribute('data-nombre');
+
+                        elementos.cedFuncionario.value = ced;
+                        elementos.resultadoFuncionario.innerText = `${nom} (${ced})`;
+
+                        // Limpieza visual
+                        elementos.buscaFuncionario.value = '';
+                        utils.limpiarAlerta();
+
+                        // Ocultar lista
+                        lista.classList.add('d-none');
+                        lista.innerHTML = '';
+                    });
+                });
+
+            } catch (err) {
+                Swal.fire({
+                    title: 'Error',
+                    text: err.message || 'No se pudo buscar el funcionario.',
+                    icon: 'error',
+                    confirmButtonColor: '#1E376C'
+                });
+            }
         },
 
         async buscarReporte() {
@@ -278,7 +349,6 @@
                 });
             }
         },
-
         exportarPDF() {
             const tipo = elementos.tipoReporte.value;
             const config = tiposReporte[tipo];

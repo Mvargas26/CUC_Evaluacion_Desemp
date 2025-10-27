@@ -267,6 +267,8 @@
     <Content Include="Views\Evaluacion\CierreEvaluacion.cshtml" />
     <Content Include="Views\Mantenimientos\ManteniNivelesComportamientos.cshtml" />
     <Content Include="Views\Reportes\ReporteGeneralRH.cshtml" />
+    <Content Include="Views\Reportes\SeleccionarSubalternoReporteEvaluacion.cshtml" />
+    <Content Include="Views\Reportes\ListarReportesFuncionario.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

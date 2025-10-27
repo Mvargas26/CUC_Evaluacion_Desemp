@@ -1,9 +1,11 @@
-﻿using Negocios;
+﻿using Entidades;
+using Negocios;
 using Negocios.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -19,6 +21,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
         }
 
+        #region Reporte GEneral RH
         public ActionResult ReporteGeneralRH()
         {
             try
@@ -109,6 +112,118 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        [HttpGet]
+        public JsonResult BuscarFuncionariosPorCedONombre(string criterio)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(criterio))
+                {
+                    return Json(new { error = "Criterio requerido" }, JsonRequestBehavior.AllowGet);
+                }
+
+                var lista = _servicioMantenimientos.Funcionario.BuscarFuncionariosPorCedONombre(criterio);
+
+                var resultado = lista.Select(f => new
+                {
+                    cedula = f.Cedula,
+                    nombreCompleto = f.Nombre + " " + f.Apellido1 + " " + f.Apellido2
+                }).ToList();
+
+                return Json(new { data = resultado }, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+                return Json(new { error = "Error interno al buscar funcionarios" }, JsonRequestBehavior.AllowGet);
+            }
+        }//BuscarFuncionariosPorCedONombre
+
+        #endregion
+
+        #region Reporte Por Funcioanrio
+        public ActionResult SeleccionarSubalternoReporteEvaluacion()
+        {
+            try
+            {
+                var listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosConEvaluacionCerradasPorJefe("44444444");
+
+                return View(listaSubAlternos);
+
+
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener la lista.";
+                return View("Error");
+            }
+        }//fin
+
+        [HttpPost]
+        public ActionResult ReportesPDFPorFuncionario(string cedulaSeleccionada)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(cedulaSeleccionada))
+                {
+                    TempData["MensajeError"] = "Debe seleccionar un subalterno.";
+                    return RedirectToAction("SeleccionarSubalternoReporteEvaluacion");
+                }
+
+                return RedirectToAction(nameof(ListarReportesFuncionario), new { cedula = cedulaSeleccionada });
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al seleccionar Funcionario.";
+                return RedirectToAction(nameof(SeleccionarSubalternoReporteEvaluacion));
+            }
+        }//ReportesPDFPorFuncionario
+
+        [HttpGet]
+        public ActionResult ListarReportesFuncionario(string cedula)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(cedula))
+                {
+                    TempData["MensajeError"] = "No se recibió la cédula del funcionario.";
+                    return RedirectToAction(nameof(SeleccionarSubalternoReporteEvaluacion));
+                }
+
+                var rutaCarpeta = Server.MapPath("~/Reportes/" + cedula);
+
+                if (!Directory.Exists(rutaCarpeta))
+                {
+                    ViewBag.Cedula = cedula;
+                    ViewBag.Reportes = new List<ReportePdfViewModel>();
+                    return View();
+                }
+
+                var archivos = Directory.GetFiles(rutaCarpeta, "*.pdf", SearchOption.TopDirectoryOnly);
+
+                var listaReportes = archivos
+                    .Select(fullPath => new ReportePdfViewModel
+                    {
+                        NombreArchivo = Path.GetFileName(fullPath),
+                        RutaRelativa = Url.Content("~/Reportes/" + cedula + "/" + Path.GetFileName(fullPath)),
+                        FechaCreacion = System.IO.File.GetCreationTime(fullPath)
+                    })
+                    .OrderByDescending(r => r.FechaCreacion)
+                    .ToList();
+
+                ViewBag.Cedula = cedula;
+                ViewBag.Reportes = listaReportes;
+
+                return View();
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al cargar los reportes PDF.";
+                return RedirectToAction(nameof(SeleccionarSubalternoReporteEvaluacion));
+            }
+        }
+
+        #endregion
 
 
     }//fin class

@@ -70,14 +70,21 @@
                 <div class="col-md-6 d-none" id="filtroFuncionarioWrapper">
                     <label for="buscaFuncionario" class="form-label">Funcionario</label>
                     <div class="input-group">
-                        <input type="text" class="form-control" id="buscaFuncionario" name="buscaFuncionario" placeholder="Cédula o nombre completo">
-                        <button class="btn btn-outline-secondary" type="button" id="btnBuscarFuncionario">
-                            <i class="bi bi-search"></i>
+                        <input type="text" class="form-control" id="buscaFuncionario" placeholder="Cédula o nombre...">
+                        <button class="btn btn-primary" id="btnBuscarFuncionario" type="button">
+                            Buscar
                         </button>
                     </div>
-                    <div class="small text-muted" id="resultadoFuncionarioSeleccionado"></div>
-                    <input type="hidden" id="cedFuncionarioSeleccionado" name="cedFuncionarioSeleccionado" value="" />
+
+                    <div class="list-group small mt-2 d-none" id="listaResultadosFuncionario"></div>
+
+                    <input type="hidden" id="cedFuncionarioSeleccionado" />
+                    <div class="mt-2">
+                        <small class="text-muted">Seleccionado:</small>
+                        <div id="resultadoFuncionarioSeleccionado" class="fw-bold">-</div>
+                    </div>
                 </div>
+
 
                 @*--------------------------------------------------------------------- Combo Conglomerado ----------------------------------------------------*@
                 <div class="col-md-6 d-none" id="filtroConglomeradoWrapper">

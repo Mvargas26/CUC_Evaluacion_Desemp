@@ -334,6 +334,94 @@ namespace Negocios
 
             return lista;
         }
+        public List<FuncionarioModel> BuscarFuncionariosPorCedONombre(string criterio)
+        {
+            var pMensajeError = new SqlParameter("@MensajeError", SqlDbType.VarChar, 255)
+            {
+                Direction = ParameterDirection.Output
+            };
+
+            var parametros = new SqlParameter[]
+            {
+                new SqlParameter("@Accion", "CED_O_NOMBRE"),
+                new SqlParameter("@Cedula", criterio),
+                new SqlParameter("@Nombre", DBNull.Value),
+                new SqlParameter("@Apellido1", DBNull.Value),
+                new SqlParameter("@Apellido2", DBNull.Value),
+                new SqlParameter("@Correo", DBNull.Value),
+                new SqlParameter("@Password", DBNull.Value),
+                new SqlParameter("@IdRol", DBNull.Value),
+                new SqlParameter("@IdPuesto", DBNull.Value),
+                new SqlParameter("@IdEstadoFuncionario", DBNull.Value),
+                new SqlParameter("@CodigoSeguridad", DBNull.Value),
+                new SqlParameter("@Telefono", DBNull.Value),
+                new SqlParameter("@cedJefeInmediato", DBNull.Value),
+                pMensajeError
+            };
+
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_CrudFuncionarios", parametros);
+
+            var lista = new List<FuncionarioModel>();
+
+            foreach (DataRow row in dt.Rows)
+            {
+                lista.Add(new FuncionarioModel
+                {
+                    Cedula = row["cedula"].ToString(),
+                    Nombre = row["nombre"].ToString(),
+                    Apellido1 = row["apellido1"].ToString(),
+                    Apellido2 = row["apellido2"].ToString()
+                });
+            }
+
+            var mensajeError = pMensajeError.Value != DBNull.Value
+                ? pMensajeError.Value.ToString()
+                : null;
+
+            if (!string.IsNullOrWhiteSpace(mensajeError) && lista.Count == 0)
+            {
+                throw new Exception(mensajeError);
+            }
+
+            return lista;
+        }//BuscarFuncionariosPorCedONombre
+
+        public List<FuncionarioModel> ListarSubAlternosConEvaluacionCerradasPorJefe(string cedJefatura)
+        {
+            var parametros = new SqlParameter[]
+            {
+                new SqlParameter("@cedJefe", cedJefatura),
+                new SqlParameter("@operacion", "listarSubalternosConEvaluacionCerradas"),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
+            };
+
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_ListarSubAlternosPorJefe", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError) && mensajeError != "OK")
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
+
+            var lista = new List<FuncionarioModel>();
+            foreach (DataRow row in dt.Rows)
+            {
+                lista.Add(new FuncionarioModel
+                {
+                    Cedula = row["cedula"].ToString(),
+                    Nombre = row["nombre"].ToString(),
+                    Apellido1 = row["apellido1"].ToString(),
+                    Apellido2 = row["apellido2"].ToString(),
+                    IdRol = Convert.ToInt32(row["idRol"]),
+                    IdPuesto = Convert.ToInt32(row["idPuesto"]),
+                    IdEstadoFuncionario = Convert.ToInt32(row["idEstadoFuncionario"]),
+                    Dependencia = row["Dependencia"].ToString(),
+                    CedJefeInmediato = row["cedJefeInmediato"].ToString()
+                });
+            }
+
+            return lista;
+        }
     }//fin class
 
 }//fin space

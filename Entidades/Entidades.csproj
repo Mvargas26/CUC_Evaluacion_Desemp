@@ -120,7 +120,7 @@
     <Compile Include="PesosConglomeradoModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PuestoModel.cs" />
-    <Compile Include="ReporteMolde.cs" />
+    <Compile Include="ReportePdfViewModel.cs" />
     <Compile Include="RolesModel.cs" />
     <Compile Include="TiposCompetenciasModel.cs" />
     <Compile Include="TiposObjetivosModel.cs" />
