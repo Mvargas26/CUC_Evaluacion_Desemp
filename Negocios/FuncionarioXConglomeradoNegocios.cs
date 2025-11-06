@@ -116,13 +116,20 @@ namespace Negocios
 
         public void EliminarPorFuncionario(string idFuncionario)
         {
-            var parametros = new SqlParameter[]
+            try
             {
+                var parametros = new SqlParameter[]
+                    {
             new SqlParameter("@Operacion", "DELETE_POR_FUNCIONARIO"),
             new SqlParameter("@idFuncionario", idFuncionario)
-            };
+                    };
 
-            _accesoBD.EjecutarSPconDT("[adm].[sp_FuncionarioXConglomerado_CRUD]", parametros);
+                _accesoBD.EjecutarSPconDT("sp_FuncionarioXConglomerado_CRUD", parametros);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception (ex.Message);
+            }
         }
 
         public void EliminarFuncionarioXConglomerado(int idFuncXConglo)

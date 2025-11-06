@@ -138,7 +138,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
-        // GET: Cargar vista para modificar funcionario
         public ActionResult ModificarFuncionario(string cedula)
         {
             try
@@ -186,7 +185,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
-        // POST: Guardar cambios al funcionario
         [HttpPost]
         public ActionResult ModificarFuncionario(FuncionarioViewModel model, FormCollection collection)
         {
@@ -194,7 +192,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             {
                 string cedula = model.Funcionario.Cedula;
 
-                // ✅ Si el campo de contraseña viene vacío, recuperamos la actual
+                // Si el campo de contraseña viene vacío, recuperamos la actual
                 if (string.IsNullOrWhiteSpace(model.Funcionario.Password))
                 {
                     var actual = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(cedula);
@@ -226,7 +224,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 }
 
                 // Actualiza áreas
-                _servicioMantenimientos.Funcionario.EliminarFuncionario(cedula);
+                //_servicioMantenimientos.FuncionarioPorArea.eliminar(cedula);
                 var areasSeleccionadas = collection["IdAreasSeleccionadas"];
                 if (!string.IsNullOrEmpty(areasSeleccionadas))
                 {
@@ -253,6 +251,26 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult BorrarFuncionario(string cedula)
+        {
+            try
+            {
+                var resultado = _servicioMantenimientos.Funcionario.EliminarFuncionario(cedula);
+
+                if (resultado)
+                    TempData["MensajeExito"] = "El funcionario fue eliminado correctamente.";
+                else
+                    TempData["MensajeError"] = "No se pudo eliminar el funcionario.";
+
+                return RedirectToAction("ManteniFuncionarios"); 
+            }
+            catch (Exception ex)
+            {
+                TempData["MensajeError"] = "Ocurrió un error al intentar eliminar el funcionario: " + ex.Message;
+                return RedirectToAction("ManteniFuncionarios");
+            }
+        }
 
 
         #endregion
@@ -287,7 +305,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
             
                    _servicioMantenimientos.Puestos.CrearPuesto(nuevoPuesto);
                     ViewBag.ListaAreas = _servicioMantenimientos.Dependencias.ListarDependencias();
-
 
                     TempData["MensajeExito"] = $"Puesto {nuevoPuesto.Puesto} creado correctamente.";
                     return RedirectToAction(nameof(ManteniPuesto));

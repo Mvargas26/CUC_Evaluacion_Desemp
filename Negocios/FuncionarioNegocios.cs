@@ -110,20 +110,20 @@ namespace Negocios
          {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Accion", "INSERT"),
-            new SqlParameter("@Cedula", funcionario.Cedula),
-            new SqlParameter("@Nombre", funcionario.Nombre),
-            new SqlParameter("@Apellido1", funcionario.Apellido1),
-            new SqlParameter("@Apellido2", funcionario.Apellido2),
-            new SqlParameter("@Correo", funcionario.Correo),
-            new SqlParameter("@Password", funcionario.Password),
-            new SqlParameter("@IdRol", funcionario.IdRol),
-            new SqlParameter("@IdPuesto", funcionario.IdPuesto),
-            new SqlParameter("@IdEstadoFuncionario", funcionario.IdEstadoFuncionario),
-            new SqlParameter("@CodigoSeguridad", funcionario.CodigoSeguridad),
-            new SqlParameter("@Telefono", funcionario.Telefono),
-            new SqlParameter("@cedJefeInmediato", funcionario.CedJefeInmediato),
-            new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+                new SqlParameter("@Accion", "INSERT"),
+                new SqlParameter("@Cedula", funcionario.Cedula),
+                new SqlParameter("@Nombre", funcionario.Nombre),
+                new SqlParameter("@Apellido1", funcionario.Apellido1),
+                new SqlParameter("@Apellido2", funcionario.Apellido2),
+                new SqlParameter("@Correo", funcionario.Correo),
+                new SqlParameter("@Password", funcionario.Password),
+                new SqlParameter("@IdRol", funcionario.IdRol),
+                new SqlParameter("@IdPuesto", funcionario.IdPuesto),
+                new SqlParameter("@IdEstadoFuncionario", funcionario.IdEstadoFuncionario),
+                new SqlParameter("@CodigoSeguridad", funcionario.CodigoSeguridad),
+                new SqlParameter("@Telefono", funcionario.Telefono),
+                new SqlParameter("@cedJefeInmediato", funcionario.CedJefeInmediato),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             _accesoBD.EjecutarSPconDT("sp_CrudFuncionarios", parametros);
@@ -141,24 +141,29 @@ namespace Negocios
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Accion", "UPDATE"),
-            new SqlParameter("@Cedula", funcionario.Cedula),
-            new SqlParameter("@Nombre", funcionario.Nombre),
-            new SqlParameter("@Apellido1", funcionario.Apellido1),
-            new SqlParameter("@Apellido2", funcionario.Apellido2),
-            new SqlParameter("@Correo", funcionario.Correo),
-            new SqlParameter("@Password", funcionario.Password),
-            new SqlParameter("@Departamento", funcionario.Dependencia),
-            new SqlParameter("@Rol", funcionario.Rol),
-            new SqlParameter("@Puesto", funcionario.Puesto),
-            new SqlParameter("@Estado", funcionario.Estado),
-            new SqlParameter("@CodigoSeguridad", funcionario.CodigoSeguridad),
-            new SqlParameter("@IdDepartamento", funcionario.IdDepartamento),
-            new SqlParameter("@cedJefeInmediato", funcionario.CedJefeInmediato),
-            new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+                new SqlParameter("@Accion", "UPDATE"),
+                new SqlParameter("@Cedula", funcionario.Cedula),
+                new SqlParameter("@Nombre", funcionario.Nombre),
+                new SqlParameter("@Apellido1", funcionario.Apellido1),
+                new SqlParameter("@Apellido2", funcionario.Apellido2),
+                new SqlParameter("@Correo", funcionario.Correo),
+                new SqlParameter("@Password", funcionario.Password),
+                new SqlParameter("@IdRol", funcionario.IdRol),
+                new SqlParameter("@IdPuesto", funcionario.IdPuesto),
+                new SqlParameter("@IdEstadoFuncionario", funcionario.IdEstadoFuncionario),
+                new SqlParameter("@CodigoSeguridad", funcionario.CodigoSeguridad),
+                new SqlParameter("@Telefono", funcionario.Telefono),
+                new SqlParameter("@cedJefeInmediato", funcionario.CedJefeInmediato),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             _accesoBD.EjecutarSPconDT("sp_CrudFuncionarios", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
 
             return true;
         }
@@ -167,12 +172,18 @@ namespace Negocios
         {
             var parametros = new SqlParameter[]
             {
-            new SqlParameter("@Accion", "DELETE"),
-            new SqlParameter("@Cedula", cedula),
+                new SqlParameter("@Accion", "DELETE"),
+                new SqlParameter("@Cedula", cedula),
             new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };
 
             _accesoBD.EjecutarSPconDT("sp_CrudFuncionarios", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
 
             return true;
         }
