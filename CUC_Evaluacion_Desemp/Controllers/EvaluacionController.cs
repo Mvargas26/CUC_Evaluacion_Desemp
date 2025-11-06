@@ -1223,6 +1223,123 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     AgregarCompetenciasAgrupadas(doc, w, "Competencias Transversales", transversalesAgrupadas, fSub, fTxt, faseActual.IdEstado);
                     AgregarCompetenciasAgrupadas(doc, w, tituloCompetencias, competenciasAgrupadas, fSub, fTxt, faseActual.IdEstado);
 
+                    //****************************************************************************
+                    //**********************Resumen FInal ****************************************
+                    var resumenFinal = data["resumenFinal"] as JArray;
+                    if (resumenFinal != null && resumenFinal.Count > 0)
+                    {
+                        var fuenteTituloResumen = FontFactory.GetFont("Helvetica", 12, Font.BOLD | Font.UNDERLINE, azulCUC);
+
+                        // Título con salto de línea
+                        doc.Add(new Paragraph("Resumen Final", fuenteTituloResumen) { SpacingAfter = 8f });
+                        doc.Add(Chunk.NEWLINE);
+
+                        var tablaResumen = new PdfPTable(3) { WidthPercentage = 80, HorizontalAlignment = Element.ALIGN_CENTER };
+                        tablaResumen.SetWidths(new float[] { 50f, 25f, 25f });
+                        tablaResumen.SpacingBefore = 4f;
+                        tablaResumen.SpacingAfter = 6f;
+
+                        tablaResumen.AddCell(new PdfPCell(new Phrase("Tipo", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY, HorizontalAlignment = Element.ALIGN_CENTER });
+                        tablaResumen.AddCell(new PdfPCell(new Phrase("Porcentaje", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY, HorizontalAlignment = Element.ALIGN_CENTER });
+                        tablaResumen.AddCell(new PdfPCell(new Phrase("Valor", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY, HorizontalAlignment = Element.ALIGN_CENTER });
+
+                        decimal sumaPorcentaje = 0m;
+                        decimal sumaValor = 0m;
+
+                        foreach (var item in resumenFinal)
+                        {
+                            var tipo = item["tipo"]?.ToString() ?? "";
+                            var porcentajeRaw = item["porcentaje"]?.ToString() ?? "";
+                            var valorRaw = item["valor"]?.ToString() ?? "";
+
+                            tablaResumen.AddCell(new PdfPCell(new Phrase(tipo, fTxt)));
+                            tablaResumen.AddCell(new PdfPCell(new Phrase(porcentajeRaw, fTxt)) { HorizontalAlignment = Element.ALIGN_CENTER });
+                            tablaResumen.AddCell(new PdfPCell(new Phrase(valorRaw, fTxt)) { HorizontalAlignment = Element.ALIGN_CENTER });
+
+                            // Suma de porcentajes
+                            var pStr = porcentajeRaw.Replace("%", "").Trim();
+                            if (decimal.TryParse(pStr, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var pVal))
+                                sumaPorcentaje += pVal;
+                            else if (decimal.TryParse(pStr, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.CurrentCulture, out var pValLocal))
+                                sumaPorcentaje += pValLocal;
+
+                            // Suma de valores
+                            if (decimal.TryParse(valorRaw, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var vVal))
+                                sumaValor += vVal;
+                            else if (decimal.TryParse(valorRaw, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.CurrentCulture, out var vValLocal))
+                                sumaValor += vValLocal;
+                        }
+
+                        // Fila Resultado (suma total)
+                        var celResultado = new PdfPCell(new Phrase("Resultado:", fSub))
+                        {
+                            BackgroundColor = BaseColor.LIGHT_GRAY,
+                            HorizontalAlignment = Element.ALIGN_LEFT
+                        };
+                        tablaResumen.AddCell(celResultado);
+                        tablaResumen.AddCell(new PdfPCell(new Phrase(sumaPorcentaje.ToString("0") + "%", fTxt)) { HorizontalAlignment = Element.ALIGN_CENTER });
+                        tablaResumen.AddCell(new PdfPCell(new Phrase(sumaValor.ToString("0.##"), fTxt)) { HorizontalAlignment = Element.ALIGN_CENTER });
+
+                        doc.Add(tablaResumen);
+                        doc.Add(Chunk.NEWLINE);
+                    }
+
+                    //**********************************************************************************************
+                    //************************* Comentario Final si es cierre ****************************************
+                    if (faseActual != null && faseActual.IdEstado == 3)
+                    {
+                        doc.Add(Chunk.NEWLINE);
+
+                        // ====== Comentarios Finales ======
+                        var colorAzul = new BaseColor(30, 55, 108);
+                        var celdaTituloComentarios = new PdfPCell(new Phrase("Comentarios Finales", FontFactory.GetFont("Helvetica", 11, Font.BOLD, BaseColor.WHITE)))
+                        {
+                            BackgroundColor = colorAzul,
+                            HorizontalAlignment = Element.ALIGN_CENTER,
+                            Padding = 6f,
+                            Border = 0
+                        };
+
+                        var tablaComentarios = new PdfPTable(1) { WidthPercentage = 100 };
+                        tablaComentarios.AddCell(celdaTituloComentarios);
+                        tablaComentarios.AddCell(new PdfPCell(new Phrase("\n\n\n", fTxt)) { FixedHeight = 60f }); // espacio para escribir
+                        doc.Add(tablaComentarios);
+
+                        doc.Add(Chunk.NEWLINE);
+
+                        // ====== Notificación de la Evaluación ======
+                        var celdaTituloNotif = new PdfPCell(new Phrase("NOTIFICACIÓN DE LA EVALUACIÓN DEL DESEMPEÑO", FontFactory.GetFont("Helvetica", 11, Font.BOLD, BaseColor.WHITE)))
+                        {
+                            BackgroundColor = colorAzul,
+                            HorizontalAlignment = Element.ALIGN_CENTER,
+                            Padding = 6f,
+                            Border = 0
+                        };
+
+                        var tablaNotif = new PdfPTable(1) { WidthPercentage = 100 };
+                        tablaNotif.AddCell(celdaTituloNotif);
+
+                        string textoNotif =
+                            "Hago constar que he leído y discutido la presente evaluación de mi desempeño laboral y me doy por enterado(a) del contenido de la misma el día _____ / _____ / ______.\n\n" +
+                            "_____ De acuerdo\n" +
+                            "_____ En desacuerdo (proceda a completarse el formulario de manifestación de disconformidad)";
+
+                        var celdaTextoNotif = new PdfPCell(new Phrase(textoNotif, fTxt))
+                        {
+                            PaddingTop = 10f,
+                            PaddingBottom = 10f,
+                            Border = 0
+                        };
+
+                        tablaNotif.AddCell(celdaTextoNotif);
+                        doc.Add(tablaNotif);
+
+                        doc.Add(Chunk.NEWLINE);
+                    }
+
+
+
+
                     doc.Add(new Paragraph("\n\n\n"));
                     var firmas = new PdfPTable(2) { WidthPercentage = 100 };
                     firmas.SetWidths(new float[] { 50f, 50f });

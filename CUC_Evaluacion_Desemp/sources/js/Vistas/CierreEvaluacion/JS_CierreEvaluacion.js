@@ -157,6 +157,7 @@ function enviarEvaluacion() {
     const competenciasPlanas = obtenerDatosTablaCompetencias('#tbCompetenciasEval tbody tr');
     const competenciasTransversales = agruparCompetencias(competenciasTransversalesPlanas);
     const competencias = agruparCompetencias(competenciasPlanas);
+    const resumenFinal = obtenerResumenFinal();
 
     //Recolectamos lo otro
     const observaciones = document.getElementById('txtObservaciones').value;
@@ -207,7 +208,8 @@ function enviarEvaluacion() {
         cedFuncionario: cedFuncionario,
         idConglo: idConglo,
         idPeriodo: idPeriodo,
-        notaFinal: notaFinal
+        notaFinal: notaFinal,
+        resumenFinal: resumenFinal
 
     };
 
@@ -386,4 +388,23 @@ function agruparCompetencias(items) {
     }
     return Array.from(map.values());
 }
+function obtenerResumenFinal() {
+    const filas = document.querySelectorAll("#tablaResultados tbody tr");
+    const resumen = [];
 
+    filas.forEach(fila => {
+        const tipoCelda = fila.querySelector("td:nth-child(1)");
+        const porcentajeCelda = fila.querySelector("td:nth-child(2)");
+        const inputValor = fila.querySelector("td:nth-child(3) input");
+
+        if (tipoCelda && !tipoCelda.textContent.includes("Resultado")) {
+            resumen.push({
+                tipo: tipoCelda.textContent.trim(),
+                porcentaje: porcentajeCelda.textContent.trim(),
+                valor: inputValor ? inputValor.value.trim() : ""
+            });
+        }
+    });
+
+    return resumen;
+}
