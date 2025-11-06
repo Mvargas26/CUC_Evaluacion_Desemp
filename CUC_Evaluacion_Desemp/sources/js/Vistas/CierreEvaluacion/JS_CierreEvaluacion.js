@@ -4,6 +4,10 @@
 
 $(document).ready(function () {
     inicializarEventos();
+    setTimeout(() => {
+        actualizarObjetivosEnTbResultados();
+        actualizarCompetenciasEnTbResultados();
+    }, 300);
 });
 function inicializarEventos() {
     functionModalObjetivos();

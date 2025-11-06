@@ -1,9 +1,14 @@
-﻿//*******************************************************************************************************************************
-//***********************************  Funcion Principal                    *****************************************************
+﻿//***********************************  Funcion Principal                    *****************************************************
 //*******************************************************************************************************************************
 
 $(document).ready(function () {
     inicializarEventos();
+
+      // Espera un breve tiempo para asegurar que las tablas están cargadas
+    setTimeout(() => {
+        actualizarObjetivosEnTbResultados();
+        actualizarCompetenciasEnTbResultados();
+    }, 300);
 });
 function inicializarEventos() {
     functionModalObjetivos();
@@ -11,7 +16,6 @@ function inicializarEventos() {
 
 document.getElementById("btnGuardarSeguimiento").addEventListener("click", enviarEvaluacion);
 
-//*******************************************************************************************************************************
 //***********************************  Seccion Objetivos                    *****************************************************
 function functionModalObjetivos() {
     // Evento para abrir el modal con los datos del botón
@@ -71,7 +75,6 @@ function cerrarModal() {
     $("#valorError").addClass("d-none");
     document.activeElement.blur();
 }
-//*******************************************************************************************************************************
 //***********************************  Seccion Tabla Resultados             *****************************************************
 function actualizarObjetivosEnTbResultados() {
     let acumulados = {};
@@ -147,7 +150,6 @@ function actualizarCompetenciasEnTbResultados() {
 $(document).on('change', '#tbTransversalesEval select.select-nivel-obtenido, #tbCompetenciasEval select.select-nivel-obtenido', function () {
     actualizarCompetenciasEnTbResultados();
 });
-//*******************************************************************************************************************************
 //--------------- Envio de las tablas --------------
 function enviarEvaluacion() {
 
