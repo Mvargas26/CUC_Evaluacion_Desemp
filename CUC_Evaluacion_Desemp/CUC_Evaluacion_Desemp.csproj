@@ -269,9 +269,11 @@
     <Content Include="Views\Reportes\ReporteGeneralRH.cshtml" />
     <Content Include="Views\Reportes\SeleccionarSubalternoReporteEvaluacion.cshtml" />
     <Content Include="Views\Reportes\ListarReportesFuncionario.cshtml" />
+    <Content Include="Views\Mantenimientos\ModificarFuncionario.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Manuales\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
