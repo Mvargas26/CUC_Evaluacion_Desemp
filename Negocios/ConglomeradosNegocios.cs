@@ -144,38 +144,7 @@ namespace Negocios
                 throw new Exception("Error SP: " + mensajeError);
             }
         }
-        public List<PesosConglomeradoModel> ConsultarPesosXConglomerado(int id)
-        {
-            try
-            {
-                var parametros = new SqlParameter[]
-                {
-                new SqlParameter("@conglomeradoID", id)
-                };
-
-                DataTable dt = _accesoBD.EjecutarSPconDT("SP_PesosXConglomerado", parametros);
-                List<PesosConglomeradoModel> lista = new List<PesosConglomeradoModel>();
-
-                foreach (DataRow row in dt.Rows)
-                {
-                    lista.Add(new PesosConglomeradoModel
-                    {
-                        IdPesoXConglomerado = Convert.ToInt32(row["idPesoXConglomerado"]),
-                        IdConglomerado = Convert.ToInt32(row["idConglomerado"]),
-                        IdTipoObjetivo = row["idTipoObjetivo"] as int?,
-                        IdTipoCompetencia = row["idTipoCompetencia"] as int?,
-                        Porcentaje = Convert.ToDecimal(row["Porcentaje"])
-                    });
-                }
-
-                return lista;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Fallo en PesosConglomerado Negocios " + ex.Message);
-            }
-        }
-
+        
         public List<FuncionarioXConglomeradoModel> ConsultarConglomeradoXFuncionario(string idFuncionario)
         {
             try

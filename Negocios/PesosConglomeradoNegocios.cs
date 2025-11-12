@@ -59,78 +59,36 @@ namespace Negocios
             _accesoBD.EjecutarSPconDT("SP_PesoXConglomeradoCRUD", parametros);
         }
 
-        public List<PesosConglomeradoModel> ObtenerTodos()
+        public List<PesosConglomeradoModel> ConsultarPesosXConglomerado(int id)
         {
-            var parametros = new SqlParameter[]
+            try
             {
-            new SqlParameter("@Operacion", "SELECT")
-            };
-
-            DataTable dt = _accesoBD.EjecutarSPconDT("SP_PesoXConglomeradoCRUD", parametros);
-            var lista = new List<PesosConglomeradoModel>();
-
-            foreach (DataRow row in dt.Rows)
-            {
-                lista.Add(new PesosConglomeradoModel
+                var parametros = new SqlParameter[]
                 {
-                    IdPesoXConglomerado = Convert.ToInt32(row["idPesoXConglomerado"]),
-                    IdConglomerado = Convert.ToInt32(row["idConglomerado"]),
-                    IdTipoObjetivo = row["idTipoObjetivo"] != DBNull.Value ? Convert.ToInt32(row["idTipoObjetivo"]) : (int?)null,
-                    IdTipoCompetencia = row["idTipoCompetencia"] != DBNull.Value ? Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null,
-                    Porcentaje = Convert.ToDecimal(row["Porcentaje"])
-                });
-            }
+                new SqlParameter("@conglomeradoID", id)
+                };
 
-            return lista;
-        }
+                DataTable dt = _accesoBD.EjecutarSPconDT("SP_PesosXConglomerado", parametros);
+                List<PesosConglomeradoModel> lista = new List<PesosConglomeradoModel>();
 
-        public PesosConglomeradoModel ConsultarPorID(int id)
-        {
-            var parametros = new SqlParameter[]
-            {
-            new SqlParameter("@Operacion", "SELECT"),
-            new SqlParameter("@idPesoXConglomerado", id)
-            };
-
-            DataTable dt = _accesoBD.EjecutarSPconDT("SP_PesoXConglomeradoCRUD", parametros);
-            if (dt.Rows.Count == 0)
-                return null;
-
-            DataRow row = dt.Rows[0];
-            return new PesosConglomeradoModel
-            {
-                IdPesoXConglomerado = Convert.ToInt32(row["idPesoXConglomerado"]),
-                IdConglomerado = Convert.ToInt32(row["idConglomerado"]),
-                IdTipoObjetivo = row["idTipoObjetivo"] != DBNull.Value ? Convert.ToInt32(row["idTipoObjetivo"]) : (int?)null,
-                IdTipoCompetencia = row["idTipoCompetencia"] != DBNull.Value ? Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null,
-                Porcentaje = Convert.ToDecimal(row["Porcentaje"])
-            };
-        }
-
-        public List<PesosConglomeradoModel> ListarPorIdConglomerado(int idConglomerado)
-        {
-            var parametros = new SqlParameter[]
-            {
-            new SqlParameter("@Operacion", "SELECT"),
-            new SqlParameter("@idConglomerado", idConglomerado)
-            };
-
-            DataTable dt = _accesoBD.EjecutarSPconDT("SP_PesoXConglomeradoCRUD", parametros);
-            var lista = new List<PesosConglomeradoModel>();
-
-            foreach (DataRow row in dt.Rows)
-            {
-                lista.Add(new PesosConglomeradoModel
+                foreach (DataRow row in dt.Rows)
                 {
-                    IdPesoXConglomerado = Convert.ToInt32(row["idPesoXConglomerado"]),
-                    IdConglomerado = Convert.ToInt32(row["idConglomerado"]),
-                    IdTipoObjetivo = row["idTipoObjetivo"] != DBNull.Value ? Convert.ToInt32(row["idTipoObjetivo"]) : (int?)null,
-                    IdTipoCompetencia = row["idTipoCompetencia"] != DBNull.Value ? Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null,
-                    Porcentaje = Convert.ToDecimal(row["Porcentaje"])
-                });
-            }
+                    lista.Add(new PesosConglomeradoModel
+                    {
+                        IdPesoXConglomerado = Convert.ToInt32(row["idPesoXConglomerado"]),
+                        IdConglomerado = Convert.ToInt32(row["idConglomerado"]),
+                        IdTipoObjetivo = row["idTipoObjetivo"] as int?,
+                        IdTipoCompetencia = row["idTipoCompetencia"] as int?,
+                        Porcentaje = Convert.ToDecimal(row["Porcentaje"])
+                    });
+                }
 
-            return lista;
+                return lista;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Fallo en PesosConglomerado Negocios " + ex.Message);
+            }
         }
     }
 }//fin space

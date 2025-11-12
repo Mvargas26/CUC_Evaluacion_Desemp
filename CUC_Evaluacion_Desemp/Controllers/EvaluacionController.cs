@@ -134,7 +134,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 //obtenemos el funcionario
                 var subalterno = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(cedulaSeleccionada);
                 //obtenemos los pesos de su conglomerado
-                var PesosConglomerados = _servicioMantenimientos.Conglomerados.ConsultarPesosXConglomerado(idConglomerado);
+                var PesosConglomerados = _servicioMantenimientos.PesosConglomerado.ConsultarPesosXConglomerado(idConglomerado);
                 // Obtenemos tipos de Objetivos
                 ViewData["ListaTiposObjetivos"] = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
                 //Obtenemos tipos de competencias
@@ -400,7 +400,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 }
 
                 var subalterno = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(cedulaSeleccionada);
-                var PesosConglomerados = _servicioMantenimientos.Conglomerados.ConsultarPesosXConglomerado(idConglomerado);
+                var PesosConglomerados = _servicioMantenimientos.PesosConglomerado.ConsultarPesosXConglomerado(idConglomerado);
                 ViewData["ListaTiposObjetivos"] = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
                 ViewData["ListaTiposCompetencias"] = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
                 ViewData["ListaConglomerados"] = _servicioMantenimientos.Conglomerados.ListarConglomerados();
@@ -788,7 +788,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 }
 
                 var subalterno = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(cedulaSeleccionada);
-                var PesosConglomerados = _servicioMantenimientos.Conglomerados.ConsultarPesosXConglomerado(idConglomerado);
+                var PesosConglomerados = _servicioMantenimientos.PesosConglomerado.ConsultarPesosXConglomerado(idConglomerado);
                 ViewData["ListaTiposObjetivos"] = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
                 ViewData["ListaTiposCompetencias"] = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
                 ViewData["ListaConglomerados"] = _servicioMantenimientos.Conglomerados.ListarConglomerados();
