@@ -135,6 +135,12 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var subalterno = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(cedulaSeleccionada);
                 //obtenemos los pesos de su conglomerado
                 var PesosConglomerados = _servicioMantenimientos.PesosConglomerado.ConsultarPesosXConglomerado(idConglomerado);
+
+                if (PesosConglomerados.Count==0)
+                {
+                    TempData["MensajeError"] = "No se han asignado los pesos para este conglomerado. Por favor contacte a un administrador para continuar el proceso.";
+                    return View("Error");
+                }
                 // Obtenemos tipos de Objetivos
                 ViewData["ListaTiposObjetivos"] = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
                 //Obtenemos tipos de competencias

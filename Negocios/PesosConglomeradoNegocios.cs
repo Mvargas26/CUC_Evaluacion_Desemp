@@ -65,10 +65,23 @@ namespace Negocios
             {
                 var parametros = new SqlParameter[]
                 {
-                new SqlParameter("@conglomeradoID", id)
+                    new SqlParameter("@Operacion", "PORIDCONGLOMERADO"),
+                    new SqlParameter("@idPesoXConglomerado", DBNull.Value),
+                    new SqlParameter("@idConglomerado", id),
+                    new SqlParameter("@idTipoObjetivo", DBNull.Value),
+                    new SqlParameter("@idTipoCompetencia", DBNull.Value),
+                    new SqlParameter("@Porcentaje", DBNull.Value),
+                    new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
                 };
 
-                DataTable dt = _accesoBD.EjecutarSPconDT("SP_PesosXConglomerado", parametros);
+                DataTable dt = _accesoBD.EjecutarSPconDT("SP_PesoXConglomeradoCRUD", parametros);
+
+                string mensajeError = parametros.Last().Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(mensajeError))
+                {
+                    throw new Exception("Error SP: " + mensajeError);
+                }
+
                 List<PesosConglomeradoModel> lista = new List<PesosConglomeradoModel>();
 
                 foreach (DataRow row in dt.Rows)
@@ -77,8 +90,8 @@ namespace Negocios
                     {
                         IdPesoXConglomerado = Convert.ToInt32(row["idPesoXConglomerado"]),
                         IdConglomerado = Convert.ToInt32(row["idConglomerado"]),
-                        IdTipoObjetivo = row["idTipoObjetivo"] as int?,
-                        IdTipoCompetencia = row["idTipoCompetencia"] as int?,
+                        IdTipoObjetivo = row["idTipoObjetivo"] != DBNull.Value ? Convert.ToInt32(row["idTipoObjetivo"]) : (int?)null,
+                        IdTipoCompetencia = row["idTipoCompetencia"] != DBNull.Value ? Convert.ToInt32(row["idTipoCompetencia"]) : (int?)null,
                         Porcentaje = Convert.ToDecimal(row["Porcentaje"])
                     });
                 }
@@ -87,8 +100,10 @@ namespace Negocios
             }
             catch (Exception ex)
             {
-                throw new Exception("Fallo en PesosConglomerado Negocios " + ex.Message);
+                throw new Exception("Fallo en PesosConglomerado Negocios: " + ex.Message);
             }
-        }
+        }//ConsultarPesosXConglomerado
+
+
     }
 }//fin space
