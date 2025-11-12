@@ -82,11 +82,6 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="Porcentaje" class="form-label">Porcentaje</label>
-                        <input type="number" class="form-control" id="Porcentaje" name="Porcentaje" required />
-                    </div>
-
-                    <div class="mb-3">
                         <label for="IdTipoObjetivo" class="form-label">Tipo de Objetivo</label>
                         @Html.DropDownList("IdTipoObjetivo", new SelectList(ViewBag.TiposObjetivo, "IdTipoObjetivo", "Tipo"), "Seleccione un tipo", new { @class = "form-control" })
                     </div>
@@ -122,13 +117,6 @@
                             <label class="form-label">Nombre del Objetivo</label>
                             <input type="text" class="form-control" name="Objetivo" value="@Objetivo.Objetivo" required />
                         </div>
-
-
-                        <div class="mb-3">
-                            <label class="form-label">Porcentaje</label>
-                            <input type="number" class="form-control" id="Porcentaje" name="Porcentaje" value="@Objetivo.Porcentaje" required />
-                        </div>
-
 
                         <div class="mb-3">
                             <label class="form-label">Tipo de Objetivo</label>

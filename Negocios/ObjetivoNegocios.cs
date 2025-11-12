@@ -99,7 +99,7 @@ namespace Negocios
             new SqlParameter("@Operacion", "C"),
               new SqlParameter("@idObjetivo", DBNull.Value),
             new SqlParameter("@Objetivo", objetivo.Objetivo),
-            new SqlParameter("@Porcentaje", objetivo.Porcentaje),
+            new SqlParameter("@Porcentaje", 0),
             new SqlParameter("@idTipoObjetivo", objetivo.IdTipoObjetivo ?? (object)DBNull.Value),
                 new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
 
@@ -120,7 +120,7 @@ namespace Negocios
             new SqlParameter("@Operacion", "U"),
             new SqlParameter("@idObjetivo", objetivo.IdObjetivo),
             new SqlParameter("@Objetivo", objetivo.Objetivo),
-            new SqlParameter("@Porcentaje", objetivo.Porcentaje),
+            new SqlParameter("@Porcentaje", 0),
             new SqlParameter("@idTipoObjetivo", objetivo.IdTipoObjetivo ?? (object)DBNull.Value),
               new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
             };

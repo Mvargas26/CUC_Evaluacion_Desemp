@@ -391,7 +391,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return RedirectToAction(nameof(ManteniArea));
             }
         }
-
   
         [HttpPost]
         public ActionResult CreaArea(AreasModel nuevoArea)
@@ -420,8 +419,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return View("ManteniArea", nuevoArea);
             }
         }
-            
-
 
         [HttpPost]
         public ActionResult EditaArea(AreasModel areaModificado)
@@ -1072,6 +1069,88 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
 
 
+        #endregion
+
+        #region TipoObjetivos
+        public ActionResult MantenTipoObjetivo()
+        {
+            try
+            {
+                var tipos = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
+                return View(tipos);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener los tipos de objetivos.";
+                return RedirectToAction(nameof(MantenTipoObjetivo));
+            }
+        }//MantenTipoObjetivo
+        [HttpPost]
+        public ActionResult CrearTipoObjetivo(TiposObjetivosModel nuevoTipo)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _servicioMantenimientos.TiposObjetivos.CrearTipoObjetivo(nuevoTipo);
+                    TempData["MensajeExito"] = $"Tipo de objetivo '{nuevoTipo.Tipo}' creado correctamente.";
+                    return RedirectToAction(nameof(MantenTipoObjetivo));
+                }
+                else
+                {
+                    return View("MantenTipoObjetivo", nuevoTipo);
+                }
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al crear el tipo de objetivo.";
+                return View("MantenTipoObjetivo", nuevoTipo);
+            }
+        }//CrearTipoObjetivo
+        [HttpPost]
+        public ActionResult EditarTipoObjetivo(TiposObjetivosModel tipoModificado)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _servicioMantenimientos.TiposObjetivos.ModificarTipoObjetivo(tipoModificado);
+                    TempData["MensajeExito"] = $"'{tipoModificado.Tipo}' fue modificado correctamente.";
+                    return RedirectToAction(nameof(MantenTipoObjetivo));
+                }
+                else
+                {
+                    return View("MantenTipoObjetivo", tipoModificado);
+                }
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al actualizar el tipo de objetivo.";
+                return RedirectToAction(nameof(MantenTipoObjetivo));
+            }
+        }//EditarTipoObjetivo
+        public ActionResult EliminarTipoObjetivo(int id)
+        {
+            try
+            {
+                var tipo = _servicioMantenimientos.TiposObjetivos.ConsultarTipoObjetivoPorID(id);
+                if (tipo == null)
+                {
+                    TempData["MensajeError"] = $"El tipo de objetivo con ID {id} no fue encontrado.";
+                }
+                else
+                {
+                    _servicioMantenimientos.TiposObjetivos.EliminarTipoObjetivo(id);
+                    TempData["MensajeExito"] = $"Tipo de objetivo '{tipo.Tipo}' eliminado correctamente.";
+                }
+                return RedirectToAction(nameof(MantenTipoObjetivo));
+            }
+            catch
+            {
+                TempData["MensajeError"] = "No puede eliminar este tipo de objetivo. Verifique las relaciones.";
+                return RedirectToAction(nameof(MantenTipoObjetivo));
+            }
+        }// EliminarTipoObjetivo
         #endregion
 
         #region Objetivos
