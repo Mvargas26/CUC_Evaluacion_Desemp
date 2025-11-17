@@ -223,8 +223,46 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
+
         #endregion
 
+        #region Manuales de Usuario
+        [HttpGet]
+        public ActionResult ManualesUsuario()
+        {
+            try
+            {
+                var rutaCarpeta = Server.MapPath("~/Manuales");
 
+                if (!Directory.Exists(rutaCarpeta))
+                {
+                    ViewBag.Reportes = new List<ReportePdfViewModel>();
+                    return View();
+                }
+
+                var archivos = Directory.GetFiles(rutaCarpeta, "*.pdf", SearchOption.TopDirectoryOnly);
+
+                var listaManuales = archivos
+                    .Select(fullPath => new ReportePdfViewModel
+                    {
+                        NombreArchivo = Path.GetFileName(fullPath),
+                        RutaRelativa = Url.Content("~/Manuales/" + Path.GetFileName(fullPath)),
+                        FechaCreacion = System.IO.File.GetCreationTime(fullPath)
+                    })
+                    .OrderByDescending(r => r.FechaCreacion)
+                    .ToList();
+
+                ViewBag.Reportes = listaManuales;
+
+                return View();
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al cargar los Manuales PDF.";
+                return RedirectToAction(nameof(SeleccionarSubalternoReporteEvaluacion));
+            }
+        }
+
+        #endregion
     }//fin class
 }//fin Controller

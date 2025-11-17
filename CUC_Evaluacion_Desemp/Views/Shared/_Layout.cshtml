@@ -4,7 +4,6 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- jQuery CDN (minified) -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <title>Evaluación del Desempeño CUC</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
@@ -32,7 +31,7 @@
                 </h2>
             </div>
             <ul class="sidebar-menu">
-                <!-- Menú principal (solo 3 opciones) -->
+                <!-- Menú principal -->
                 <li>
                     <a href="#" class="main-menu-item" data-target="mantenimientos">
                         Mantenimientos <i class="fa-solid fa-screwdriver"></i>
@@ -48,10 +47,14 @@
                         Reportes <i class="fa-solid fa-flag"></i>
                     </a>
                 </li>
+                <li>
+                    <a href="#" class="main-menu-item" data-target="manuales">
+                        Manuales <i class="fa-solid fa-book-open"></i>
+                    </a>
+                </li>
             </ul>
         </nav>
 
-        <!-- Contenedor para el menú flotante -->
         <div id="floating-menu-container" class="floating-menu-container">
             <!-- El contenido se cargará dinámicamente mediante JavaScript -->
         </div>
@@ -94,8 +97,10 @@
          ESTA PARTE DEBE ESTAR EN LA VISTA PARA QUE FUNCIONEN LAS RUTAS EN PRODUCCION
         *********************************************************************************@
 <script>
-        window.menuData = {
-        mantenimientos: {
+    window.menuData =
+    {
+        mantenimientos:
+        {
             sections: [
                 {
                     title: "General",
@@ -106,6 +111,11 @@
                         { text: "Areas", url: "@Url.Action("ManteniArea", "Mantenimientos")" },
                         { text: "Carreras", url: "@Url.Action("ManteniCarreras", "Mantenimientos")" },
                         { text: "Funcionarios", url: "@Url.Action("ManteniFuncionarios", "Mantenimientos")" },
+                    ]
+                },
+                {
+                    title: "Conglomerados",
+                    items: [
                         { text: "Conglomerados", url: "@Url.Action("ManteniConglomerados", "Mantenimientos")" },
                         { text: "Pesos Conglomerados", url: "@Url.Action("SeleccionarConglomeradoParaPesos", "Mantenimientos")" }
                     ]
@@ -117,20 +127,21 @@
                         { text: "Objetivos", url: "@Url.Action("ManteniObjetivos", "Mantenimientos")" }
                     ]
                 },
-                 {
-                     title: "Competencias",
-                     items: [
-                         { text: "Tipos de Competencias", url: "@Url.Action("ManteniTiposCompetencias", "Mantenimientos")" },
-                         { text: "Comportamientos", url: "@Url.Action("ManteniComportamientos", "Mantenimientos")" },
-                         { text: "Niveles Comportamientos", url: "@Url.Action("ManteniNivelesComportamientos", "Mantenimientos")" },
-                         { text: "Mantenimiento Competencias", url: "@Url.Action("ManteniCompetencias", "Mantenimientos")" },
-                         { text: "Asignar Comportamientos y Niveles", url: "@Url.Action("SelecCompetenciaParaAsignarComportamientos", "Mantenimientos")" },
-                         { text: "Ver comportamientos y niveles", url: "@Url.Action("ConsultarComportamientosYNiveles", "Mantenimientos")" }
-                     ]
-                 }
+                    {
+                        title: "Competencias",
+                        items: [
+                            { text: "Tipos de Competencias", url: "@Url.Action("ManteniTiposCompetencias", "Mantenimientos")" },
+                            { text: "Comportamientos", url: "@Url.Action("ManteniComportamientos", "Mantenimientos")" },
+                            { text: "Niveles Comportamientos", url: "@Url.Action("ManteniNivelesComportamientos", "Mantenimientos")" },
+                            { text: "Mantenimiento Competencias", url: "@Url.Action("ManteniCompetencias", "Mantenimientos")" },
+                            { text: "Asignar Comportamientos y Niveles", url: "@Url.Action("SelecCompetenciaParaAsignarComportamientos", "Mantenimientos")" },
+                            { text: "Ver comportamientos y niveles", url: "@Url.Action("ConsultarComportamientosYNiveles", "Mantenimientos")" }
+                        ]
+                    }
             ]
         },
-        evaluacion: {
+        evaluacion:
+        {
             sections: [
                 {
                     title: "Planificación",
@@ -139,20 +150,21 @@
                     ],
                 },
                 {
-                     title: "Evaluación y Seguimientos",
-                     items: [
-                         { text: "Evaluar Sub-Alterno", url: "@Url.Action("SeleccionarSubalternoParaEvaluar", "Evaluacion")" }
-                     ],
+                        title: "Evaluación y Seguimientos",
+                        items: [
+                            { text: "Evaluar Sub-Alterno", url: "@Url.Action("SeleccionarSubalternoParaEvaluar", "Evaluacion")" }
+                        ],
                 },
                 {
-                     title: "Cierre de Evaluación",
-                     items: [
-                         { text: "Cerrar Evaluaciones", url: "@Url.Action("SeleccionarSubalternoCierreEvaluacion", "Evaluacion")" }
-                     ],
+                        title: "Cierre de Evaluación",
+                        items: [
+                            { text: "Cerrar Evaluaciones", url: "@Url.Action("SeleccionarSubalternoCierreEvaluacion", "Evaluacion")" }
+                        ],
                 }
             ],
         },
-        reportes: {
+        reportes:
+        {
             sections: [
                 {
                     title: "Reportes",
@@ -162,11 +174,20 @@
                     ]
                 }
             ]
-        }
+        },
+         manuales:
+          {
+             sections: [
+                 {
+                     title: "Ver Manuales",
+                     items: [
+                         { text: "Manuales de Usuario", url: "@Url.Action("ManualesUsuario", "Reportes")" }
+                     ]
+                 }
+             ]
+          }
     };
 </script>
-
-
 
 </body>
 </html>
