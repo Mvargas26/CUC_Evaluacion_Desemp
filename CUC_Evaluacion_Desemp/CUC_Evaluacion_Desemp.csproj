@@ -220,6 +220,7 @@
     <Content Include="sources\js\Vistas\ConsultarComportamientosYNiveles\ListarComportamientosYDescripcionesNegocios_JS.js" />
     <Content Include="sources\js\Vistas\CrearFuncionario\CrearFuncionarioJS.js" />
     <Content Include="sources\js\Vistas\EvaluarSubAlterno\JS_EvaluarSubAlterno.js" />
+    <Content Include="sources\js\Vistas\ManteniPesosConglomerado\JS_PesosCongloemrado.js" />
     <Content Include="sources\js\Vistas\PlanificarEvaluacion\JS_Planificar.js" />
     <Content Include="sources\js\Vistas\ReporteGeneralRH\JS_ReporteGeneralRH.js" />
     <Content Include="Web.config" />
@@ -275,6 +276,8 @@
     <Content Include="Views\Reportes\ListarReportesFuncionario.cshtml" />
     <Content Include="Views\Mantenimientos\ModificarFuncionario.cshtml" />
     <Content Include="Views\Mantenimientos\MantenTipoObjetivo.cshtml" />
+    <Content Include="Views\Mantenimientos\ManteniPesosConglomerado.cshtml" />
+    <Content Include="Views\Mantenimientos\SeleccionarConglomeradoParaPesos.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

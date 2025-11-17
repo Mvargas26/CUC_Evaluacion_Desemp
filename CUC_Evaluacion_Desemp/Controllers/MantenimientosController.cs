@@ -1559,7 +1559,122 @@ namespace CUC_Evaluacion_Desemp.Controllers
         }
         #endregion
 
-    }
+        #region Pesos Por Congloemrado
 
-}
+        public ActionResult SeleccionarConglomeradoParaPesos()
+        {
+            try
+            {
+                var conglomerados = _servicioMantenimientos.Conglomerados.ListarConglomerados();
+                ViewBag.ListaConglomerados = conglomerados;
+                return View();
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener los conglomerados.";
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult SeleccionarConglomeradoParaPesos(int idConglomerado)
+        {
+            return RedirectToAction("ManteniPesosConglomerado", new { idConglomerado });
+        }
+
+        public ActionResult ManteniPesosConglomerado(int idConglomerado)
+        {
+            try
+            {
+                var listaPesos = _servicioMantenimientos.PesosConglomerado.ConsultarPesosXConglomerado(idConglomerado);
+                var listaTiposObjetivos = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
+                var listaTiposCompetencias = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
+
+                ViewBag.idConglomerado = idConglomerado;
+                ViewBag.ListaTiposObjetivos = listaTiposObjetivos;
+                ViewBag.ListaTiposCompetencias = listaTiposCompetencias;
+
+                return View(listaPesos);
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al obtener los pesos por conglomerado.";
+                return RedirectToAction(nameof(ManteniPesosConglomerado), new { idConglomerado });
+            }
+        }//ManteniPesosConglomerado
+
+        [HttpPost]
+        public ActionResult CrearPesoConglomerado(PesosConglomeradoModel nuevoPeso)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _servicioMantenimientos.PesosConglomerado.CrearPesoXConglomerado(nuevoPeso);
+                    TempData["MensajeExito"] = "Peso registrado correctamente.";
+                    return RedirectToAction(nameof(ManteniPesosConglomerado), new { idConglomerado = nuevoPeso.IdConglomerado });
+                }
+                else
+                {
+                    return View("ManteniPesosConglomerado", nuevoPeso);
+                }
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al crear el peso por conglomerado.";
+                return RedirectToAction(nameof(ManteniPesosConglomerado), new { idConglomerado = nuevoPeso.IdConglomerado });
+            }
+        }//CrearPesoConglomerado
+
+        [HttpPost]
+        public ActionResult EditarPesoConglomerado(PesosConglomeradoModel pesoModificado)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _servicioMantenimientos.PesosConglomerado.ModificarPesoXConglomerado(pesoModificado);
+                    TempData["MensajeExito"] = "Peso modificado correctamente.";
+                    return RedirectToAction(nameof(ManteniPesosConglomerado), new { idConglomerado = pesoModificado.IdConglomerado });
+                }
+                else
+                {
+                    return View("ManteniPesosConglomerado", pesoModificado);
+                }
+            }
+            catch (Exception)
+            {
+                TempData["MensajeError"] = "Error al actualizar el peso.";
+                return RedirectToAction(nameof(ManteniPesosConglomerado), new { idConglomerado = pesoModificado.IdConglomerado });
+            }
+        }//EditarPesoConglomerado
+
+        public ActionResult EliminarPesoConglomerado(int id, int idConglomerado)
+        {
+            try
+            {
+                var peso = _servicioMantenimientos.PesosConglomerado.ConsultarPesosXConglomerado(idConglomerado)
+                            .FirstOrDefault(p => p.IdPesoXConglomerado == id);
+
+                if (peso == null)
+                {
+                    TempData["MensajeError"] = $"El registro con ID {id} no fue encontrado.";
+                }
+                else
+                {
+                    _servicioMantenimientos.PesosConglomerado.EliminarPesoXConglomerado(id);
+                    TempData["MensajeExito"] = $"Peso con ID {id} eliminado correctamente.";
+                }
+
+                return RedirectToAction(nameof(ManteniPesosConglomerado), new { idConglomerado });
+            }
+            catch
+            {
+                TempData["MensajeError"] = "No se puede eliminar este registro. Verifique las relaciones.";
+                return RedirectToAction(nameof(ManteniPesosConglomerado), new { idConglomerado });
+            }
+        }//EliminarPesoConglomerado
+        #endregion
+    }//fin class
+}//fin space
 

@@ -1,0 +1,32 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Seleccionar Conglomerado";
+    var conglomerados = ViewBag.ListaConglomerados as IEnumerable<Entidades.ConglomeradoModel>;
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Seleccionar Conglomerado</h2>
+
+    @if (TempData["MensajeError"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["MensajeError"]
+        </div>
+    }
+
+    <form asp-action="SeleccionarConglomerado" asp-controller="PesosConglomerado" method="post">
+        <div class="mb-3">
+            <label class="form-label">Seleccione un Conglomerado</label>
+            <select name="idConglomerado" class="form-select" required>
+                <option value="">-- Seleccione --</option>
+                @foreach (var c in conglomerados)
+                {
+                    <option value="@c.IdConglomerado">@c.NombreConglomerado</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Continuar</button>
+    </form>
+</div>
+

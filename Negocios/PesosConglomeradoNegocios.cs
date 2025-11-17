@@ -19,47 +19,7 @@ namespace Negocios
             _accesoBD = accesoBD;
         }
 
-        public void Crear(PesosConglomeradoModel model)
-        {
-            var parametros = new SqlParameter[]
-            {
-            new SqlParameter("@Operacion", "INSERT"),
-            new SqlParameter("@idConglomerado", model.IdConglomerado),
-            new SqlParameter("@idTipoObjetivo", (object)model.IdTipoObjetivo ?? DBNull.Value),
-            new SqlParameter("@idTipoCompetencia", (object)model.IdTipoCompetencia ?? DBNull.Value),
-            new SqlParameter("@Porcentaje", model.Porcentaje)
-            };
-
-            _accesoBD.EjecutarSPconDT("SP_PesoXConglomeradoCRUD", parametros);
-        }
-
-        public void Modificar(PesosConglomeradoModel model)
-        {
-            var parametros = new SqlParameter[]
-            {
-            new SqlParameter("@Operacion", "UPDATE"),
-            new SqlParameter("@idPesoXConglomerado", model.IdPesoXConglomerado),
-            new SqlParameter("@idConglomerado", model.IdConglomerado),
-            new SqlParameter("@idTipoObjetivo", (object)model.IdTipoObjetivo ?? DBNull.Value),
-            new SqlParameter("@idTipoCompetencia", (object)model.IdTipoCompetencia ?? DBNull.Value),
-            new SqlParameter("@Porcentaje", model.Porcentaje)
-            };
-
-            _accesoBD.EjecutarSPconDT("SP_PesoXConglomeradoCRUD", parametros);
-        }
-
-        public void Eliminar(int id)
-        {
-            var parametros = new SqlParameter[]
-            {
-            new SqlParameter("@Operacion", "DELETE"),
-            new SqlParameter("@idPesoXConglomerado", id)
-            };
-
-            _accesoBD.EjecutarSPconDT("SP_PesoXConglomeradoCRUD", parametros);
-        }
-
-        public List<PesosConglomeradoModel> ConsultarPesosXConglomerado(int id)
+         public List<PesosConglomeradoModel> ConsultarPesosXConglomerado(int id)
         {
             try
             {
@@ -104,6 +64,71 @@ namespace Negocios
             }
         }//ConsultarPesosXConglomerado
 
+        public void CrearPesoXConglomerado(PesosConglomeradoModel nuevoPeso)
+        {
+            var parametros = new SqlParameter[]
+            {
+                new SqlParameter("@Operacion", "INSERT"),
+                new SqlParameter("@idPesoXConglomerado", DBNull.Value),
+                new SqlParameter("@idConglomerado", nuevoPeso.IdConglomerado),
+                new SqlParameter("@idTipoObjetivo", (object)(nuevoPeso.IdTipoObjetivo ?? (object)DBNull.Value)),
+                new SqlParameter("@idTipoCompetencia", (object)(nuevoPeso.IdTipoCompetencia ?? (object)DBNull.Value)),
+                new SqlParameter("@Porcentaje", nuevoPeso.Porcentaje),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
+            };
+
+            _accesoBD.EjecutarSPconDT("SP_PesoXConglomeradoCRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
+        }//CrearPesoXConglomerado
+
+        public void ModificarPesoXConglomerado(PesosConglomeradoModel pesoModificado)
+        {
+            var parametros = new SqlParameter[]
+            {
+                new SqlParameter("@Operacion", "UPDATE"),
+                new SqlParameter("@idPesoXConglomerado", pesoModificado.IdPesoXConglomerado),
+                new SqlParameter("@idConglomerado", pesoModificado.IdConglomerado),
+        new SqlParameter("@idTipoObjetivo", (object)(pesoModificado.IdTipoObjetivo ?? (object)DBNull.Value)),
+        new SqlParameter("@idTipoCompetencia", (object)(pesoModificado.IdTipoCompetencia ?? (object)DBNull.Value)),
+                new SqlParameter("@Porcentaje", pesoModificado.Porcentaje),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
+            };
+
+            _accesoBD.EjecutarSPconDT("SP_PesoXConglomeradoCRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
+        }//ModificarPesoXConglomerado
+
+        public void EliminarPesoXConglomerado(int idPesoXConglomerado)
+        {
+            var parametros = new SqlParameter[]
+            {
+                new SqlParameter("@Operacion", "DELETE"),
+                new SqlParameter("@idPesoXConglomerado", idPesoXConglomerado),
+                new SqlParameter("@idConglomerado", DBNull.Value),
+                new SqlParameter("@idTipoObjetivo", DBNull.Value),
+                new SqlParameter("@idTipoCompetencia", DBNull.Value),
+                new SqlParameter("@Porcentaje", DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
+            };
+
+            _accesoBD.EjecutarSPconDT("SP_PesoXConglomeradoCRUD", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
+        }
 
     }
 }//fin space

@@ -1,0 +1,245 @@
+﻿@model IEnumerable<Entidades.PesosConglomeradoModel>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Mantenimiento Pesos por Conglomerado";
+
+    var tiposObjetivos = ViewBag.ListaTiposObjetivos as IEnumerable<Entidades.TiposObjetivosModel>;
+    var tiposCompetencias = ViewBag.ListaTiposCompetencias as IEnumerable<Entidades.TiposCompetenciasModel>;
+    var idConglomerado = ViewBag.idConglomerado;
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Mantenimiento Pesos por Conglomerado</h2>
+
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="alert alert-success">@TempData["MensajeExito"]</div>
+    }
+
+    @if (TempData["MensajeError"] != null)
+    {
+        <div class="alert alert-danger">@TempData["MensajeError"]</div>
+    }
+
+    <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrearPeso">
+            <i class="fas fa-plus"></i> Crear
+        </button>
+    </div>
+
+    <div class="table-responsive mt-3">
+        <table class="table table-striped table-bordered text-center">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tipo de Objetivo</th>
+                    <th>Tipo de Competencia</th>
+                    <th>Porcentaje (%)</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var peso in Model)
+                {
+                    <tr>
+                        <td>@peso.IdPesoXConglomerado</td>
+                        <td>
+                            @(peso.IdTipoObjetivo.HasValue
+                                ? tiposObjetivos?.FirstOrDefault(o => o.IdTipoObjetivo == peso.IdTipoObjetivo)?.Tipo
+                                : "-")
+                        </td>
+                        <td>
+                            @(peso.IdTipoCompetencia.HasValue
+                                ? tiposCompetencias?.FirstOrDefault(c => c.IdTipoCompetencia == peso.IdTipoCompetencia)?.Tipo
+                                : "-")
+                        </td>
+                        <td class="col-porcentaje">@peso.Porcentaje</td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarPeso-@peso.IdPesoXConglomerado">
+                                <i class="fas fa-edit"></i>
+                            </button>
+
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminarPeso-@peso.IdPesoXConglomerado">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="table-secondary">
+                    <th colspan="3" class="text-end">Suma Total:</th>
+                    <th id="sumaTotalPorcentaje"></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Crear -->
+<div class="modal fade" id="modalCrearPeso" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nuevo Peso por Conglomerado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form action="@Url.Action("CrearPesoConglomerado", "Mantenimientos")" method="post">
+                <input type="hidden" name="IdConglomerado" value="@ViewBag.idConglomerado" />
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Registro</label>
+                        <select class="form-select" id="tipoRegistro" required>
+                            <option value="">-- Seleccione --</option>
+                            <option value="objetivo">Tipo de Objetivo</option>
+                            <option value="competencia">Tipo de Competencia</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 d-none" id="divObjetivos">
+                        <label class="form-label">Tipo de Objetivo</label>
+                        <select class="form-select" name="IdTipoObjetivo">
+                            <option value="">-- Seleccione --</option>
+                            @foreach (var item in ViewBag.ListaTiposObjetivos)
+                            {
+                                <option value="@item.IdTipoObjetivo">@item.Tipo</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3 d-none" id="divCompetencias">
+                        <label class="form-label">Tipo de Competencia</label>
+                        <select class="form-select" name="IdTipoCompetencia">
+                            <option value="">-- Seleccione --</option>
+                            @foreach (var item in ViewBag.ListaTiposCompetencias)
+                            {
+                                <option value="@item.IdTipoCompetencia">@item.Tipo</option>
+                            }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Porcentaje</label>
+                        <input type="number" class="form-control" name="Porcentaje" required min="1" max="100" step="1" />
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modales Editar -->
+@foreach (var item in Model)
+{
+    <div class="modal fade" id="modalEditarPeso-@item.IdPesoXConglomerado" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Peso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form action="@Url.Action("EditarPesoConglomerado", "Mantenimientos")" method="post">
+                    <input type="hidden" name="IdPesoXConglomerado" value="@item.IdPesoXConglomerado" />
+                    <input type="hidden" name="IdConglomerado" value="@item.IdConglomerado" />
+
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Registro</label>
+                            <select class="form-select tipoRegistroEditar" data-id="@item.IdPesoXConglomerado" required>
+                                <option value="">-- Seleccione --</option>
+                                <option value="objetivo" @(item.IdTipoObjetivo != null ? "selected" : "")>Tipo de Objetivo</option>
+                                <option value="competencia" @(item.IdTipoCompetencia != null ? "selected" : "")>Tipo de Competencia</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3 @(item.IdTipoObjetivo == null ? "d-none" : "")" id="divObjetivos-@item.IdPesoXConglomerado">
+                            <label class="form-label">Tipo de Objetivo</label>
+                            <select class="form-select" name="IdTipoObjetivo">
+                                <option value="">-- Seleccione --</option>
+                                @foreach (var obj in ViewBag.ListaTiposObjetivos)
+                                {
+                                    <option value="@obj.IdTipoObjetivo" @(item.IdTipoObjetivo == obj.IdTipoObjetivo ? "selected" : "")>
+                                        @obj.Tipo
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3 @(item.IdTipoCompetencia == null ? "d-none" : "")" id="divCompetencias-@item.IdPesoXConglomerado">
+                            <label class="form-label">Tipo de Competencia</label>
+                            <select class="form-select" name="IdTipoCompetencia">
+                                <option value="">-- Seleccione --</option>
+                                @foreach (var comp in ViewBag.ListaTiposCompetencias)
+                                {
+                                    <option value="@comp.IdTipoCompetencia" @(item.IdTipoCompetencia == comp.IdTipoCompetencia ? "selected" : "")>
+                                        @comp.Tipo
+                                    </option>
+                                }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Porcentaje</label>
+                            <input type="number" class="form-control" name="Porcentaje"
+                                   value="@item.Porcentaje" required min="1" max="100" step="1" />
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+<!-- Modales Eliminar -->
+@foreach (var peso in Model)
+{
+    <div class="modal fade" id="modalEliminarPeso-@peso.IdPesoXConglomerado" tabindex="-1" aria-labelledby="modalEliminarPesoLabel-@peso.IdPesoXConglomerado" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEliminarPesoLabel-@peso.IdPesoXConglomerado">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Desea eliminar este registro con <strong>@peso.Porcentaje %</strong> asignado?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                    <form action="@Url.Action("EliminarPesoConglomerado", "Mantenimientos")" method="post">
+                        <input type="hidden" name="id" value="@peso.IdPesoXConglomerado" />
+                        <input type="hidden" name="idConglomerado" value="@peso.IdConglomerado" />
+                        <button type="submit" class="btn btn-danger">Sí</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script defer src="~/sources/js/accionOcultarCerrarMensajes.js"></script>
+<script defer src="~/sources/js/Vistas/ManteniPesosConglomerado/JS_PesosCongloemrado.js"></script>
+
