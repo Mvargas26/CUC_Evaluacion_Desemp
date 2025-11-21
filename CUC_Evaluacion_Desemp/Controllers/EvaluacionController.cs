@@ -273,7 +273,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                 IdCompetencia = idCompetencia,
                                 IdComportamiento = idComportamiento,
                                 IdNivel = idNivel,
-                                ValorObtenido = 0 // si después necesitas ponerle nota real, aquí la cargas
+                                ValorObtenido = 0 
                             };
 
                             _servicioMantenimientos.EvaluacionXcompetencia.CrearEvaluacionXCompetencia(evaluacionXCompetencia);
@@ -1089,6 +1089,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var ced = data["cedFuncionario"]?.ToString() ?? eva.IdFuncionario ?? "sincedula";
                 var ruta = Path.Combine(dir, nombreArchivo);
                 var incluirNivelAsignado = faseActual != null && faseActual.IdEstado != 1;
+                PeriodosModel periodoDeEva = _servicioMantenimientos.Periodos.ObtenerPeriodoID(Convert.ToInt32(data["idPeriodo"]));
 
                 using (var fs = new FileStream(ruta, FileMode.Create, FileAccess.Write, FileShare.None))
                 using (var doc = new Document(PageSize.LETTER, 36, 36, 36, 36))
@@ -1101,8 +1102,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     var fSub = FontFactory.GetFont("Helvetica", 11, Font.BOLD);
                     var fTxt = FontFactory.GetFont("Helvetica", 10, Font.NORMAL);
 
-                    var tblEncabezado = new PdfPTable(2) { WidthPercentage = 100 };
-                    tblEncabezado.SetWidths(new float[] { 70, 30 });
                     var logoPath = Server.MapPath("~/sources/img/LogoCUCsinFondo.png");
                     Image logo = null;
                     if (System.IO.File.Exists(logoPath))
@@ -1111,20 +1110,50 @@ namespace CUC_Evaluacion_Desemp.Controllers
                         logo.ScaleToFit(90f, 90f);
                     }
 
-                    var celTexto = new PdfPCell(new Phrase("Colegio Universitario de Cartago", FontFactory.GetFont("Helvetica", 20, Font.BOLD, azulCUC)))
+                    //**********************************Encabezado
+                    var tblEncabezado = new PdfPTable(2) { WidthPercentage = 100 };
+                    tblEncabezado.SetWidths(new float[] { 70, 30 });
+
+                    var titulo = new Phrase("Colegio Universitario de Cartago\n",
+                        FontFactory.GetFont("Helvetica", 20, Font.BOLD, azulCUC));
+
+                    var subtitulo = new Phrase("Departamento de Gestión Institucional de Recursos Humanos\n",
+                        FontFactory.GetFont("Helvetica", 14, Font.NORMAL, azulCUC));
+
+                    var periodoTexto = (periodoDeEva != null)
+                     ? $"{periodoDeEva.Nombre} ({periodoDeEva.FechaInicio:dd/MM/yyyy} - {periodoDeEva.FechaFin:dd/MM/yyyy})"
+                     : "N/A";
+
+                    var periodo = new Phrase(periodoTexto,
+                        FontFactory.GetFont("Helvetica", 12, Font.NORMAL, azulCUC));
+
+                    var celTexto = new PdfPCell()
                     {
                         Border = 0,
-                        VerticalAlignment = Element.ALIGN_MIDDLE,
+                        PaddingTop = 5f,
                         HorizontalAlignment = Element.ALIGN_LEFT,
-                        PaddingTop = 10f
+                        VerticalAlignment = Element.ALIGN_MIDDLE
                     };
 
-                    var celLogo = new PdfPCell { Border = 0, HorizontalAlignment = Element.ALIGN_RIGHT, VerticalAlignment = Element.ALIGN_MIDDLE };
-                    if (logo != null) celLogo.AddElement(logo);
+                    celTexto.AddElement(titulo);
+                    celTexto.AddElement(subtitulo);
+                    celTexto.AddElement(periodo);
+
+                    var celLogo = new PdfPCell()
+                    {
+                        Border = 0,
+                        HorizontalAlignment = Element.ALIGN_RIGHT,
+                        VerticalAlignment = Element.ALIGN_MIDDLE,
+                    };
+
+                    if (logo != null)
+                        celLogo.AddElement(logo);
 
                     tblEncabezado.AddCell(celTexto);
                     tblEncabezado.AddCell(celLogo);
+
                     doc.Add(tblEncabezado);
+                    tblEncabezado.SpacingAfter = 10f;
 
                     var cb = w.DirectContent;
                     cb.SetColorStroke(azulCUC);
