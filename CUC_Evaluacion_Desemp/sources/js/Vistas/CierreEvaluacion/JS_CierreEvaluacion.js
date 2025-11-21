@@ -134,7 +134,7 @@ function actualizarCompetenciasEnTbResultados() {
         const porcTxt = $filaComp.find('td').eq(1).text();
         const porcCategoria = parseFloat(porcTxt.replace('%', '').replace(',', '.').trim()) || 0;
         const ponderado = (porcLogro * porcCategoria) / 100;
-        $filaComp.find('.input-calificacion').val(ponderado.toFixed(2));
+        $filaComp.find('.input-calificacion').val(ponderado.toFixed(1));
     }
 
     let totalGeneral = 0;
@@ -142,7 +142,7 @@ function actualizarCompetenciasEnTbResultados() {
         const v = parseFloat($(this).val() || '0');
         if (!isNaN(v)) totalGeneral += v;
     });
-    $('#resultado-total').val(totalGeneral.toFixed(2));
+    $('#resultado-total').val(totalGeneral.toFixed(1));
 
     return { total, porcLogro, totalGeneral };
 }

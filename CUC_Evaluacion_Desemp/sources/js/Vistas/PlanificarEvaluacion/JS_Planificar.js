@@ -438,7 +438,7 @@ function actualizarResultadosGlobales() {
     // 4. Actualizar vista para todos los tipos definidos
     for (const [idTipo, def] of Object.entries(tiposDefinidos)) {
         const sumaActual = sumasPorTipo[idTipo] || 0; // Si no hay datos es 0
-        def.input.value = sumaActual.toFixed(2);
+        def.input.value = sumaActual.toFixed(1);
         const diferencia = Math.abs(sumaActual - def.porcentajeDeseado);
         def.input.style.backgroundColor = diferencia > 1 ? '#e62929' : '';
         sumaTotal += sumaActual;
@@ -447,7 +447,7 @@ function actualizarResultadosGlobales() {
     // 5. Actualizar total general
     const resultadoTotal = document.getElementById('resultado-total');
     if (resultadoTotal) {
-        resultadoTotal.value = sumaTotal.toFixed(2);
+        resultadoTotal.value = sumaTotal.toFixed(1); //funcion para un solo decimal
         resultadoTotal.style.backgroundColor = Math.abs(sumaTotal - 100) > 1 ? '#e62929' : '';
     }
 }
