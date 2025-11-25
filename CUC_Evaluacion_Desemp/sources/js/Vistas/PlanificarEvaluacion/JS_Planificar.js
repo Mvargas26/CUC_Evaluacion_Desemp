@@ -469,6 +469,8 @@ function enviarEvaluacion() {
     const idConglo = document.getElementById('idConglo').innerText;
     const idPeriodo = document.getElementById('idPeriodo').innerText;
     const notaFinal = document.getElementById('resultado-total').value;
+    const Dependencia = document.getElementById('Dependencia').innerText.replace("Dependencia:", "").trim();
+
 
     // Valida que ambas tablas tengan datos ****************************
     if (competenciasTransversales.length === 0) {
@@ -539,6 +541,7 @@ function enviarEvaluacion() {
         cedFuncionario: cedFuncionario,
         idConglo: idConglo,
         idPeriodo: idPeriodo,
+        Dependencia: Dependencia,
         notaFinal: notaFinal
     };
 

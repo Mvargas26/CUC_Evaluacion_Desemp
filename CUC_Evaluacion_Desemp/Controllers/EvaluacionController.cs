@@ -1083,6 +1083,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             try
             {
                 var idConglo = data["idConglo"]?.ToString();
+                var DependenciaFuncionario = data["Dependencia"]?.ToString();
                 var Conglo = _servicioMantenimientos.Conglomerados.ConsultarConglomeradoID(Convert.ToInt32(idConglo));
                 var dir = Server.MapPath("~/Reportes/" + data["cedFuncionario"]?.ToString());
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
@@ -1187,6 +1188,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     tblInfo.AddCell(new PdfPCell(new Phrase(eva.IdEvaluacion.ToString(), fTxt)));
                     tblInfo.AddCell(new PdfPCell(new Phrase("Conglomerado:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
                     tblInfo.AddCell(new PdfPCell(new Phrase(Conglo?.NombreConglomerado ?? "", fTxt)));
+                    tblInfo.AddCell(new PdfPCell(new Phrase("Dependencia:", fSub)) { BackgroundColor = BaseColor.LIGHT_GRAY });
+                    tblInfo.AddCell(new PdfPCell(new Phrase(DependenciaFuncionario ?? "", fTxt)));
                     doc.Add(tblInfo);
                     doc.Add(Chunk.NEWLINE);
 
