@@ -15,9 +15,6 @@
 </head>
 <body>
     @{
-        var claimsUser = User as ClaimsPrincipal;
-        var idRol = claimsUser?.FindFirst("IdRol")?.Value;
-        var nombreRol = claimsUser?.FindFirst(ClaimTypes.Role)?.Value;
         var FuncionarioEnSesion = FuncionarioLogueado.retornarDatosFunc();
     }
 
@@ -33,27 +30,35 @@
             </div>
             <ul class="sidebar-menu">
                 <!-- Menú principal -->
-                <li>
-                    <a href="#" class="main-menu-item" data-target="mantenimientos">
-                        Mantenimientos <i class="fa-solid fa-screwdriver"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="main-menu-item" data-target="evaluacion">
-                        Evaluación <i class="fa-solid fa-pen-to-square"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="main-menu-item" data-target="reportes">
-                        Reportes <i class="fa-solid fa-flag"></i>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="main-menu-item" data-target="manuales">
-                        Manuales <i class="fa-solid fa-book-open"></i>
-                    </a>
-                </li>
-            </ul>
+                @if (FuncionarioLogueado.EsJefatura() || FuncionarioLogueado.EsAdministrador())
+                {
+                    <li>
+                        <a href="#" class="main-menu-item" data-target="mantenimientos">
+                            Mantenimientos <i class="fa-solid fa-screwdriver"></i>
+                        </a>
+                    </li>
+                }
+
+                @if (FuncionarioLogueado.EsJefatura())
+                {
+                    <li>
+                        <a href="#" class="main-menu-item" data-target="evaluacion">
+                            Evaluación <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                    </li>
+                }
+
+                    <li>
+                        <a href="#" class="main-menu-item" data-target="reportes">
+                            Reportes <i class="fa-solid fa-flag"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="main-menu-item" data-target="manuales">
+                            Manuales <i class="fa-solid fa-book-open"></i>
+                        </a>
+                    </li>
+                </ul>
         </nav>
 
         <div id="floating-menu-container" class="floating-menu-container">
@@ -67,12 +72,20 @@
                 <h1>Sistema de Evaluación del Desempeño CUC</h1>
                 <div class="user-menu d-flex align-items-center gap-2 text-white">
                     <span>
-                        <strong>Bienvenido(a): @FuncionarioEnSesion.Nombre @FuncionarioEnSesion.Apellido1</strong><br />
-                        <small>Rol: @FuncionarioEnSesion.Rol </small>
+                        @if (FuncionarioEnSesion != null)
+                        {
+                            <strong>Bienvenido(a): @(FuncionarioEnSesion.Nombre ?? "Indefinido") @(FuncionarioEnSesion.Apellido1 ?? "Indefinido")</strong><br />
+                            <small>Rol: @(FuncionarioEnSesion.Rol ?? "Indefinido")</small>
+                        }
+                        else
+                        {
+                            <strong>Bienvenido(a): Usuario</strong><br />
+                            <small>Rol: Indefinido</small>
+                        }
                     </span>
                     <button id="userIcon" class="user-icon" type="button">👤</button>
                     <ul class="dropdown-menu">
-                        <li><a href="@Url.Action("Login", "Auth")">Cerrar sesión</a></li>
+                        <li><a href="@Url.Action("CerrarSesion", "Auth")">Cerrar sesión</a></li>
                     </ul>
                 </div>
             </header>
@@ -169,9 +182,16 @@
             sections: [
                 {
                     title: "Reportes",
-                    items: [
-                        { text: "Reporte General RH", url: "@Url.Action("ReporteGeneralRH", "Reportes")" },
-                        { text: "Reportes PDF por funcionario", url: "@Url.Action("SeleccionarSubalternoReporteEvaluacion", "Reportes")" }
+                    items:
+                    [
+                        @if (FuncionarioLogueado.EsRecursosHumanos())
+                        {
+                            @:{ text: "Reporte General RH", url: "@Url.Action("ReporteGeneralRH", "Reportes")" },
+                        }
+                         @if (FuncionarioLogueado.EsRecursosHumanos() || FuncionarioLogueado.EsJefatura())
+                        {
+                            @:{ text: "Reportes PDF por funcionario", url: "@Url.Action("SeleccionarSubalternoReporteEvaluacion", "Reportes")" },
+                        }
                     ]
                 }
             ]

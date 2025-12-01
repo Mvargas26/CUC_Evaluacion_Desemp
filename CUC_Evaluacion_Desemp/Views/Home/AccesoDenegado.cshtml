@@ -1,0 +1,19 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml"; 
+    ViewBag.Title = "Acceso Denegado";
+}
+
+<div class="container mt-5 text-center">
+    <h1 class="text-danger mb-4">
+        <i class="fa-solid fa-ban"></i> Acceso Denegado
+    </h1>
+
+    <p class="fs-5">
+        No tiene permisos para acceder a esta sección del sistema.
+    </p>
+
+    <a href="@Url.Action("Index", "Home")" class="btn btn-primary mt-4">
+        Volver al inicio
+    </a>
+</div>
+

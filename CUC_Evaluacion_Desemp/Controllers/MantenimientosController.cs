@@ -1,4 +1,5 @@
-﻿using Entidades;
+﻿using CUC_Evaluacion_Desemp.Filters;
+using Entidades;
 using Negocios;
 using Negocios.Services;
 using System;
@@ -9,6 +10,7 @@ using System.Web.Mvc;
 
 namespace CUC_Evaluacion_Desemp.Controllers
 {
+    [AutorizarRol("Jefatura", "Administración")]
     public class MantenimientosController : Controller
     {
      

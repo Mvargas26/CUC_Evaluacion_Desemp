@@ -1,4 +1,5 @@
-﻿using Entidades;
+﻿using CUC_Evaluacion_Desemp.Filters;
+using Entidades;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Negocios.Services;
@@ -18,9 +19,11 @@ using Image = iTextSharp.text.Image;
 
 namespace CUC_Evaluacion_Desemp.Controllers
 {
+    [AutorizarRol("Jefatura")] //Aqui protegemos todo el controller de ingresos por URL
     public class EvaluacionController : Controller
     {
         private readonly IMantenimientosService _servicioMantenimientos;
+        FuncionarioModel FuncionarioEnSesion = FuncionarioLogueado.retornarDatosFunc();
         public EvaluacionController(IMantenimientosService servicio)
         {
             _servicioMantenimientos = servicio;
@@ -32,7 +35,15 @@ namespace CUC_Evaluacion_Desemp.Controllers
         {
             try
             {
-                var listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosPorJefe("44444444");
+                var cedula = FuncionarioEnSesion?.Cedula;
+
+                if (string.IsNullOrEmpty(cedula))
+                {
+                    throw new Exception("No se pudo obtener la cédula del usuario en sesión.");
+                }
+
+                var listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosPorJefe(cedula);
+
 
                 return View(listaSubAlternos);
 
@@ -306,7 +317,14 @@ namespace CUC_Evaluacion_Desemp.Controllers
         {
             try
             {
-                var listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosConEvaluacionPorJefe("44444444");
+                var cedula = FuncionarioEnSesion?.Cedula;
+
+                if (string.IsNullOrEmpty(cedula))
+                {
+                    throw new Exception("No se pudo obtener la cédula del usuario en sesión.");
+                }
+
+                var listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosConEvaluacionPorJefe(cedula);
 
                 return View(listaSubAlternos);
 
@@ -694,7 +712,14 @@ namespace CUC_Evaluacion_Desemp.Controllers
         {
             try
             {
-                var listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosConEvaluacionPorJefe("44444444");
+                var cedula = FuncionarioEnSesion?.Cedula;
+
+                if (string.IsNullOrEmpty(cedula))
+                {
+                    throw new Exception("No se pudo obtener la cédula del usuario en sesión.");
+                }
+
+                var listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosConEvaluacionPorJefe(cedula);
 
                 return View(listaSubAlternos);
 

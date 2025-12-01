@@ -1,4 +1,5 @@
-﻿using Entidades;
+﻿using CUC_Evaluacion_Desemp.Filters;
+using Entidades;
 using Negocios;
 using Negocios.Services;
 using Newtonsoft.Json;
@@ -15,6 +16,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
     public class ReportesController : Controller
     {
         private readonly IMantenimientosService _servicioMantenimientos;
+        FuncionarioModel FuncionarioEnSesion = FuncionarioLogueado.retornarDatosFunc();
+
         public ReportesController(IMantenimientosService servicio)
         {
             _servicioMantenimientos = servicio;
@@ -142,11 +145,20 @@ namespace CUC_Evaluacion_Desemp.Controllers
         #endregion
 
         #region Reporte Por Funcioanrio
+
+        [AutorizarRol("Jefatura", "Recursos Humanos")]
         public ActionResult SeleccionarSubalternoReporteEvaluacion()
         {
             try
             {
-                var listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosConEvaluacionCerradasPorJefe("44444444");
+                var cedula = FuncionarioEnSesion?.Cedula;
+
+                if (string.IsNullOrEmpty(cedula))
+                {
+                    throw new Exception("No se pudo obtener la cédula del usuario en sesión.");
+                }
+
+                var listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosConEvaluacionCerradasPorJefe(cedula);
 
                 return View(listaSubAlternos);
 
@@ -159,6 +171,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }//fin
 
+        [AutorizarRol("Jefatura", "Recursos Humanos")]
         [HttpPost]
         public ActionResult ReportesPDFPorFuncionario(string cedulaSeleccionada)
         {

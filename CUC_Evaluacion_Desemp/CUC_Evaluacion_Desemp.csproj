@@ -154,6 +154,9 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MantenimientosController.cs" />
     <Compile Include="Controllers\ReportesController.cs" />
+    <Compile Include="Filters\AutorizarRolAttribute.cs" />
+    <Compile Include="Filters\NoCacheAttribute.cs" />
+    <Compile Include="Filters\ValidarSesionAttribute.cs" />
     <Compile Include="FuncionarioLogueado.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -280,6 +283,7 @@
     <Content Include="Views\Mantenimientos\ManteniPesosConglomerado.cshtml" />
     <Content Include="Views\Mantenimientos\SeleccionarConglomeradoParaPesos.cshtml" />
     <Content Include="Views\Reportes\ManualesUsuario.cshtml" />
+    <Content Include="Views\Home\AccesoDenegado.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

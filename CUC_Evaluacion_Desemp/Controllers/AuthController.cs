@@ -153,6 +153,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
             FormsAuthentication.SetAuthCookie(ced, false);
             Session["UserRole"] = rol;
+            Session["Cedula"] = ced;
 
             Session.Remove("CodigoSeguridad");
             Session.Remove("CedulaTemp");
@@ -161,6 +162,22 @@ namespace CUC_Evaluacion_Desemp.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        public ActionResult CerrarSesion()
+        {
+            // Cerramos cookie de autenticación
+            FormsAuthentication.SignOut();
+
+            // Limpiamos toda la sesión
+            Session.Clear();
+            Session.RemoveAll();
+            Session.Abandon();
+
+            // Evitar cache del navegador (por si se devuelve con back)
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.Cache.SetNoStore();
+
+            return RedirectToAction("Login", "Auth");
+        }
 
         #region Metodos Internos
         private void RegistrarIntentoFallido(string cedula)
