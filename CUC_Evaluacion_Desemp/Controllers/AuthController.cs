@@ -75,7 +75,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 return View(model);
             }
 
-            if (model.Password != usuario.Password)
+            if (!PasswordHelper_Service.VerificarPassword(model.Password, usuario.Password))
             {
                 RegistrarIntentoFallido(cedula);
                 ModelState.AddModelError("", "Contraseña incorrecta.");

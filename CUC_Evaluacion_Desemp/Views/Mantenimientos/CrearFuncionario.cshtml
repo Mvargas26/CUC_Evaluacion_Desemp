@@ -26,15 +26,15 @@
             @*********************************** Fila 1*@
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.Cedula, "Cedula:", new { @class = "form-label" })
+                    @Html.LabelFor(m => m.Funcionario.Cedula, "Cedula:*", new { @class = "form-label" })
                     @Html.TextBoxFor(m => m.Funcionario.Cedula, new { @class = "form-control", required = "required", maxlength = "15", minlength = "8", pattern = ".*\\S.*" })
                 </div>
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.Nombre, "Nombre:", new { @class = "form-label" })
+                    @Html.LabelFor(m => m.Funcionario.Nombre, "Nombre:*", new { @class = "form-label" })
                     @Html.TextBoxFor(m => m.Funcionario.Nombre, new { @class = "form-control", required = "required", maxlength = "100", pattern = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$" })
                 </div>
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.Apellido1, "Primer apellido:", new { @class = "form-label" })
+                    @Html.LabelFor(m => m.Funcionario.Apellido1, "Primer apellido:*", new { @class = "form-label" })
                     @Html.TextBoxFor(m => m.Funcionario.Apellido1, new { @class = "form-control", required = "required", maxlength = "100", pattern = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$" })
                 </div>
             </div>
@@ -42,29 +42,29 @@
             <div class="row">
                 <div class="col-md-4 mb-3">
                     @Html.LabelFor(m => m.Funcionario.Apellido2, "Segundo apellido:", new { @class = "form-label" })
-                    @Html.TextBoxFor(m => m.Funcionario.Apellido2, new { @class = "form-control", required = "required", maxlength = "100", pattern = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$" })
+                    @Html.TextBoxFor(m => m.Funcionario.Apellido2, new { @class = "form-control", maxlength = "100", pattern = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+$" })
                 </div>
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.Correo, "Correo:", new { @class = "form-label" })
+                    @Html.LabelFor(m => m.Funcionario.Correo, "Correo:*", new { @class = "form-label" })
                     @Html.TextBoxFor(m => m.Funcionario.Correo, new { @class = "form-control", type = "email", required = "required", maxlength = "255" })
                 </div>
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.Password, "Contraseña:", new { @class = "form-label" })
+                    @Html.LabelFor(m => m.Funcionario.Password, "Contraseña:*", new { @class = "form-label" })
                     @Html.PasswordFor(m => m.Funcionario.Password, new { @class = "form-control", required = "required", type = "password", maxlength = "100" })
                 </div>
             </div>
             @*********************************** Fila 3*@
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.IdRol, "Rol:", new { @class = "form-label" })
+                    @Html.LabelFor(m => m.Funcionario.IdRol, "Rol:*", new { @class = "form-label" })
                     @Html.DropDownListFor(m => m.Funcionario.IdRol, new SelectList(Model.Roles, "IdRol", "Rol"), "Seleccione", new { @class = "form-select", required = "required" })
                 </div>
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.IdPuesto, "Puesto:", new { @class = "form-label" })
+                    @Html.LabelFor(m => m.Funcionario.IdPuesto, "Puesto:*", new { @class = "form-label" })
                     @Html.DropDownListFor(m => m.Funcionario.IdPuesto, new SelectList(Model.Puestos, "IdPuesto", "Puesto"), "Seleccione", new { @class = "form-select", required = "required" })
                 </div>
                 <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m => m.Funcionario.IdRol, "Estado:", new { @class = "form-label" })
+                    @Html.LabelFor(m => m.Funcionario.IdRol, "Estado:*", new { @class = "form-label" })
                     @Html.DropDownListFor(m => m.Funcionario.IdEstadoFuncionario, new SelectList(Model.EstadosFuncionario, "IdEstadoFuncionario", "Estado"), "Seleccione", new { @class = "form-select", required = "required" })
                 </div>
             </div>
@@ -72,7 +72,7 @@
             <div class="row">
                 <div class="col-md-4 mb-3">
                     @Html.LabelFor(m => m.Funcionario.IdDepartamento, "Telefono:", new { @class = "form-label" })
-                    @Html.TextBoxFor(m => m.Funcionario.Telefono, new { @class = "form-control", type = "text", required = "required", maxlength = "20" })
+                    @Html.TextBoxFor(m => m.Funcionario.Telefono, new { @class = "form-control", type = "text", maxlength = "20" })
                 </div>
                 <div class="col-md-4 mb-3">
                     @Html.LabelFor(m => m.Funcionario.IdPuesto, "Carrera:", new { @class = "form-label" })
@@ -81,7 +81,7 @@
                 <div class="col-md-4 mb-3">
                     @Html.LabelFor(m => m.Funcionario.CedJefeInmediato, "Jefe Inmediato:", new { @class = "form-label" })
                     @Html.DropDownListFor(m => m.Funcionario.CedJefeInmediato,new SelectList(Model.Jefes, "Cedula", "NombreCompleto"),
-                        "Seleccione",new { @class = "form-select", required = "required" })
+                        "Seleccione",new { @class = "form-select" })
                     @Html.ValidationMessageFor(m => m.Funcionario.CedJefeInmediato, "", new { @class = "text-danger" })
                 </div>
             </div>

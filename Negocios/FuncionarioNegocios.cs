@@ -1,5 +1,6 @@
 ﻿using Datos.Services;
 using Entidades;
+using Negocios.Services;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -116,7 +117,7 @@ namespace Negocios
                 new SqlParameter("@Apellido1", funcionario.Apellido1),
                 new SqlParameter("@Apellido2", funcionario.Apellido2),
                 new SqlParameter("@Correo", funcionario.Correo),
-                new SqlParameter("@Password", funcionario.Password),
+                new SqlParameter("@Password", PasswordHelper_Service.EncriptarPassword(funcionario.Password)),
                 new SqlParameter("@IdRol", funcionario.IdRol),
                 new SqlParameter("@IdPuesto", funcionario.IdPuesto),
                 new SqlParameter("@IdEstadoFuncionario", funcionario.IdEstadoFuncionario),
@@ -147,7 +148,7 @@ namespace Negocios
                 new SqlParameter("@Apellido1", funcionario.Apellido1),
                 new SqlParameter("@Apellido2", funcionario.Apellido2),
                 new SqlParameter("@Correo", funcionario.Correo),
-                new SqlParameter("@Password", funcionario.Password),
+                new SqlParameter("@Password", PasswordHelper_Service.EncriptarPassword(funcionario.Password)),
                 new SqlParameter("@IdRol", funcionario.IdRol),
                 new SqlParameter("@IdPuesto", funcionario.IdPuesto),
                 new SqlParameter("@IdEstadoFuncionario", funcionario.IdEstadoFuncionario),
@@ -203,6 +204,11 @@ namespace Negocios
             if (dt.Rows.Count == 0) return null;
 
             DataRow row = dt.Rows[0];
+
+            string hashedPassword = row["password"].ToString();
+
+            if (!PasswordHelper_Service.VerificarPassword(password, hashedPassword))
+                return null;
 
             return new FuncionarioModel
             {
