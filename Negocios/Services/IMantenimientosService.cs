@@ -32,10 +32,10 @@ namespace Negocios.Services
         PeriodosNegocios Periodos { get;}
         ComportamientosNegocios Comportamientos { get; }
         NivelesComportamientosNegocios NivelesComportamientos { get; }
-
         CompetenciaPorComportamientoNegocios CompetenciaPorComportamiento { get; }
         ComportamientoPorNivelNegocios ComportamientoPorNivel { get; }
         ObtenerComportamientosYDescripcionesNegocios ObtenerComportamientosYDescripciones { get; }
         ReportesNegocios ReportesNegocios { get; }
+        CorreoService CorreoService { get; }
     }
 }

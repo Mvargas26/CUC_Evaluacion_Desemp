@@ -17,11 +17,11 @@ namespace Negocios
                 var clienteCorreo = new SmtpClient("smtp.gmail.com")
                 {
                     Port = 587,
-                    Credentials = new NetworkCredential("x", "x"),  // correo del remitente
+                    Credentials = new NetworkCredential("michaelvargas059@gmail.com", "hvvj jpid bzrr gxdh"),  // correo del remitente
                     EnableSsl = true
                 };
 
-                // crea el mensaje del correo
+                // creamos el mensaje del correo
                 var mensaje = new MailMessage
                 {
                     From = new MailAddress("michaelvargas059@gmail.com"),

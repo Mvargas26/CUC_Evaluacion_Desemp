@@ -42,7 +42,7 @@ namespace Negocios.Services
         public ComportamientoPorNivelNegocios ComportamientoPorNivel { get; }
         public ObtenerComportamientosYDescripcionesNegocios ObtenerComportamientosYDescripciones {  get; }
         public ReportesNegocios ReportesNegocios { get; }
-
+        public CorreoService CorreoService { get; }
 
         public MantenimientosService(
             FuncionarioNegocios funcionario,
@@ -71,8 +71,8 @@ namespace Negocios.Services
             CompetenciaPorComportamientoNegocios competenciaPorComportamiento,
             ComportamientoPorNivelNegocios comportamientoPorNivel,
             ObtenerComportamientosYDescripcionesNegocios obtenerComportamientosYDescripciones,
-            ReportesNegocios reportesNegocios
-
+            ReportesNegocios reportesNegocios,
+            CorreoService correoService
             )
         {
             Funcionario = funcionario;
@@ -102,6 +102,7 @@ namespace Negocios.Services
             ComportamientoPorNivel = comportamientoPorNivel;
             ObtenerComportamientosYDescripciones = obtenerComportamientosYDescripciones;
             ReportesNegocios = reportesNegocios;
+            CorreoService = correoService;
         }
     }
 }

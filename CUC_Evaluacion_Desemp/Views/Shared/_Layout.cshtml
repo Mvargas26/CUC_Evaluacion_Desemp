@@ -18,6 +18,7 @@
         var claimsUser = User as ClaimsPrincipal;
         var idRol = claimsUser?.FindFirst("IdRol")?.Value;
         var nombreRol = claimsUser?.FindFirst(ClaimTypes.Role)?.Value;
+        var FuncionarioEnSesion = FuncionarioLogueado.retornarDatosFunc();
     }
 
     <div class="wrapper">
@@ -66,8 +67,8 @@
                 <h1>Sistema de Evaluación del Desempeño CUC</h1>
                 <div class="user-menu d-flex align-items-center gap-2 text-white">
                     <span>
-                        <strong>Bienvenido(a): Michael Vargas</strong><br />
-                        <small>Rol: Admin</small>
+                        <strong>Bienvenido(a): @FuncionarioEnSesion.Nombre @FuncionarioEnSesion.Apellido1</strong><br />
+                        <small>Rol: @FuncionarioEnSesion.Rol </small>
                     </span>
                     <button id="userIcon" class="user-icon" type="button">👤</button>
                     <ul class="dropdown-menu">

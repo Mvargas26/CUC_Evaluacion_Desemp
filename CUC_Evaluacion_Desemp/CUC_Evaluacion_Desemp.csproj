@@ -154,6 +154,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MantenimientosController.cs" />
     <Compile Include="Controllers\ReportesController.cs" />
+    <Compile Include="FuncionarioLogueado.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
