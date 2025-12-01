@@ -96,7 +96,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             //capturo la info del func logueado
             FuncionarioLogueado.capturarDatosFunc(usuario);
 
-            await _servicioMantenimientos.CorreoService.EnviarCodigoSeguridad(usuario.Correo, codigoSeguridad);
+            await _servicioMantenimientos.Correo_Service.EnviarCodigoSeguridad(usuario.Correo, codigoSeguridad);
 
             TempData["Cedula"] = usuario.Cedula;
             return RedirectToAction("VerificarCodigo");

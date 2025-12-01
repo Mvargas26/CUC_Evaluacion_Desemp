@@ -36,6 +36,7 @@ namespace Negocios.Services
         ComportamientoPorNivelNegocios ComportamientoPorNivel { get; }
         ObtenerComportamientosYDescripcionesNegocios ObtenerComportamientosYDescripciones { get; }
         ReportesNegocios ReportesNegocios { get; }
-        CorreoService CorreoService { get; }
+        Correo_Service Correo_Service { get; }
+        PasswordHelper_Service PasswordHelper_Service { get; }
     }
 }

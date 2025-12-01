@@ -6,9 +6,9 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Negocios
+namespace Negocios.Services
 {
-    public class CorreoService
+    public class Correo_Service
     {
         public async Task EnviarCodigoSeguridad(string correo, string codigo)
         {
@@ -40,6 +40,7 @@ namespace Negocios
             {
                 throw new Exception("Error al enviar el correo de seguridad.", ex);
             }
-        }
-    }//fn class
+        }// EnviarCodigoSeguridad
+
+    }//fin class
 }//fin space
