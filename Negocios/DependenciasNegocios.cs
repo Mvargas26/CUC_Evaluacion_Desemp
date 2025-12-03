@@ -19,17 +19,17 @@ namespace Negocios
             _accesoBD = accesoBD;
         }
 
-        public DependenciasModel ConsultarDependenciaID(int id)
+        public DependenciasModel ConsultarDependenciaID(int idDependencia)
         {
             var parametros = new SqlParameter[]
             {
-                new SqlParameter("@Operacion ", "S"),
-                new SqlParameter("@idDependencia ", id),
-                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
-
+                new SqlParameter("@Operacion", "R"),
+                new SqlParameter("@idDependencia", idDependencia),
+                new SqlParameter("@Dependencia", DBNull.Value),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
             };
 
-            DataTable dt = _accesoBD.EjecutarSPconDT("idDependencia", parametros);
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_DependenciasCRUD", parametros);
 
             string mensajeError = parametros.Last().Value?.ToString();
             if (!string.IsNullOrWhiteSpace(mensajeError))
@@ -44,8 +44,8 @@ namespace Negocios
 
             return new DependenciasModel
             {
-                IdDependencia = Convert.ToInt32(row["idDepartamento"]),
-                Dependencia = row["Departamento"].ToString()
+                IdDependencia = Convert.ToInt32(row["idDependencia"]),
+                Dependencia = row["Dependencia"].ToString()
             };
         }
 

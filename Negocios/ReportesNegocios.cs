@@ -23,10 +23,10 @@ namespace Negocios
         {
             var parametros = new SqlParameter[]
             {
-        new SqlParameter("@TipoReporte", tipoReporte),
-        new SqlParameter("@Filtro", string.IsNullOrEmpty(filtro) ? (object)DBNull.Value : filtro),
-        new SqlParameter("@IdPeriodo", Convert.ToInt32(periodo)),
-        new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
+                new SqlParameter("@TipoReporte", tipoReporte),
+                new SqlParameter("@Filtro", string.IsNullOrEmpty(filtro) ? (object)DBNull.Value : filtro),
+                new SqlParameter("@IdPeriodo", Convert.ToInt32(periodo)),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 500) { Direction = ParameterDirection.Output }
             };
 
             DataSet ds = _accesoBD.EjecutarSPconDS("sp_ReporteGeneralRH", parametros);

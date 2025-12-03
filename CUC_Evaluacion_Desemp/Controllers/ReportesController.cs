@@ -165,7 +165,12 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 // Convertir el objeto anónimo a una lista dinámica
                 var detalleProperty = resultado.GetType().GetProperty("detalle");
-                var detalle = detalleProperty.GetValue(resultado) as List<object>;
+                var detalleObj = detalleProperty.GetValue(resultado) as IEnumerable<object>;
+
+                if (detalleObj == null)
+                    throw new Exception("El detalle no tiene el formato esperado.");
+
+                var detalle = detalleObj.Cast<dynamic>().ToList();
 
                 if (detalle == null || detalle.Count == 0)
                     throw new Exception("No hay datos para exportar.");
@@ -480,25 +485,33 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     // Datos
                     foreach (var item in detalle)
                     {
-                        tablaDetalle.AddCell(new PdfPCell(new Phrase(item.Funcionario?.ToString() ?? "", fTxt)));
+                        var tipo = item.GetType();
 
-                        var notaFinal = item.NotaFinal != null ? Convert.ToDecimal(item.NotaFinal).ToString("0.##") : "";
+                        string funcionario = tipo.GetProperty("Funcionario")?.GetValue(item)?.ToString() ?? "";
+                        string notaFinal = tipo.GetProperty("NotaFinal")?.GetValue(item)?.ToString() ?? "";
+                        string nivel = tipo.GetProperty("NivelDesempeno")?.GetValue(item)?.ToString() ?? "";
+                        string descripcion = tipo.GetProperty("DescripcionRubro")?.GetValue(item)?.ToString() ?? "";
+                        string observaciones = tipo.GetProperty("Observaciones")?.GetValue(item)?.ToString() ?? "";
+
+                        tablaDetalle.AddCell(new PdfPCell(new Phrase(funcionario, fTxt)));
+
                         tablaDetalle.AddCell(new PdfPCell(new Phrase(notaFinal, fTxt))
                         {
                             HorizontalAlignment = Element.ALIGN_CENTER
                         });
 
-                        tablaDetalle.AddCell(new PdfPCell(new Phrase(item.NivelDesempeno?.ToString() ?? "", fTxt))
+                        tablaDetalle.AddCell(new PdfPCell(new Phrase(nivel, fTxt))
                         {
                             HorizontalAlignment = Element.ALIGN_CENTER
                         });
 
-                        tablaDetalle.AddCell(new PdfPCell(new Phrase(item.DescripcionRubro?.ToString() ?? "",
+                        tablaDetalle.AddCell(new PdfPCell(new Phrase(descripcion,
                             FontFactory.GetFont("Helvetica", 8, Font.NORMAL))));
 
-                        tablaDetalle.AddCell(new PdfPCell(new Phrase(item.Observaciones?.ToString() ?? "",
+                        tablaDetalle.AddCell(new PdfPCell(new Phrase(observaciones,
                             FontFactory.GetFont("Helvetica", 8, Font.NORMAL))));
                     }
+
 
                     doc.Add(tablaDetalle);
                     doc.Add(Chunk.NEWLINE);

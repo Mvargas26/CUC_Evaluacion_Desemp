@@ -1,5 +1,10 @@
 ﻿(function () {
     // ============================================
+    // VARIABLES GLOBALES
+    // ============================================
+    let datosReporteActual = null;
+    let filtrosActuales = null;
+    // ============================================
     // CONFIGURACIÓN Y ELEMENTOS DEL DOM
     // ============================================
     const elementos = {
@@ -92,6 +97,41 @@
                 'Deficiente': 'bg-danger'
             };
             return clases[nivel] || 'bg-secondary';
+        },
+        mostrarCargando(enMostrar = true) {
+            if (enMostrar) {
+                elementos.detalleBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Buscando datos...</p>
+                </td>
+            </tr>
+        `;
+                elementos.btnBuscarReporte.disabled = true;
+                elementos.btnBuscarReporte.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
+            } else {
+                elementos.btnBuscarReporte.disabled = false;
+                elementos.btnBuscarReporte.innerHTML = '<i class="bi bi-search"></i> Buscar Reporte';
+            }
+        },
+
+        mostrarAlertaTemporal(mensaje, tipo = 'success') {
+            // Simple alerta sin SweetAlert
+            const alertaTemp = document.createElement('div');
+            alertaTemp.className = `alert alert-${tipo} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+            alertaTemp.style.zIndex = '9999';
+            alertaTemp.innerHTML = `
+        ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+            document.body.appendChild(alertaTemp);
+
+            setTimeout(() => {
+                alertaTemp.remove();
+            }, 3000);
         }
     };
 
@@ -311,25 +351,54 @@
 
             const tipo = elementos.tipoReporte.value;
             const periodo = elementos.periodo.value;
+            const periodoText = utils.obtenerTextoSeleccionado(elementos.periodo);
 
             if (!validacion.validarFiltros(tipo, periodo)) return;
 
             const datosFiltro = validacion.obtenerDatosFiltro(tipo);
             if (!datosFiltro) return;
 
-            const payload = {
+            // Guardar filtros actuales para exportar
+            filtrosActuales = {
                 tipoReporte: tipo,
                 filtro: datosFiltro.valor,
-                periodo: periodo
+                periodo: periodo,
+                periodoText: periodoText
             };
 
-            const contexto = validacion.construirContexto(tipo, datosFiltro.label, periodo);
+            // Usar el texto completo del periodo, no solo el value
+            const contexto = validacion.construirContexto(tipo, datosFiltro.label, periodoText);
             elementos.detalleContexto.innerText = contexto;
 
+            // Usar mostrarCargando si lo agregaste
+            if (utils.mostrarCargando) {
+                utils.mostrarCargando(true);
+            } else {
+                // Fallback si no está definida
+                elementos.detalleBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+            }
+
             try {
-                const data = await api.obtenerReporte(payload);
-                render.resultados(data);
+                const data = await api.obtenerReporte(filtrosActuales);
+                datosReporteActual = data;
+
+                // Asegúrate que render.resultados pueda manejar la respuesta
+                if (Array.isArray(data)) {
+                    render.detalle(data);
+                } else {
+                    render.resultados(data);
+                }
+
                 elementos.btnExportarPDF.disabled = false;
+
             } catch (error) {
                 Swal.fire({
                     title: 'Error',
@@ -337,22 +406,71 @@
                     icon: 'error',
                     confirmButtonColor: '#1E376C'
                 });
+
+                elementos.btnExportarPDF.disabled = true;
+            } finally {
+                if (utils.mostrarCargando) {
+                    utils.mostrarCargando(false);
+                } else {
+                    elementos.btnBuscarReporte.disabled = false;
+                    elementos.btnBuscarReporte.innerHTML = '<i class="bi bi-search"></i> Buscar Reporte';
+                }
             }
         },
 
-        exportarPDF() {
-            const tipo = elementos.tipoReporte.value;
-            const config = tiposReporte[tipo];
-            if (!config) return;
+        exportarPDF: async function () {
+            if (!filtrosActuales) {
+                utils.mostrarAlerta('Primero debe generar un reporte.', 'warning');
+                return;
+            }
 
-            const dataExport = {
-                tipoReporte: tipo,
-                filtro: config.elemento.value,
-                periodo: elementos.periodo.value
-            };
+            try {
+                const body = `reporteGeneralData=${encodeURIComponent(JSON.stringify(filtrosActuales))}`;
 
-            console.log('Exportar PDF con:', dataExport);
+                const response = await fetch(`${urlBase}Reportes/ExportarReportePDFGeneral`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: body
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || "No se pudo generar el PDF");
+                }
+
+                await Swal.fire({
+                    title: 'PDF generado correctamente',
+                    text: '¿Desea abrir el reporte?',
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonText: 'Abrir PDF',
+                    cancelButtonText: 'Cerrar',
+                    confirmButtonColor: '#1E376C',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.open(data.rutaDescarga, '_blank');
+                    }
+                });
+
+            } catch (error) {
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message,
+                    icon: 'error',
+                    confirmButtonColor: '#1E376C'
+                });
+            }
         }
+
     };
 
     // ============================================
@@ -363,4 +481,20 @@
     elementos.btnBuscarReporte?.addEventListener('click', handlers.buscarReporte);
     elementos.btnExportarPDF?.addEventListener('click', handlers.exportarPDF);
 
+    elementos.periodo.addEventListener('change', () => {
+        elementos.btnExportarPDF.disabled = true;
+        datosReporteActual = null;
+
+        if (datosReporteActual === null) {
+            elementos.detalleBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-muted py-4">
+                    Sin resultados. Aún no se ha realizado la búsqueda.
+                </td>
+            </tr>
+        `;
+            elementos.totalRegistros.innerText = 'Total registros: 0';
+            elementos.detalleContexto.innerText = '';
+        }
+    });
 })();
