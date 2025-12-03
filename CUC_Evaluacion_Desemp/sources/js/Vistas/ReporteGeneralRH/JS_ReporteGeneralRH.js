@@ -25,9 +25,7 @@
 
         // Alertas y resultados
         alerta: document.getElementById('alertaValidacion'),
-        consolidadoBody: document.getElementById('tbConsolidadoBody'),
         detalleBody: document.getElementById('tbResultadosDetalleBody'),
-        resumenContexto: document.getElementById('resumenContextoSeleccion'),
         detalleContexto: document.getElementById('detalleContextoSeleccion'),
         totalRegistros: document.getElementById('totalRegistrosLabel'),
 
@@ -84,6 +82,16 @@
 
         obtenerTextoSeleccionado(dropdown) {
             return dropdown.options[dropdown.selectedIndex]?.text || '';
+        },
+
+        obtenerClaseBadge(nivel) {
+            const clases = {
+                'Excelente': 'bg-success',
+                'Muy Bueno': 'bg-info',
+                'Bueno': 'bg-primary',
+                'Deficiente': 'bg-danger'
+            };
+            return clases[nivel] || 'bg-secondary';
         }
     };
 
@@ -137,34 +145,11 @@
     // RENDERIZADO DE RESULTADOS
     // ============================================
     const render = {
-        consolidado(datos) {
-            if (!datos?.length) {
-                elementos.consolidadoBody.innerHTML = `
-                    <tr>
-                        <td colspan="3" class="text-center text-muted py-4">
-                            No hay datos consolidados para esta selección.
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            const filas = datos.map(row => `
-                <tr>
-                    <td>${row.Criterio || ''}</td>
-                    <td class="text-end">${row.CantidadFuncionarios ?? 0}</td>
-                    <td class="text-end">${utils.formatearNumero(row.PromedioNotaFinal)}</td>
-                </tr>
-            `).join('');
-
-            elementos.consolidadoBody.innerHTML = filas;
-        },
-
         detalle(datos) {
             if (!datos?.length) {
                 elementos.detalleBody.innerHTML = `
                     <tr>
-                        <td colspan="3" class="text-center text-muted py-4">
+                        <td colspan="5" class="text-center text-muted py-4">
                             Sin resultados para los filtros indicados.
                         </td>
                     </tr>
@@ -176,8 +161,14 @@
             const filas = datos.map(row => `
                 <tr>
                     <td>${row.Funcionario || ''}</td>
-                    <td>${row.Observaciones || ''}</td>
                     <td class="text-end">${utils.formatearNumero(row.NotaFinal)}</td>
+                    <td class="text-center">
+                        <span class="badge ${utils.obtenerClaseBadge(row.NivelDesempeno)}">
+                            ${row.NivelDesempeno || 'N/A'}
+                        </span>
+                    </td>
+                    <td><small class="text-muted">${row.DescripcionRubro || ''}</small></td>
+                    <td>${row.Observaciones || ''}</td>
                 </tr>
             `).join('');
 
@@ -191,13 +182,12 @@
                 return;
             }
 
-            this.consolidado(data.consolidado);
             this.detalle(data.detalle);
         }
     };
 
     // ============================================
-    // LLAMADA AL BAKND
+    // LLAMADA AL BACKEND
     // ============================================
     const api = {
         async obtenerReporte(filtros) {
@@ -235,6 +225,7 @@
             const tipo = elementos.tipoReporte.value;
             if (tipo) utils.mostrarFiltro(tipo);
         },
+
         async buscarFuncionario() {
             const criterio = elementos.buscaFuncionario.value?.trim();
             if (!criterio) return;
@@ -268,22 +259,22 @@
 
                 if (!resultados.length) {
                     lista.innerHTML = `
-                <div class="list-group-item text-muted text-center">
-                    Sin coincidencias
-                </div>
-            `;
+                        <div class="list-group-item text-muted text-center">
+                            Sin coincidencias
+                        </div>
+                    `;
                     lista.classList.remove('d-none');
                     return;
                 }
 
                 lista.innerHTML = resultados.map(f => `
-            <button type="button"
-                class="list-group-item list-group-item-action"
-                data-ced="${f.cedula}"
-                data-nombre="${f.nombreCompleto}">
-                ${f.nombreCompleto} (${f.cedula})
-            </button>
-        `).join('');
+                    <button type="button"
+                        class="list-group-item list-group-item-action"
+                        data-ced="${f.cedula}"
+                        data-nombre="${f.nombreCompleto}">
+                        ${f.nombreCompleto} (${f.cedula})
+                    </button>
+                `).join('');
 
                 lista.classList.remove('d-none');
 
@@ -333,7 +324,6 @@
             };
 
             const contexto = validacion.construirContexto(tipo, datosFiltro.label, periodo);
-            elementos.resumenContexto.innerText = contexto;
             elementos.detalleContexto.innerText = contexto;
 
             try {
@@ -349,6 +339,7 @@
                 });
             }
         },
+
         exportarPDF() {
             const tipo = elementos.tipoReporte.value;
             const config = tiposReporte[tipo];
