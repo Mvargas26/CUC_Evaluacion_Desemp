@@ -425,6 +425,13 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 var subalterno = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(cedulaSeleccionada);
                 var PesosConglomerados = _servicioMantenimientos.PesosConglomerado.ConsultarPesosXConglomerado(idConglomerado);
+
+                if (PesosConglomerados.Count == 0)
+                {
+                    TempData["MensajeError"] = "No se han asignado los pesos para este conglomerado. Por favor contacte a un administrador para continuar el proceso.";
+                    return View("Error");
+                }
+
                 ViewData["ListaTiposObjetivos"] = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
                 ViewData["ListaTiposCompetencias"] = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
                 ViewData["ListaConglomerados"] = _servicioMantenimientos.Conglomerados.ListarConglomerados();
@@ -820,6 +827,13 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 var subalterno = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(cedulaSeleccionada);
                 var PesosConglomerados = _servicioMantenimientos.PesosConglomerado.ConsultarPesosXConglomerado(idConglomerado);
+
+                if (PesosConglomerados.Count == 0)
+                {
+                    TempData["MensajeError"] = "No se han asignado los pesos para este conglomerado. Por favor contacte a un administrador para continuar el proceso.";
+                    return View("Error");
+                }
+
                 ViewData["ListaTiposObjetivos"] = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
                 ViewData["ListaTiposCompetencias"] = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
                 ViewData["ListaConglomerados"] = _servicioMantenimientos.Conglomerados.ListarConglomerados();
