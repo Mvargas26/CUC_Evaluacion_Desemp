@@ -1610,21 +1610,51 @@ namespace CUC_Evaluacion_Desemp.Controllers
         {
             try
             {
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
-                    _servicioMantenimientos.PesosConglomerado.CrearPesoXConglomerado(nuevoPeso);
-                    TempData["MensajeExito"] = "Peso registrado correctamente.";
-                    return RedirectToAction(nameof(ManteniPesosConglomerado), new { idConglomerado = nuevoPeso.IdConglomerado });
+                    return View("SeleccionarConglomeradoParaPesos");
                 }
-                else
+
+                var listaPesos = _servicioMantenimientos.PesosConglomerado
+                    .ConsultarPesosXConglomerado(nuevoPeso.IdConglomerado);
+
+                // Validar que el tipo de objetivo no esté duplicado
+                if (nuevoPeso.IdTipoObjetivo != null && listaPesos.Any(p => p.IdTipoObjetivo == nuevoPeso.IdTipoObjetivo))
                 {
-                    return View("ManteniPesosConglomerado", nuevoPeso);
+                    TempData["MensajeError"] = "Este tipo de Objetivo ya fue asignado.";
+                    return RedirectToAction(nameof(ManteniPesosConglomerado),
+                        new { idConglomerado = nuevoPeso.IdConglomerado });
                 }
+
+                // Validar que el tipo de competencia no esté duplicado
+                if (nuevoPeso.IdTipoCompetencia != null && listaPesos.Any(p => p.IdTipoCompetencia == nuevoPeso.IdTipoCompetencia))
+                {
+                    TempData["MensajeError"] = "Este tipo de Competencia ya fue asignada.";
+                    return RedirectToAction(nameof(ManteniPesosConglomerado),
+                        new { idConglomerado = nuevoPeso.IdConglomerado });
+                }
+
+                // Validar que no exceda el 100%
+                decimal sumaPesos = listaPesos.Sum(p => p.Porcentaje) + nuevoPeso.Porcentaje;
+
+                if (sumaPesos > 100)
+                {
+                    TempData["MensajeError"] = $"No se puede asignar este peso. La suma total sería {sumaPesos}% y excede el 100%.";
+                    return RedirectToAction(nameof(ManteniPesosConglomerado),
+                        new { idConglomerado = nuevoPeso.IdConglomerado });
+                }
+
+                _servicioMantenimientos.PesosConglomerado.CrearPesoXConglomerado(nuevoPeso);
+                TempData["MensajeExito"] = "Peso registrado correctamente.";
+
+                return RedirectToAction(nameof(ManteniPesosConglomerado),
+                    new { idConglomerado = nuevoPeso.IdConglomerado });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 TempData["MensajeError"] = "Error al crear el peso por conglomerado.";
-                return RedirectToAction(nameof(ManteniPesosConglomerado), new { idConglomerado = nuevoPeso.IdConglomerado });
+                return RedirectToAction(nameof(ManteniPesosConglomerado),
+                    new { idConglomerado = nuevoPeso.IdConglomerado });
             }
         }//CrearPesoConglomerado
 
@@ -1633,16 +1663,27 @@ namespace CUC_Evaluacion_Desemp.Controllers
         {
             try
             {
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
-                    _servicioMantenimientos.PesosConglomerado.ModificarPesoXConglomerado(pesoModificado);
-                    TempData["MensajeExito"] = "Peso modificado correctamente.";
-                    return RedirectToAction(nameof(ManteniPesosConglomerado), new { idConglomerado = pesoModificado.IdConglomerado });
+                    return View("SeleccionarConglomeradoParaPesos");
                 }
-                else
+
+                var listaPesos = _servicioMantenimientos.PesosConglomerado
+                    .ConsultarPesosXConglomerado(pesoModificado.IdConglomerado);
+
+                // Validar que no exceda el 100%
+                decimal sumaPesos = listaPesos.Sum(p => p.Porcentaje) + pesoModificado.Porcentaje;
+
+                if (sumaPesos > 100)
                 {
-                    return View("ManteniPesosConglomerado", pesoModificado);
+                    TempData["MensajeError"] = $"No se puede asignar este peso. La suma total sería {sumaPesos}% y excede el 100%.";
+                    return RedirectToAction(nameof(ManteniPesosConglomerado),
+                        new { idConglomerado = pesoModificado.IdConglomerado });
                 }
+
+                _servicioMantenimientos.PesosConglomerado.ModificarPesoXConglomerado(pesoModificado);
+                TempData["MensajeExito"] = "Peso modificado correctamente.";
+                return RedirectToAction(nameof(ManteniPesosConglomerado), new { idConglomerado = pesoModificado.IdConglomerado });
             }
             catch (Exception)
             {
