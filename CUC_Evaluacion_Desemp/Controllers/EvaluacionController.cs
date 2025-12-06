@@ -152,14 +152,66 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     TempData["MensajeError"] = "No se han asignado los pesos para este conglomerado. Por favor contacte a un administrador para continuar el proceso.";
                     return View("Error");
                 }
-                // Obtenemos tipos de Objetivos
+
                 ViewData["ListaTiposObjetivos"] = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
-                //Obtenemos tipos de competencias
                 ViewData["ListaTiposCompetencias"] = _servicioMantenimientos.TiposCompetencias.ListarTiposCompetencias();
-                //Obtenemos la lista de conglomerados
+
+                var listaTiposCompetencias = (List<TiposCompetenciasModel>)ViewData["ListaTiposCompetencias"];
+                var listaTiposObjetivos = (List<TiposObjetivosModel>)ViewData["ListaTiposObjetivos"];
+
                 ViewData["ListaConglomerados"] = _servicioMantenimientos.Conglomerados.ListarConglomerados();
-                //obtenemos los objetivos y competencias relacionadas a este congloemrado
+
                 var (listaObjetivos, listaCompetencias) = _servicioMantenimientos.Evaluaciones.ListarObjYCompetenciasXConglomerado(idConglomerado);
+
+                //Validaciones por si no se han asignado del tipo que requiere el conglo
+                string mensaje = "";
+                if (listaObjetivos.Count == 0)
+                {
+                    // Buscar cuáles tipos de Objetivos existen en Pesos
+                    var tiposObjetivosEnPesos = PesosConglomerados
+                        .Where(x => x.IdTipoObjetivo.HasValue)
+                        .Select(x => x.IdTipoObjetivo.Value)
+                        .Distinct()
+                        .ToList();
+
+                    var nombresObjetivosFaltantes = listaTiposObjetivos
+                        .Where(t => tiposObjetivosEnPesos.Contains(t.IdTipoObjetivo))
+                        .Select(t => t.Tipo)
+                        .ToList();
+
+                    if (nombresObjetivosFaltantes.Count > 0)
+                    {
+                        mensaje += "Atención,no se puede planificar ya que no hay objetivos del tipo: "
+                                 + string.Join(", ", nombresObjetivosFaltantes) + ". ";
+                    }
+                }
+
+                if (listaCompetencias.Count == 0)
+                {
+                    var tiposCompetenciasEnPesos = PesosConglomerados
+                        .Where(x => x.IdTipoCompetencia.HasValue)
+                        .Select(x => x.IdTipoCompetencia.Value)
+                        .Distinct()
+                        .ToList();
+
+                    var nombresCompetenciasFaltantes = listaTiposCompetencias
+                        .Where(t => tiposCompetenciasEnPesos.Contains(t.IdTipoCompetencia))
+                        .Select(t => t.Tipo)
+                        .ToList();
+
+                    if (nombresCompetenciasFaltantes.Count > 0)
+                    {
+                        mensaje += "Atención,no se puede planificar ya que no hay competencias del tipo: "
+                                 + string.Join(", ", nombresCompetenciasFaltantes) + ". Tambien es necesario asignar comportamientos.";
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(mensaje))
+                {
+                    TempData["AlertaSweet"] = mensaje;
+                    return RedirectToAction("ManteniCompetencias", "Mantenimientos");
+                }
+
                 //Obtenemos la fase de planificacion para pintarla de titulo
                 EstadoEvaluacionModel faseActual = _servicioMantenimientos.EstadoEvaluacion.ConsultarEstadoPorID(1);
 
@@ -167,6 +219,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var transversales = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegocios(2500, "PorTipo");
 
                 var CompetenciasDelConglomerado = _servicioMantenimientos.ObtenerComportamientosYDescripciones.ListarComportamientosYDescripcionesNegociosXCOnglo(idConglomerado);
+
                 var tiposdeObjetivos = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
                 //pasamos todo a la vista
                 ViewBag.ListaObjetivos = listaObjetivos;

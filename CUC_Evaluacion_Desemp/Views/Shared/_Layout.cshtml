@@ -5,12 +5,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Evaluación del Desempeño CUC</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://kit.fontawesome.com/611d65fda4.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="~/sources/css/styles.css" />
     <link rel="stylesheet" href="~/sources/css/alerta.css" />
-    <script defer src="~/sources/js/scripts.js"></script>
 
 </head>
 <body>
@@ -105,7 +105,6 @@
     <script defer src="~/sources/js/menuFlotante.js"></script>
     <script defer src="~/sources/js/scripts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @*********************************************************************************
          ESTA PARTE DEBE ESTAR EN LA VISTA PARA QUE FUNCIONEN LAS RUTAS EN PRODUCCION
@@ -147,7 +146,7 @@
                             { text: "Tipos de Competencias", url: "@Url.Action("ManteniTiposCompetencias", "Mantenimientos")" },
                             { text: "Comportamientos", url: "@Url.Action("ManteniComportamientos", "Mantenimientos")" },
                             { text: "Niveles Comportamientos", url: "@Url.Action("ManteniNivelesComportamientos", "Mantenimientos")" },
-                            { text: "Mantenimiento Competencias", url: "@Url.Action("ManteniCompetencias", "Mantenimientos")" },
+                            { text: "Competencias", url: "@Url.Action("ManteniCompetencias", "Mantenimientos")" },
                             { text: "Asignar Comportamientos y Niveles", url: "@Url.Action("SelecCompetenciaParaAsignarComportamientos", "Mantenimientos")" },
                             { text: "Ver comportamientos y niveles", url: "@Url.Action("ConsultarComportamientosYNiveles", "Mantenimientos")" }
                         ]
