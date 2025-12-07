@@ -135,6 +135,18 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 string cedulaSeleccionada = coleccion["cedulaSeleccionada"];
                 int idConglomerado = Convert.ToInt32(coleccion["idConglomerado"]);
                 string idPeriodo = coleccion["idPeriodo"];
+                DateTime fechaActual = DateTime.Now.Date;
+                var periodo = _servicioMantenimientos.Periodos.ObtenerPeriodoID(Convert.ToInt32(idPeriodo));
+
+                if (periodo.FechaFin.Date < fechaActual.Date)
+                {
+                    string fechaHoy = fechaActual.ToString("dd/MM/yyyy");
+                    string fechaFin = periodo.FechaFin.ToString("dd/MM/yyyy");
+
+                    TempData["AlertaSweet"] = "No se puede planificar evaluaciones en este período. Hoy es "+ fechaHoy
+                        + " y el período finalizó el "+ fechaFin;
+                    return RedirectToAction("Index", "Home");
+                }
 
                 if (string.IsNullOrEmpty(cedulaSeleccionada) || string.IsNullOrEmpty(coleccion["idConglomerado"]))
                 {
@@ -209,7 +221,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 if (!string.IsNullOrEmpty(mensaje))
                 {
                     TempData["AlertaSweet"] = mensaje;
-                    return RedirectToAction("ManteniCompetencias", "Mantenimientos");
+                    return RedirectToAction("Index", "Home");
                 }
 
                 //Obtenemos la fase de planificacion para pintarla de titulo

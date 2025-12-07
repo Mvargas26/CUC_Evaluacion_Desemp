@@ -32,3 +32,16 @@ else if (TempData["Mensaje"] != null)
 
 
 <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+
+@***********************************Alerta con sweet (Dejar siempre de ultimo) ***************************@
+@if (TempData["AlertaSweet"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atención',
+            html: '@TempData["AlertaSweet"]',
+            confirmButtonText: 'Entendido'
+        });
+    </script>
+}
