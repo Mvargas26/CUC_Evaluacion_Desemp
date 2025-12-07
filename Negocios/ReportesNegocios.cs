@@ -47,6 +47,7 @@ namespace Negocios
                         NotaFinal = row.Table.Columns.Contains("NotaFinal") && row["NotaFinal"] != DBNull.Value
                             ? Convert.ToDecimal(row["NotaFinal"])
                             : 0m,
+                        NombreConglomerado = row.Table.Columns.Contains("NombreConglomerado") ? row["NombreConglomerado"]?.ToString() : "",
                         NivelDesempeno = row.Table.Columns.Contains("NivelDesempeno") ? row["NivelDesempeno"]?.ToString() : "",
                         DescripcionRubro = row.Table.Columns.Contains("DescripcionRubro") ? row["DescripcionRubro"]?.ToString() : "",
                         Observaciones = row.Table.Columns.Contains("Observaciones") ? row["Observaciones"]?.ToString() : ""

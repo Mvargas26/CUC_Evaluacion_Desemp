@@ -451,8 +451,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     var fuenteTituloDetalle = FontFactory.GetFont("Helvetica", 12, Font.BOLD | Font.UNDERLINE, azulCUC);
                     doc.Add(new Paragraph("Detalle de Evaluaciones", fuenteTituloDetalle) { SpacingAfter = 8f });
 
-                    var tablaDetalle = new PdfPTable(5) { WidthPercentage = 100 };
-                    tablaDetalle.SetWidths(new float[] { 25f, 12f, 18f, 25f, 20f });
+                    var tablaDetalle = new PdfPTable(6) { WidthPercentage = 100 };
+                    tablaDetalle.SetWidths(new float[] { 23f, 10f, 18f, 17f, 18f, 14f });
                     tablaDetalle.SpacingBefore = 3f;
 
                     // Encabezados
@@ -462,6 +462,11 @@ namespace CUC_Evaluacion_Desemp.Controllers
                         HorizontalAlignment = Element.ALIGN_CENTER
                     });
                     tablaDetalle.AddCell(new PdfPCell(new Phrase("Nota Final", fSub))
+                    {
+                        BackgroundColor = BaseColor.LIGHT_GRAY,
+                        HorizontalAlignment = Element.ALIGN_CENTER
+                    });
+                    tablaDetalle.AddCell(new PdfPCell(new Phrase("Conglomerado de la Evaluación", fSub))
                     {
                         BackgroundColor = BaseColor.LIGHT_GRAY,
                         HorizontalAlignment = Element.ALIGN_CENTER
@@ -489,6 +494,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                         string funcionario = tipo.GetProperty("Funcionario")?.GetValue(item)?.ToString() ?? "";
                         string notaFinal = tipo.GetProperty("NotaFinal")?.GetValue(item)?.ToString() ?? "";
+                        string conglomerado = tipo.GetProperty("NombreConglomerado")?.GetValue(item)?.ToString() ?? "";
                         string nivel = tipo.GetProperty("NivelDesempeno")?.GetValue(item)?.ToString() ?? "";
                         string descripcion = tipo.GetProperty("DescripcionRubro")?.GetValue(item)?.ToString() ?? "";
                         string observaciones = tipo.GetProperty("Observaciones")?.GetValue(item)?.ToString() ?? "";
@@ -499,7 +505,10 @@ namespace CUC_Evaluacion_Desemp.Controllers
                         {
                             HorizontalAlignment = Element.ALIGN_CENTER
                         });
-
+                        tablaDetalle.AddCell(new PdfPCell(new Phrase(conglomerado, fTxt))
+                        {
+                            HorizontalAlignment = Element.ALIGN_CENTER
+                        });
                         tablaDetalle.AddCell(new PdfPCell(new Phrase(nivel, fTxt))
                         {
                             HorizontalAlignment = Element.ALIGN_CENTER
@@ -550,7 +559,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     error = ex.Message
                 }, JsonRequestBehavior.AllowGet);
             }
-        }
+        }//fn
 
         // Métodos auxiliares al reporte
         private string ObtenerTituloReporte(string tipoReporte)

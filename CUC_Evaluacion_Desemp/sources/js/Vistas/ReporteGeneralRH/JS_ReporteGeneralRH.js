@@ -202,6 +202,7 @@
                 <tr>
                     <td>${row.Funcionario || ''}</td>
                     <td class="text-end">${utils.formatearNumero(row.NotaFinal)}</td>
+                    <td>${row.NombreConglomerado || ''}</td>
                     <td class="text-center">
                         <span class="badge ${utils.obtenerClaseBadge(row.NivelDesempeno)}">
                             ${row.NivelDesempeno || 'N/A'}
