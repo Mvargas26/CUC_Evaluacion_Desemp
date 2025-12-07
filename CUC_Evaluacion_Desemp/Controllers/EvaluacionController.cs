@@ -486,6 +486,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 {
                     TempData["MensajeError"] = "Debe seleccionar un funcionario y un conglomerado.";
                     return RedirectToAction("SeleccionarSubalterno");
+
                 }
 
                 var subalterno = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(cedulaSeleccionada);
@@ -493,8 +494,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 if (PesosConglomerados.Count == 0)
                 {
-                    TempData["MensajeError"] = "No se han asignado los pesos para este conglomerado. Por favor contacte a un administrador para continuar el proceso.";
-                    return View("Error");
+                    TempData["AlertaSweet"] = "No se han asignado los pesos para este conglomerado. Por favor contacte a un administrador para continuar el proceso.";
+                    return RedirectToAction("Index", "Home");
                 }
 
                 ViewData["ListaTiposObjetivos"] = _servicioMantenimientos.TiposObjetivos.ListarTiposObjetivos();
@@ -503,11 +504,11 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 EstadoEvaluacionModel faseActual = _servicioMantenimientos.EstadoEvaluacion.ConsultarEstadoPorID(2);
 
-                var ultimaEvaluacionFuncionario = _servicioMantenimientos.Evaluaciones.ConsultarEvaluacionComoFuncionario(cedulaSeleccionada, idConglomerado);
+                EvaluacionModel ultimaEvaluacionFuncionario = _servicioMantenimientos.Evaluaciones.ConsultarEvaluacionComoFuncionario(cedulaSeleccionada, idConglomerado);
 
-                if (ultimaEvaluacionFuncionario == null)
+                if (ultimaEvaluacionFuncionario == null || idConglomerado != ultimaEvaluacionFuncionario.IdConglomerado)
                 {
-                    TempData["AlertMessage"] = "No hay una evaluación para usted en este conglomerado.Por favor contacte a su Jefatura para planificarla.";
+                    TempData["AlertaSweet"] = "No hay una evaluación para el funcionario en este conglomerado.Por favor planificarla primero.";
                     return RedirectToAction("Index", "Home");
                 }
 
@@ -907,9 +908,9 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                 var ultimaEvaluacionFuncionario = _servicioMantenimientos.Evaluaciones.ConsultarEvaluacionComoFuncionario(cedulaSeleccionada, idConglomerado);
 
-                if (ultimaEvaluacionFuncionario == null)
+                if (ultimaEvaluacionFuncionario == null || idConglomerado != ultimaEvaluacionFuncionario.IdConglomerado)
                 {
-                    TempData["AlertMessage"] = "No hay una evaluación para usted en este conglomerado.Por favor contacte a su Jefatura para planificarla.";
+                    TempData["AlertaSweet"] = "No hay una evaluación que cerrar para el funcionario en este conglomerado.";
                     return RedirectToAction("Index", "Home");
                 }
 
