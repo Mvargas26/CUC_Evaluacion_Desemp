@@ -228,7 +228,7 @@ function obtenerDatosTablaObjetivos(selector) {
     return Array.from(filas).map(fila => {
         const c = fila.querySelectorAll('td');
         const btn = fila.querySelector('.btn-editar-actual');
-        const id = btn ? btn.getAttribute('data-id') : '';
+        const id = btn ? btn.getAttribute('data-objid') : '';
         const idEvaxObj = (c[6]?.textContent?.trim()) || (btn?.getAttribute('data-IdEvaxObj')) || '';
         const tipo = c[0]?.textContent.trim() || '';
         const nombre = c[1]?.textContent.trim() || '';
