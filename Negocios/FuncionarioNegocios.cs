@@ -439,6 +439,26 @@ namespace Negocios
 
             return lista;
         }
+
+        public bool ModificarPasswordFuncionario(FuncionarioModel funcionario)
+        {
+            var parametros = new SqlParameter[]
+            {
+                new SqlParameter("@Cedula", funcionario.Cedula),
+                new SqlParameter("@Password", PasswordHelper_Service.EncriptarPassword(funcionario.Password)),
+                new SqlParameter("@MensajeError", SqlDbType.VarChar, 255) { Direction = ParameterDirection.Output }
+            };
+
+            _accesoBD.EjecutarSPconDT("sp_ModificarPasswordFuncionario", parametros);
+
+            string mensajeError = parametros.Last().Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
+
+            return true;
+        }
     }//fin class
 
 }//fin space

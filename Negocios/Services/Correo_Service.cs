@@ -42,5 +42,35 @@ namespace Negocios.Services
             }
         }// EnviarCodigoSeguridad
 
+        public async Task EnviarPasswordTemporal(string correo, string PasswordTemporal)
+        {
+            try
+            {
+                var clienteCorreo = new SmtpClient("smtp.gmail.com")
+                {
+                    Port = 587,
+                    Credentials = new NetworkCredential("michaelvargas059@gmail.com", "hvvj jpid bzrr gxdh"),  
+                    EnableSsl = true
+                };
+
+                // creamos el mensaje del correo
+                var mensaje = new MailMessage
+                {
+                    From = new MailAddress("michaelvargas059@gmail.com"),
+                    Subject = "Solicitud Clave temporal",
+                    Body = $"Usted solicito una clave temporal, ingrese: "+ PasswordTemporal,
+                    IsBodyHtml = false
+                };
+
+                mensaje.To.Add(correo);
+
+                await clienteCorreo.SendMailAsync(mensaje);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al enviar el correo de seguridad.", ex);
+            }
+        }// EnviarCodigoSeguridad
     }//fin class
 }//fin space

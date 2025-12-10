@@ -102,13 +102,41 @@ namespace CUC_Evaluacion_Desemp.Controllers
             return RedirectToAction("VerificarCodigo");
         }//fin
 
-
         [HttpGet]
         public ActionResult RecuperarPassword()
         {
-            //return View(new RecuperarPasswordViewModel());
             return View();
-        }
+        }//fin 
+
+        [HttpPost]
+        public async Task<ActionResult> RecuperarPassword(LoginViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var usuario = _servicioMantenimientos.Funcionario.ConsultarFuncionarioID(model.Cedula);
+
+
+            if (usuario == null || usuario.Correo != model.Correo)
+            {
+                TempData["AlertaSweet"] = "Los datos ingresados no coinciden con ningún usuario registrado.";
+                return RedirectToAction("RecuperarPassword");
+            }
+
+            // Generar token:
+            String token = GenerarClaveAleatoria();
+
+            //Le cambiamos el password y lo guardamos
+            usuario.Password = token;
+            _servicioMantenimientos.Funcionario.ModificarPasswordFuncionario(usuario);
+
+            // Enviar correo con la clave nueva
+            await _servicioMantenimientos.Correo_Service.EnviarPasswordTemporal(usuario.Correo, token);
+
+            TempData["AlertaSweet"] = "Si los datos coinciden, se ha enviado un correo con las instrucciones.";
+            return RedirectToAction("Login");
+        }//fin 
+
 
         [HttpGet]
         public ActionResult VerificarCodigo()
@@ -177,7 +205,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
             Response.Cache.SetNoStore();
 
             return RedirectToAction("Login", "Auth");
-        }
+        }//fin 
 
         #region Metodos Internos
         private void RegistrarIntentoFallido(string cedula)
@@ -198,6 +226,28 @@ namespace CUC_Evaluacion_Desemp.Controllers
             if (c == null) return null;
             return c.Trim().Trim('"').Trim();
         }
+
+        private string GenerarClaveAleatoria()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            const int length = 10;
+
+            var bytes = new byte[length];
+            using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(bytes);
+            }
+
+            var resultado = new char[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                resultado[i] = chars[bytes[i] % chars.Length];
+            }
+
+            return new string(resultado);
+        }
+        
         #endregion
     }//fin controller
 }//fin space
