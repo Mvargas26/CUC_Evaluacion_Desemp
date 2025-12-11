@@ -293,7 +293,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
         {
             try
             {
-                var rutaCarpeta = Server.MapPath("~/Manuales");
+                var rutaCarpeta = Server.MapPath("~/sources/manuales");
 
                 if (!Directory.Exists(rutaCarpeta))
                 {
