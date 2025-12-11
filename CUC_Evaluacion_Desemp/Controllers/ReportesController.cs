@@ -200,16 +200,25 @@ namespace CUC_Evaluacion_Desemp.Controllers
             try
             {
                 var cedula = FuncionarioEnSesion?.Cedula;
+                var rol = FuncionarioEnSesion?.Rol;
 
                 if (string.IsNullOrEmpty(cedula))
                 {
                     throw new Exception("No se pudo obtener la cédula del usuario en sesión.");
                 }
 
-                var listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosConEvaluacionCerradasPorJefe(cedula);
+                List<FuncionarioModel> listaSubAlternos;
+
+                if (rol == "Recursos Humanos") 
+                {
+                    listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosConEvaluacionCerradasParaRH();
+                }
+                else
+                {
+                    listaSubAlternos = _servicioMantenimientos.Funcionario.ListarSubAlternosConEvaluacionCerradasPorJefe(cedula);
+                }
 
                 return View(listaSubAlternos);
-
 
             }
             catch (Exception)
@@ -293,7 +302,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
         {
             try
             {
-                var rutaCarpeta = Server.MapPath("~/sources/manuales");
+                var rutaCarpeta = Server.MapPath("~/sources/docs");
 
                 if (!Directory.Exists(rutaCarpeta))
                 {
@@ -307,7 +316,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     .Select(fullPath => new ReportePdfViewModel
                     {
                         NombreArchivo = Path.GetFileName(fullPath),
-                        RutaRelativa = Url.Content("~/Manuales/" + Path.GetFileName(fullPath)),
+                        RutaRelativa = Url.Content("~/sources/docs/" + Path.GetFileName(fullPath)),
                         FechaCreacion = System.IO.File.GetCreationTime(fullPath)
                     })
                     .OrderByDescending(r => r.FechaCreacion)

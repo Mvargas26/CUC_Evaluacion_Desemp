@@ -438,6 +438,44 @@ namespace Negocios
             }
 
             return lista;
+        }//fin
+
+        public List<FuncionarioModel> ListarSubAlternosConEvaluacionCerradasParaRH()
+        {
+            var parametros = new SqlParameter[]
+            {
+        new SqlParameter("@MensajeError", SqlDbType.VarChar, 500)
+        {
+            Direction = ParameterDirection.Output
+        }
+            };
+
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_ListarSubAlternosConEvaluacionCerradasParaRH", parametros);
+
+            string mensajeError = parametros[0].Value?.ToString();
+            if (!string.IsNullOrWhiteSpace(mensajeError) && mensajeError != "OK")
+            {
+                throw new Exception("Error SP: " + mensajeError);
+            }
+
+            var lista = new List<FuncionarioModel>();
+            foreach (DataRow row in dt.Rows)
+            {
+                lista.Add(new FuncionarioModel
+                {
+                    Cedula = row["cedula"].ToString(),
+                    Nombre = row["nombre"].ToString(),
+                    Apellido1 = row["apellido1"].ToString(),
+                    Apellido2 = row["apellido2"].ToString(),
+                    IdRol = Convert.ToInt32(row["idRol"]),
+                    IdPuesto = Convert.ToInt32(row["idPuesto"]),
+                    IdEstadoFuncionario = Convert.ToInt32(row["idEstadoFuncionario"]),
+                    Dependencia = row["Dependencia"].ToString(),
+                    CedJefeInmediato = row["cedJefeInmediato"].ToString()
+                });
+            }
+
+            return lista;
         }
 
         public bool ModificarPasswordFuncionario(FuncionarioModel funcionario)
