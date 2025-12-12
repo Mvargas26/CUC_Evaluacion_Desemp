@@ -1,4 +1,5 @@
-﻿using Entidades.AuthModels;
+﻿using Entidades;
+using Entidades.AuthModels;
 using Negocios;
 using Negocios.Services;
 using System;
@@ -20,6 +21,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
         private readonly int maxIntentos = 5;
         private readonly TimeSpan duracionBloqueo = TimeSpan.FromMinutes(5);
         private readonly int segundosDeEspera = 300;
+        FuncionarioModel FuncionarioEnSesion = FuncionarioLogueado.retornarDatosFunc();
+
 
         public AuthController(IMantenimientosService servicio)
         {
@@ -137,7 +140,6 @@ namespace CUC_Evaluacion_Desemp.Controllers
             return RedirectToAction("Login");
         }//fin 
 
-
         [HttpGet]
         public ActionResult VerificarCodigo()
         {
@@ -247,7 +249,28 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
             return new string(resultado);
         }
-        
+
+        [HttpPost]
+        public JsonResult CambiarPasswordAjax(string password)
+        {
+            try
+            {
+                var usuario = FuncionarioEnSesion;
+                if (usuario == null)
+                    return Json(new { ok = false, mensaje = "Sesión no válida." });
+
+                var modelo = new FuncionarioModel { Cedula = usuario.Cedula, Password = password };
+
+                var resultado = _servicioMantenimientos.Funcionario.ModificarPasswordFuncionario(modelo);
+
+                return Json(new { ok = resultado });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { ok = false, mensaje = ex.Message });
+            }
+        }
+
         #endregion
     }//fin controller
 }//fin space

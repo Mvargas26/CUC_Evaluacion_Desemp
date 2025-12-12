@@ -31,16 +31,25 @@
 
     <div class="mb-3 text-start">
         <label class="form-label">Contraseña:</label>
-        @Html.PasswordFor(m => m.Password, new
-        {
-            @class = "form-control",
-            placeholder = "Ingrese su contraseña",
-            required = "required",
-            oninvalid = "this.setCustomValidity('Por favor, ingrese su contraseña')",
-            oninput = "this.setCustomValidity('')"
-        })
+
+        <div class="input-group">
+            @Html.PasswordFor(m => m.Password, new
+            {
+                @class = "form-control",
+                placeholder = "Ingrese su contraseña",
+                required = "required",
+                oninvalid = "this.setCustomValidity('Por favor, ingrese su contraseña')",
+                oninput = "this.setCustomValidity('')",
+                id = "PasswordLogin"
+            })
+            <button type="button" class="btn btn-outline-secondary" onclick="togglePass('PasswordLogin', this)">
+                <i class="bi bi-eye"></i>
+            </button>
+        </div>
+
         @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
     </div>
+
 
     <div class="text-center">
         <a href="/Auth/RecuperarPassword" class="text-decoration-none link">¿Olvidó su Contraseña?</a>
