@@ -111,40 +111,110 @@ function actualizarObjetivosEnTbResultados() {
 }//fin
 
 function actualizarCompetenciasEnTbResultados() {
-    let total = 0;
 
-    $('#tbTransversalesEval select.select-nivel-obtenido, #tbCompetenciasEval select.select-nivel-obtenido').each(function () {
-        const v = parseFloat($(this).val() || '0');
-        if (!isNaN(v)) total += v;
+    var puntajesPorTipo = {}; 
+
+    // -------------------------------------------------------------------
+    // 1. Recorrer SOLO competencias del conglomerado (NO transversales)
+    // -------------------------------------------------------------------
+    $('#tbCompetenciasEval tbody tr').each(function () {
+
+        var fila = $(this);
+
+        // Identifica filas que representan tipo de competencia (cabeceras)
+        var tipoId = fila.data('id-tipo');
+
+        // Cuando encontramos una fila que marca un tipo, actualizamos el tipo actual
+        if (tipoId) {
+            puntajesPorTipo[tipoId] = { obtenido: 0, maximo: 0 };
+            window.tipoActualCompetencia = tipoId; // guardar tipo activo
+            return;
+        }
+
+        // Filas de comportamientos
+        if (fila.data('comportamiento-id')) {
+
+            var select = fila.find('select.select-nivel-obtenido')[0];
+            if (!select) return;
+
+            var valorSeleccionado = 0;
+            var maxComportamiento = 0;
+
+            // recorrer las opciones del select
+            for (var i = 0; i < select.options.length; i++) {
+                var opt = select.options[i];
+                if (opt.disabled) continue;
+
+                var val = parseFloat(opt.dataset.valor || opt.value || '0');
+                if (isNaN(val)) continue;
+
+                if (opt.selected) {
+                    valorSeleccionado = val;
+                }
+                if (val > maxComportamiento) {
+                    maxComportamiento = val;
+                }
+            }
+
+            // acumular puntajes para este tipo
+            puntajesPorTipo[window.tipoActualCompetencia].obtenido += valorSeleccionado;
+            puntajesPorTipo[window.tipoActualCompetencia].maximo += maxComportamiento;
+        }
     });
 
-    const max = Number($('#MaximoPuntosCompetencias').val() || 0);
-    const porcLogro = max > 0 ? (total * 100) / max : 0;
+    // -------------------------------------------------------------------
+    // 2. Aplicar los valores por tipo al cuadro resumen
+    // -------------------------------------------------------------------
+    $('#tablaResultados tbody tr').each(function () {
 
-    let $filaComp = $('#tablaResultados tbody tr').has('td[data-tipo-categoria="Competencia"]').first();
-    if (!$filaComp.length) {
-        $filaComp = $('#tablaResultados tbody tr').filter(function () {
-            const txt = $(this).find('td:first').text().trim().toLowerCase();
-            return txt.includes('competencia');
-        }).first();
-    }
+        var filaResumen = $(this);
+        var categoria = filaResumen.find('td[data-tipo-categoria]').data('tipo-categoria');
 
-    if ($filaComp.length) {
-        const porcTxt = $filaComp.find('td').eq(1).text();
-        const porcCategoria = parseFloat(porcTxt.replace('%', '').replace(',', '.').trim()) || 0;
-        const ponderado = (porcLogro * porcCategoria) / 100;
-        $filaComp.find('.input-calificacion').val(ponderado.toFixed(1));
-    }
+        // Solo aplicar para tipos de Competencia
+        if (!categoria || String(categoria).toLowerCase() !== 'competencia') {
+            return;
+        }
 
-    let totalGeneral = 0;
+        var tipoIdResumen = filaResumen.find('td[data-tipo-id]').data('tipo-id');
+
+        if (!puntajesPorTipo[tipoIdResumen]) {
+            // No hay puntaje asignado a este tipo (no debería pasar)
+            filaResumen.find('.input-calificacion').val("0");
+            return;
+        }
+
+        var obtenido = puntajesPorTipo[tipoIdResumen].obtenido;
+        var maximo = puntajesPorTipo[tipoIdResumen].maximo;
+
+        var porcLogroTipo = maximo > 0 ? (obtenido * 100) / maximo : 0;
+
+        // porcentaje que tiene este tipo en el conglomerado
+        var porcCategoria = parseFloat(
+            filaResumen.find('td').eq(1).text().replace('%', '').trim()
+        ) || 0;
+
+        // Ponderado final para este tipo
+        var valorFinal = (porcLogroTipo * porcCategoria) / 100;
+
+        filaResumen.find('.input-calificacion').val(valorFinal.toFixed(1));
+    });
+
+    // -------------------------------------------------------------------
+    // 3. Calcular el total general del cuadro resumen
+    // -------------------------------------------------------------------
+    var totalGeneral = 0;
+
     $('#tablaResultados .input-calificacion').each(function () {
-        const v = parseFloat($(this).val() || '0');
+        var v = parseFloat($(this).val() || '0');
         if (!isNaN(v)) totalGeneral += v;
     });
+
     $('#resultado-total').val(totalGeneral.toFixed(1));
 
-    return { total, porcLogro, totalGeneral };
+    // retorno opcional para debug
+    return puntajesPorTipo;
 }
+
 
 // Disparo al cambiar los combos de competencias/transversales
 $(document).on('change', '#tbTransversalesEval select.select-nivel-obtenido, #tbCompetenciasEval select.select-nivel-obtenido', function () {

@@ -239,7 +239,7 @@
                 {
                     var niveles = comp.Comportamientos
                         .SelectMany(c => c.Niveles)
-                        .GroupBy(n => new { n.idNivel, n.nombre })
+                        .GroupBy(n => new { n.idNivel, n.nombre, n.valor })
                         .OrderBy(g => g.Key.idNivel)
                         .Select(g => g.Key)
                         .ToList();
@@ -259,7 +259,7 @@
                         <th>Comportamientos</th>
                         @foreach (var n in niveles)
                         {
-                            <th data-nivel-id="@n.idNivel">@n.nombre</th>
+                            <th data-nivel-id="@n.idNivel">@n.nombre = @n.valor</th>
                         }
                         <th>Asignar Nivel</th>
                     </tr>
