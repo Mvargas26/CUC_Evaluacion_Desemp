@@ -229,6 +229,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
         }//fin
 
         [AutorizarRol("Jefatura", "Recursos Humanos")]
+        
         [HttpPost]
         public ActionResult ReportesPDFPorFuncionario(string cedulaSeleccionada)
         {
@@ -236,8 +237,8 @@ namespace CUC_Evaluacion_Desemp.Controllers
             {
                 if (string.IsNullOrEmpty(cedulaSeleccionada))
                 {
-                    TempData["MensajeError"] = "Debe seleccionar un subalterno.";
-                    return RedirectToAction("SeleccionarSubalternoReporteEvaluacion");
+                    TempData["AlertaSweet"] = "Error al cargar los reportes.";
+                    return RedirectToAction("Index","Home");
                 }
 
                 return RedirectToAction(nameof(ListarReportesFuncionario), new { cedula = cedulaSeleccionada });
@@ -293,6 +294,19 @@ namespace CUC_Evaluacion_Desemp.Controllers
             }
         }
 
+        [HttpGet]
+        public ActionResult ConsultarReportesPropios()
+        {
+            var cedula = FuncionarioEnSesion?.Cedula;
+
+            if (string.IsNullOrEmpty(cedula))
+            {
+                throw new Exception("No se pudo obtener la cédula del usuario en sesión.");
+            }
+
+            return ReportesPDFPorFuncionario(cedula);
+
+        }//fin ConsultarReportesPropios
 
         #endregion
 

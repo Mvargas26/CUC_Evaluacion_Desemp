@@ -251,10 +251,14 @@
                         {
                             @:{ text: "Reporte General RH", url: "@Url.Action("ReporteGeneralRH", "Reportes")" },
                         }
-                         @if (FuncionarioLogueado.EsRecursosHumanos() || FuncionarioLogueado.EsJefatura())
+                        @if (FuncionarioLogueado.EsRecursosHumanos() || FuncionarioLogueado.EsJefatura())
                         {
                             @:{ text: "Reportes PDF por funcionario", url: "@Url.Action("SeleccionarSubalternoReporteEvaluacion", "Reportes")" },
                         }
+                        @if (FuncionarioLogueado.EsSubalterno() || FuncionarioLogueado.EsJefatura())
+                             {
+                                 @:{ text: "Consultar Reportes Propios", url: "@Url.Action("ConsultarReportesPropios", "Reportes")" },
+                             }
                     ]
                 }
             ]

@@ -282,7 +282,14 @@
     <Content Include="Views\Mantenimientos\SeleccionarConglomeradoParaPesos.cshtml" />
     <Content Include="Views\Reportes\ManualesUsuario.cshtml" />
     <Content Include="Views\Home\AccesoDenegado.cshtml" />
-    <Content Include="sources\docs\planificar.pdf" />
+    <Content Include="sources\docs\Cierre.pdf" />
+    <Content Include="sources\docs\Competencias.pdf" />
+    <Content Include="sources\docs\Iniciar Sesion.pdf" />
+    <Content Include="sources\docs\Mantenimiento Funcionarios.pdf" />
+    <Content Include="sources\docs\Mantenimiento Puestos.pdf" />
+    <Content Include="sources\docs\Reportes funcionario.pdf" />
+    <Content Include="sources\docs\Seguimientos.pdf" />
+    <Content Include="sources\docs\Planificar.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
