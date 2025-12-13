@@ -15,6 +15,16 @@ function inicializarEventos() {
 
 document.getElementById("btnCerrarEvaluación").addEventListener("click", enviarEvaluacion);
 
+//Activa y desactiva el check del  comentario final
+document.addEventListener('DOMContentLoaded', function () {
+    const chk = document.getElementById('chkComentarioFinal');
+    const contenedor = document.getElementById('contenedorComentarioFinal');
+
+    chk.addEventListener('change', function () {
+        contenedor.style.display = this.checked ? 'block' : 'none';
+    });
+});
+
 //*******************************************************************************************************************************
 //***********************************  Seccion Objetivos                    *****************************************************
 function functionModalObjetivos() {
@@ -235,6 +245,9 @@ function enviarEvaluacion() {
 
     //Recolectamos lo otro
     const observaciones = document.getElementById('txtObservaciones').value;
+    const comentarioFinal = document.getElementById('chkComentarioFinal').checked
+        ? document.getElementById('txtComentarioFinal').value.trim()
+        : null;
     const cedFuncionario = document.getElementById('ceduFuncionario').innerText;
     const idConglo = document.getElementById('idConglo').innerText;
     const notaFinal = document.getElementById('resultado-total').value;
@@ -279,6 +292,7 @@ function enviarEvaluacion() {
         competenciasTransversales: competenciasTransversales,
         competencias: competencias,
         observaciones: observaciones,
+        comentarioFinal: comentarioFinal,
         cedFuncionario: cedFuncionario,
         idConglo: idConglo,
         idPeriodo: idPeriodo,

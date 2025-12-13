@@ -22,5 +22,7 @@ namespace Entidades
         public int? IdPeriodo { get; set; }
         public decimal? NotaFinal { get; set; }
 
+        public string ComentarioFinal { get; set; }
+
     }//Fin Clase
 }//Fin Space 

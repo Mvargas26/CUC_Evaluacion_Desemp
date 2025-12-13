@@ -35,6 +35,7 @@ namespace Negocios
                     IdFuncionario = row["idFuncionario"].ToString(),
                     IdConglomerado = Convert.ToInt32(row["idConglomerado"]),
                     Observaciones = row["Observaciones"]?.ToString(),
+                    ComentarioFinal = row["ComentarioFinal"]?.ToString(),
                     FechaCreacion = Convert.ToDateTime(row["fechaCreacion"]),
                     EstadoEvaluacion = Convert.ToInt32(row["estadoEvaluacion"]),
                     IdPeriodo = row["idPeriodo"] != DBNull.Value ? Convert.ToInt32(row["idPeriodo"]) : (int?)null,
@@ -53,12 +54,13 @@ namespace Negocios
                 new SqlParameter("@idFuncionario", nueva.IdFuncionario),
                 new SqlParameter("@idConglomerado", nueva.IdConglomerado),
                 new SqlParameter("@Observaciones", (object)nueva.Observaciones ?? DBNull.Value),
+                new SqlParameter("@ComentarioFinal", (object)nueva.Observaciones ?? DBNull.Value),
                 new SqlParameter("@fechaCreacion", fechaTratada),
                 new SqlParameter("@estadoEvaluacion", nueva.EstadoEvaluacion),
                 new SqlParameter("@idPeriodo", (object)nueva.IdPeriodo ?? DBNull.Value),
                 new SqlParameter("@notaFinal", (object)nueva.NotaFinal ?? DBNull.Value)
             };
-            DataTable dt = _accesoBD.EjecutarSPconDT("[sp_Evaluacion_CRUD]", parametros);
+            DataTable dt = _accesoBD.EjecutarSPconDT("sp_Evaluacion_CRUD", parametros);
             if (dt.Rows.Count == 0)
                 return null;
             DataRow row = dt.Rows[0];
@@ -77,6 +79,7 @@ namespace Negocios
                 new SqlParameter("@idFuncionario", evaluacion.IdFuncionario),
                 new SqlParameter("@idConglomerado", (object)evaluacion.IdConglomerado ?? DBNull.Value),
                 new SqlParameter("@Observaciones", (object)evaluacion.Observaciones ?? DBNull.Value),
+                new SqlParameter("@ComentarioFinal", (object)evaluacion.Observaciones ?? DBNull.Value),
                 new SqlParameter("@fechaCreacion", evaluacion.FechaCreacion),
                 new SqlParameter("@estadoEvaluacion", evaluacion.EstadoEvaluacion),
                 new SqlParameter("@idPeriodo", (object)evaluacion.IdPeriodo ?? DBNull.Value),
@@ -84,17 +87,6 @@ namespace Negocios
             };
             _accesoBD.EjecutarSPconDT("sp_Evaluacion_CRUD", parametros);
         }//ModificarEvaluacion
-
-        public void EliminarEvaluacion(int idEvaluacion)
-        {
-            var parametros = new SqlParameter[]
-            {
-            new SqlParameter("@Accion", "DELETE"),
-            new SqlParameter("@IdEvaluacion", idEvaluacion)
-            };
-
-            _accesoBD.EjecutarSPconDT("sp_CrudEvaluaciones", parametros);
-        }
 
         public EvaluacionModel ConsultarEvaluacionPorID(int idEvaluacion)
         {
@@ -113,6 +105,7 @@ namespace Negocios
                 IdFuncionario = row["idFuncionario"] != DBNull.Value ? row["idFuncionario"].ToString() : null,
                 IdConglomerado = Convert.ToInt32(row["idConglomerado"]),
                 Observaciones = row["Observaciones"] != DBNull.Value ? row["Observaciones"].ToString() : null,
+                ComentarioFinal = row["ComentarioFinal"] != DBNull.Value ? row["Observaciones"].ToString() : null,
                 FechaCreacion = Convert.ToDateTime(row["fechaCreacion"]),
                 EstadoEvaluacion = Convert.ToInt32(row["estadoEvaluacion"]),
                 IdPeriodo = row["idPeriodo"] != DBNull.Value ? Convert.ToInt32(row["idPeriodo"]) : (int?)null,
@@ -141,31 +134,7 @@ namespace Negocios
                 IdFuncionario = row["idFuncionario"].ToString(),
                 IdConglomerado = Convert.ToInt32(row["idConglomerado"]),
                 Observaciones = row["Observaciones"]?.ToString(),
-                FechaCreacion = Convert.ToDateTime(row["fechaCreacion"]),
-                EstadoEvaluacion = Convert.ToInt32(row["estadoEvaluacion"]),
-            };
-        }
-
-        public EvaluacionModel ConsultarEvaluacionPorAprobar(string idFuncionario, int idConglomerado)
-        {
-            var parametros = new SqlParameter[]
-            {
-            new SqlParameter("@idFuncionario", idFuncionario),
-            new SqlParameter("@idConglomerado", idConglomerado)
-            };
-
-            DataTable dt = _accesoBD.EjecutarSPconDT("sp_ConsultarEvaluacionPorAprobar", parametros);
-
-            if (dt.Rows.Count == 0)
-                return null;
-
-            DataRow row = dt.Rows[0];
-
-            return new EvaluacionModel
-            {
-                IdEvaluacion = Convert.ToInt32(row["idEvaluacion"]),
-                IdFuncionario = row["idFuncionario"].ToString(),
-                Observaciones = row["Observaciones"]?.ToString(),
+                ComentarioFinal = row["ComentarioFinal"]?.ToString(),
                 FechaCreacion = Convert.ToDateTime(row["fechaCreacion"]),
                 EstadoEvaluacion = Convert.ToInt32(row["estadoEvaluacion"]),
             };

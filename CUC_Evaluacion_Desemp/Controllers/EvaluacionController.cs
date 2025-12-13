@@ -1030,6 +1030,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var cedFuncionario = dataEnJSon["cedFuncionario"]?.ToString();
                 var idConglo = dataEnJSon["idConglo"]?.ToString();
                 var observaciones = dataEnJSon["observaciones"]?.ToString();
+                var comentarioFinal = dataEnJSon["comentarioFinal"]?.ToString();
 
                 var objetivos = dataEnJSon["objetivos"];
                 var competenciasTransversales = dataEnJSon["competenciasTransversales"];
@@ -1052,6 +1053,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 //actualizamos su estado y lo guardamos
                 ultimaEvaluacionFuncionario.EstadoEvaluacion = 3; //"Estado 3 = Cierre de evaluación"
                 ultimaEvaluacionFuncionario.Observaciones = observaciones;
+                ultimaEvaluacionFuncionario.ComentarioFinal = comentarioFinal;
                 ultimaEvaluacionFuncionario.NotaFinal = Convert.ToDecimal(notaFinal);
                 ultimaEvaluacionFuncionario.IdPeriodo = Convert.ToInt32(idPeriodo);
                 _servicioMantenimientos.Evaluaciones.ModificarEvaluacion(ultimaEvaluacionFuncionario);
@@ -1445,7 +1447,17 @@ namespace CUC_Evaluacion_Desemp.Controllers
 
                         var tablaComentarios = new PdfPTable(1) { WidthPercentage = 100 };
                         tablaComentarios.AddCell(celdaTituloComentarios);
-                        tablaComentarios.AddCell(new PdfPCell(new Phrase("\n\n\n", fTxt)) { FixedHeight = 60f }); // espacio para escribir
+
+                        var textoComentario = string.IsNullOrWhiteSpace(eva.ComentarioFinal)
+                        ? "No se registraron comentarios finales."
+                        : eva.ComentarioFinal;
+
+                        tablaComentarios.AddCell(new PdfPCell(new Phrase(textoComentario, fTxt))
+                        {
+                            Padding = 8f,
+                            MinimumHeight = 60f
+                        });
+
                         doc.Add(tablaComentarios);
 
                         doc.Add(Chunk.NEWLINE);
