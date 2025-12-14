@@ -255,7 +255,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
         }
 
         [HttpPost]
-        public ActionResult GuardarPlanificacion(string evaluacionData )
+        public ActionResult GuardarPlanificacion(string evaluacionData)
         {
             try
             {
@@ -283,7 +283,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     EstadoEvaluacion = 1, // planificada
                     IdConglomerado = Convert.ToInt32(idConglo),
                     IdPeriodo = Convert.ToInt32(idPeriodo),
-                    NotaFinal=Convert.ToDecimal(notaFinal)
+                    NotaFinal = Convert.ToDecimal(notaFinal)
                 });
 
                 // Guardamos los objetivos ya teniendo el id de la eva
@@ -321,7 +321,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                 IdCompetencia = idCompetencia,
                                 IdComportamiento = idComportamiento,
                                 IdNivel = idNivel,
-                                ValorObtenido = 0 
+                                ValorObtenido = 0
                             };
 
                             _servicioMantenimientos.EvaluacionXcompetencia.CrearEvaluacionXCompetencia(evaluacionXCompetencia);
@@ -349,7 +349,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                                 IdCompetencia = idCompetencia,
                                 IdComportamiento = idComportamiento,
                                 IdNivel = idNivel,
-                                ValorObtenido = 0 
+                                ValorObtenido = 0
                             };
 
                             _servicioMantenimientos.EvaluacionXcompetencia.CrearEvaluacionXCompetencia(evaluacionXCompetencia);
@@ -360,18 +360,21 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 // Construimos la URL del PDF para mostrarlo al usuario
                 var fechaNorm = DateTime.Now.ToString("yyyyMMdd_HHmm");
                 var nombreArchivo = $"planificar_{cedFuncionario}_{fechaNorm}.pdf";
-                CrearReportePDFEvaluacion(dataEnJSon, evaluacionGuardada, nombreArchivo,faseActual);
+                CrearReportePDFEvaluacion(dataEnJSon, evaluacionGuardada, nombreArchivo, faseActual);
 
-                var urlArchivo = Url.Content("~/Reportes/"+cedFuncionario+"/" + nombreArchivo);
+                var urlArchivo = Url.Content("~/Reportes/" + cedFuncionario + "/" + nombreArchivo);
                 return Json(new { ok = true, pdfUrl = urlArchivo, fileName = nombreArchivo, message = "Evaluación planificada correctamente" }, JsonRequestBehavior.AllowGet);
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                return RedirectToAction("Index", "Home");
+                return Json(new
+                {
+                    ok = false,
+                    message = "Error al guardar la planificación: "+ex.Message,
+                    detalle = ex.Message
+                }, JsonRequestBehavior.AllowGet);
             }
-
         }// fin GuardarPlanificacion
 
         #endregion

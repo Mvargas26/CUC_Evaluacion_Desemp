@@ -654,7 +654,20 @@ async function enviarPeticionEvaluacion(evaluacionData) {
         if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
 
         const data = await response.json();
-        if (!data.ok) throw new Error(data.error || 'Error al guardar la planificación');
+        if (!data.ok) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al guardar la planificación',
+                html: `
+            <div style="text-align:left;font-size:13px;">
+                <b>Mensaje:</b><br>${data.message}<br><br>
+                <b>Detalle técnico:</b><br>
+                <pre style="white-space:pre-wrap;">${data.detalle}</pre>
+            </div>
+        `
+            });
+            return;
+        }
 
         await Swal.fire({
             title: 'Evaluación planificada correctamente',
