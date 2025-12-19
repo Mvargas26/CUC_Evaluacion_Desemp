@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Negocios.Services
@@ -24,32 +21,44 @@ namespace Negocios.Services
             _correoPass = ConfigurationManager.AppSettings["Correo_Pass"];
         }
 
+        private SmtpClient CrearCliente()
+        {
+            return new SmtpClient(_smtpServer)
+            {
+                Port = _smtpPort,
+                Credentials = new NetworkCredential(_correoUsuario, _correoPass),
+                EnableSsl = true
+            };
+        }
+
         public async Task EnviarCodigoSeguridad(string correo, string codigo)
         {
             try
             {
-                var clienteCorreo = new SmtpClient(_smtpServer)
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+                using (var clienteCorreo = new SmtpClient(_smtpServer))
                 {
-                    Port = _smtpPort,
-                    Credentials = new NetworkCredential(_correoUsuario, _correoPass),
-                    EnableSsl = true
-                };
+                    clienteCorreo.Port = _smtpPort;
+                    clienteCorreo.Credentials = new NetworkCredential(_correoUsuario, _correoPass);
+                    clienteCorreo.EnableSsl = true;
+                    clienteCorreo.Timeout = 20000;
 
-                var mensaje = new MailMessage
-                {
-                    From = new MailAddress(_correoUsuario),
-                    Subject = "Código de seguridad: " + codigo,
-                    Body = "Tu código de seguridad es " + codigo,
-                    IsBodyHtml = false
-                };
+                    using (var mensaje = new MailMessage())
+                    {
+                        mensaje.From = new MailAddress(_correoUsuario);
+                        mensaje.To.Add(correo);
+                        mensaje.Subject = "Código de seguridad";
+                        mensaje.Body = "Tu código de seguridad es: " + codigo;
+                        mensaje.IsBodyHtml = false;
 
-                mensaje.To.Add(correo);
-
-                await clienteCorreo.SendMailAsync(mensaje);
+                        await clienteCorreo.SendMailAsync(mensaje);
+                    }
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al enviar el correo de seguridad.", ex);
+                throw new Exception("Error al enviar el código de seguridad por correo.", ex);
             }
         }
 
@@ -57,30 +66,29 @@ namespace Negocios.Services
         {
             try
             {
-                var clienteCorreo = new SmtpClient(_smtpServer)
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+                using (var clienteCorreo = CrearCliente())
                 {
-                    Port = _smtpPort,
-                    Credentials = new NetworkCredential(_correoUsuario, _correoPass),
-                    EnableSsl = true
-                };
+                    clienteCorreo.Timeout = 20000;
 
-                var mensaje = new MailMessage
-                {
-                    From = new MailAddress(_correoUsuario),
-                    Subject = "Solicitud Clave temporal",
-                    Body = "Usted solicitó una clave temporal, ingrese: " + passwordTemporal,
-                    IsBodyHtml = false
-                };
+                    using (var mensaje = new MailMessage())
+                    {
+                        mensaje.From = new MailAddress(_correoUsuario);
+                        mensaje.To.Add(correo);
+                        mensaje.Subject = "Clave temporal";
+                        mensaje.Body = "Usted solicitó una clave temporal: " + passwordTemporal;
+                        mensaje.IsBodyHtml = false;
 
-                mensaje.To.Add(correo);
-
-                await clienteCorreo.SendMailAsync(mensaje);
+                        await clienteCorreo.SendMailAsync(mensaje);
+                    }
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al enviar el correo de seguridad.", ex);
+                throw new Exception("Error al enviar la clave temporal por correo.", ex);
             }
         }
-    }
 
-}//fin space
+    }
+}
