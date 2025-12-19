@@ -261,7 +261,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     return RedirectToAction(nameof(SeleccionarSubalternoReporteEvaluacion));
                 }
 
-                var rutaCarpeta = Server.MapPath("~/Reportes/" + cedula);
+                var rutaCarpeta = Server.MapPath("~/sources/docs/Reportes/" + cedula);
 
                 if (!Directory.Exists(rutaCarpeta))
                 {
@@ -276,7 +276,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     .Select(fullPath => new ReportePdfViewModel
                     {
                         NombreArchivo = Path.GetFileName(fullPath),
-                        RutaRelativa = Url.Content("~/Reportes/" + cedula + "/" + Path.GetFileName(fullPath)),
+                        RutaRelativa = Url.Content("~/sources/docs/Reportes/" + cedula + "/" + Path.GetFileName(fullPath)),
                         FechaCreacion = System.IO.File.GetCreationTime(fullPath)
                     })
                     .OrderByDescending(r => r.FechaCreacion)
@@ -365,7 +365,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 // Obtener descripción del filtro
                 string descripcionFiltro = ObtenerDescripcionFiltro(tipoReporte, filtro);
 
-                var dir = Server.MapPath("~/Reportes/ReportesRH");
+                var dir = Server.MapPath("~/sources/docs/Reportes/ReportesRH");
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
                 var nombreArchivo = $"ReporteDesempeno_{tipoReporte}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
@@ -570,7 +570,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                     success = true,
                     message = "Reporte generado correctamente.",
                     nombreArchivo = nombreArchivo,
-                    rutaDescarga = Url.Content($"~/Reportes/ReportesRH/{nombreArchivo}")
+                    rutaDescarga = Url.Content($"~/sources/docs/Reportes/ReportesRH/{nombreArchivo}")
                 });
             }
             catch (Exception ex)

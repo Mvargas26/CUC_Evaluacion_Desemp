@@ -362,7 +362,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var nombreArchivo = $"planificar_{cedFuncionario}_{fechaNorm}.pdf";
                 CrearReportePDFEvaluacion(dataEnJSon, evaluacionGuardada, nombreArchivo, faseActual);
 
-                var urlArchivo = Url.Content("~/Reportes/" + cedFuncionario + "/" + nombreArchivo);
+                var urlArchivo = Url.Content("~/sources/docs/Reportes/" + cedFuncionario + "/" + nombreArchivo);
                 return Json(new { ok = true, pdfUrl = urlArchivo, fileName = nombreArchivo, message = "Evaluación planificada correctamente" }, JsonRequestBehavior.AllowGet);
 
             }
@@ -771,7 +771,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var nombreArchivo = $"seguimiento_{cedFuncionario}_{fechaNorm}.pdf";
                 CrearReportePDFEvaluacion(dataEnJSon, ultimaEvaluacionFuncionario, nombreArchivo,faseActual);
 
-                var urlArchivo = Url.Content("~/Reportes/" + cedFuncionario + "/" + nombreArchivo);
+                var urlArchivo = Url.Content("~/sources/docs/Reportes/" + cedFuncionario + "/" + nombreArchivo);
                 return Json(new { ok = true, pdfUrl = urlArchivo, fileName = nombreArchivo, message = "Seguimiento guardado correctamente" }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -1175,7 +1175,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var nombreArchivo = $"cierreEvaluacion_{cedFuncionario}_{fechaNorm}.pdf";
                 CrearReportePDFEvaluacion(dataEnJSon, ultimaEvaluacionFuncionario, nombreArchivo,faseActual);
 
-                var urlArchivo = Url.Content("~/Reportes/" + cedFuncionario + "/" + nombreArchivo);
+                var urlArchivo = Url.Content("~/sources/docs/Reportes/" + cedFuncionario + "/" + nombreArchivo);
                 return Json(new { ok = true, pdfUrl = urlArchivo, fileName = nombreArchivo, message = "Seguimiento guardado correctamente" }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -1195,7 +1195,7 @@ namespace CUC_Evaluacion_Desemp.Controllers
                 var idConglo = data["idConglo"]?.ToString();
                 var DependenciaFuncionario = data["Dependencia"]?.ToString();
                 var Conglo = _servicioMantenimientos.Conglomerados.ConsultarConglomeradoID(Convert.ToInt32(idConglo));
-                var dir = Server.MapPath("~/Reportes/" + data["cedFuncionario"]?.ToString());
+                var dir = Server.MapPath("~/sources/docs/Reportes/" + data["cedFuncionario"]?.ToString());
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
                 var ced = data["cedFuncionario"]?.ToString() ?? eva.IdFuncionario ?? "sincedula";
                 var ruta = Path.Combine(dir, nombreArchivo);
